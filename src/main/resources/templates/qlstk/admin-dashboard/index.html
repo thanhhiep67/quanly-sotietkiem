@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi" class="light" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QUẢN LÝ TIẾT KIỆM - Tổng quan</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="admin-dashboard/css/styles.css">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+
+<div class="flex h-screen overflow-hidden">
+
+    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-3 rounded-xl">
+                    <span class="material-icons-outlined text-white text-3xl">savings</span>
+                </div>
+                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
+            <div>
+                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
+                <ul class="space-y-1">
+                    <li><a href="admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
+                    <li><a href="admin/mo-so-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
+                    <li><a href="admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
+                    <li><a href="admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
+                <ul class="space-y-1">
+                    <li><a href="admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
+                    <li><a href="admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
+                    <li><a href="admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center gap-3 px-2 mb-4">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">AD</div>
+                <div>
+                    <p class="text-sm font-medium text-white">Quản trị viên</p>
+                    <p class="text-xs text-slate-500">admin@system.com</p>
+                </div>
+            </div>
+            <button id="btn-logout" class="w-full flex items-center justify-center gap-2 py-3 bg-red-900/20 text-red-400 rounded-lg hover:bg-red-900/40 transition-all">
+                <span class="material-icons-outlined text-sm">logout</span> Đăng xuất
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto flex flex-col">
+        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <h2 class="text-xl font-bold text-slate-800">Bảng điều khiển</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <span class="material-icons-outlined text-gray-500 p-2 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200 transition">notifications</span>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </div>
+                <a href="mo-so-tiet-kiem.html" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                    <span class="material-icons-outlined">add</span> Mở sổ mới
+                </a>
+            </div>
+        </header>
+
+        <div class="p-6 lg:p-8 space-y-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-blue-50 p-3 rounded-lg text-blue-600"><span class="material-icons-outlined">payments</span></div>
+                        <span class="text-green-500 text-sm font-bold flex items-center gap-1"><span class="material-icons-outlined text-xs">trending_up</span>+8.4%</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium">TỔNG DOANH SỐ GỬI</p>
+                    <h3 class="text-3xl font-bold mt-1 text-slate-800">128.500.000.000đ</h3>
+                </div>
+                <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-purple-50 p-3 rounded-lg text-purple-600"><span class="material-icons-outlined">account_balance_wallet</span></div>
+                        <span class="text-gray-400 text-sm font-medium">Ổn định</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium">SỔ ĐANG HOẠT ĐỘNG</p>
+                    <h3 class="text-3xl font-bold mt-1 text-slate-800">4.240 Sổ</h3>
+                </div>
+                <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-orange-50 p-3 rounded-lg text-orange-600"><span class="material-icons-outlined">people</span></div>
+                        <span class="text-green-500 text-sm font-bold flex items-center gap-1"><span class="material-icons-outlined text-xs">trending_up</span>+12%</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium">TỔNG KHÁCH HÀNG</p>
+                    <h3 class="text-3xl font-bold mt-1 text-slate-800">3.850</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-xl font-bold text-slate-800">Tăng trưởng doanh số</h3>
+                        <select class="bg-gray-50 border border-gray-200 text-sm p-2 rounded-lg outline-none">
+                            <option>7 ngày qua</option>
+                            <option>30 ngày qua</option>
+                        </select>
+                    </div>
+                    <div class="h-80 flex items-center justify-center bg-gray-50 border border-dashed border-gray-200 rounded-xl relative">
+                        <div class="text-center">
+                            <span class="material-icons-outlined text-4xl text-gray-300">leaderboard</span>
+                            <p class="text-gray-400 mt-2">[ Khu vực biểu đồ thống kê ]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                    <h3 class="text-xl font-bold text-slate-800 mb-8">Tỷ lệ loại tiết kiệm</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-2"><span>Kỳ hạn 3 tháng</span><span class="text-blue-600">45%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-600 rounded-full" style="width:45%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-2"><span>Kỳ hạn 6 tháng</span><span class="text-purple-600">30%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-purple-600 rounded-full" style="width:30%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-2"><span>Kỳ hạn 12 tháng</span><span class="text-orange-500">15%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-orange-500 rounded-full" style="width:15%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-2"><span>Khác</span><span class="text-gray-400">10%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gray-300 rounded-full" style="width:10%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-slate-800">Giao dịch mới nhất</h3>
+                    <button class="text-blue-600 text-sm font-semibold hover:underline">Xem tất cả</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4">Mã yêu cầu</th>
+                            <th class="px-6 py-4">Khách hàng</th>
+                            <th class="px-6 py-4">Thời hạn</th>
+                            <th class="px-6 py-4">Số tiền gửi</th>
+                            <th class="px-6 py-4">Ngày tạo</th>
+                            <th class="px-6 py-4">Trạng thái</th>
+                            <th class="px-6 py-4">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 text-sm">
+                        <tr th:each="yc : ${yeuCauList}" class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-medium text-blue-600" th:text="${yc.id}"></td>
+                            <td class="px-6 py-4 text-slate-700" th:text="${yc.tenKhachHang}"></td>
+                            <td class="px-6 py-4 text-slate-700" th:text="${yc.thoiHan} + ' tháng'"></td>
+                            <td class="px-6 py-4 font-bold text-slate-800" th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
+                            <td class="px-6 py-4 text-gray-500" th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="px-6 py-4">
+                    <span th:switch="${yc.trangThai}">
+                        <span th:case="'CHO'" class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Chờ duyệt</span>
+                        <span th:case="'DUYET'" class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Đã duyệt</span>
+                        <span th:case="'TU CHOI'" class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Từ chối</span>
+                    </span>
+                            </td>
+                            <td class="px-6 py-4 flex gap-2">
+                                <!-- Nút duyệt -->
+                                <form th:if="${yc.trangThai == 'CHO'}" th:action="@{/admin/duyet-yeu-cau}" method="post">
+                                    <input type="hidden" name="id" th:value="${yc.id}" />
+                                    <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-xs font-bold">
+                                        Duyệt
+                                    </button>
+                                </form>
+                                <!-- Nút từ chối -->
+                                <form th:if="${yc.trangThai == 'CHO'}" th:action="@{/admin/tu-choi-yeu-cau}" method="post">
+                                    <input type="hidden" name="id" th:value="${yc.id}" />
+                                    <input type="text" name="lyDoTuChoi" placeholder="Lý do" class="border rounded px-2 py-1 text-xs"/>
+                                    <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 text-xs font-bold">
+                                        Từ chối
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="mt-auto p-6 bg-white border-t border-gray-200 text-center text-sm text-gray-500">
+            © 2026 Hệ thống quản lý sổ tiết kiệm. Version 1.0.0
+        </footer>
+    </main>
+</div>
+
+<script src="../../../static/css/js/script.js"></script>
+</body>
+</html>

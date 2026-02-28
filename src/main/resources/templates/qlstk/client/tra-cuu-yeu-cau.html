@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Tra cứu yêu cầu mở sổ - MyBank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8fafc] text-slate-900">
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl">
+        <div class="p-8 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg">
+                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                </div>
+                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
+                <span class="material-symbols-outlined">grid_view</span> Tổng quan
+            </a>
+            <a href="tra-cuu-so" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
+
+            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
+                <span class="material-symbols-outlined">history</span> Giao dịch
+            </a>
+            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
+                <span class="material-symbols-outlined">percent</span> Lãi suất
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-800 space-y-2">
+            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold">
+                <span class="material-symbols-outlined">logout</span> Đăng xuất
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-6xl mx-auto space-y-8">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-800">Yêu cầu mở sổ</h2>
+                    <p class="text-slate-500">Danh sách các yêu cầu mở sổ của bạn</p>
+                </div>
+            </div>
+
+            <!-- Flash message -->
+            <div th:if="${successMessage}" class="p-4 bg-green-100 text-green-700 rounded-xl font-semibold">
+                <p th:text="${successMessage}"></p>
+            </div>
+
+            <!-- Bảng danh sách yêu cầu -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <table class="min-w-full bg-white rounded-xl shadow">
+                    <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-bold">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Mã yêu cầu</th>
+                        <th class="px-6 py-3 text-left">Thời hạn</th>
+                        <th class="px-6 py-3 text-left">Số tiền gửi</th>
+                        <th class="px-6 py-3 text-left">Lãi suất áp dụng</th>
+                        <th class="px-6 py-3 text-left">Ngày tạo</th>
+                        <th class="px-6 py-3 text-left">Trạng thái</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                    <tr th:each="yc : ${yeuCauList}">
+                        <td class="px-6 py-4" th:text="${yc.id}"></td>
+                        <td class="px-6 py-4" th:text="${yc.thoiHan} + ' tháng'"></td>
+                        <td class="px-6 py-4" th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
+                        <td class="px-6 py-4" th:text="${yc.laiSuatApDung} + '%/năm'"></td>
+                        <td class="px-6 py-4" th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+                        <td class="px-6 py-4">
+                        <span th:switch="${yc.trangThai}">
+                          <span th:case="'CHO'" class="text-yellow-600 font-bold">Chờ duyệt</span>
+                          <span th:case="'DUYET'" class="text-green-600 font-bold">Đã duyệt</span>
+                          <span th:case="'TU CHOI'" class="text-red-600 font-bold">Từ chối</span>
+                        </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

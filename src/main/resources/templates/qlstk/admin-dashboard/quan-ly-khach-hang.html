@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QUẢN LÝ KHÁCH HÀNG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="admin-dashboard/css/styles.css">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+<div class="flex h-screen overflow-hidden">
+    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-3 rounded-xl"><span class="material-icons-outlined text-white text-3xl">savings</span></div>
+                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
+            </div>
+        </div>
+        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
+            <div>
+                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
+                <ul class="space-y-1">
+                    <li><a href="index.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
+                    <li><a href="mo-so-tiet-kiem.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
+                    <li><a href="quan-ly-khach-hang.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
+                    <li><a href="quan-ly-loai-tiet-kiem.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
+                </ul>
+            </div>
+            <div>
+                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
+                <ul class="space-y-1">
+                    <li><a href="giao-dich.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
+                    <li><a href="tra-cuu-so.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
+                    <li><a href="bao-cao-thong-ke.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto flex flex-col">
+        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
+            <h2 class="text-xl font-bold text-slate-800">Danh sách khách hàng</h2>
+            <button class="bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                <span class="material-icons-outlined">person_add</span> Thêm khách hàng
+            </button>
+        </header>
+
+        <div class="p-8">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="p-6 border-b bg-gray-50/50 flex gap-4">
+                    <div class="relative flex-1">
+                        <span class="material-icons-outlined absolute left-3 top-2.5 text-gray-400">search</span>
+                        <input type="text" placeholder="Tìm tên, mã KH hoặc số CCCD..." class="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20">
+                    </div>
+                    <button class="bg-slate-800 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-slate-900 transition">Lọc dữ liệu</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4">Mã KH</th>
+                                <th class="px-6 py-4">Họ và Tên</th>
+                                <th class="px-6 py-4">CMND/CCCD</th>
+                                <th class="px-6 py-4">Địa chỉ</th>
+                                <th class="px-6 py-4 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 text-sm">
+                            <tr class="hover:bg-blue-50/30 transition">
+                                <td class="px-6 py-4 font-medium text-blue-600">KH-001</td>
+                                <td class="px-6 py-4 font-bold text-slate-700">Nguyễn Văn A</td>
+                                <td class="px-6 py-4">079090001234</td>
+                                <td class="px-6 py-4 text-gray-500">Quận 1, TP. Hồ Chí Minh</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-blue-600 p-2 hover:bg-blue-100 rounded-lg transition"><span class="material-icons-outlined">edit</span></button>
+                                    <button class="text-red-500 p-2 hover:bg-red-50 rounded-lg transition ml-2"><span class="material-icons-outlined">delete</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="../../../static/css/js/script.js"></script>
+</body>
+</html>

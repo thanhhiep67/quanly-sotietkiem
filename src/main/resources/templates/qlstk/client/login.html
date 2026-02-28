@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Đăng nhập - MyBank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f8fafc] min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex">
+        <div class="flex-1 p-10 md:p-16">
+            <div class="mb-10">
+                <div class="bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-200">
+                    <span class="material-symbols-outlined text-3xl">account_balance</span>
+                </div>
+                <h2 class="text-3xl font-black text-slate-800 tracking-tight">Chào mừng trở lại</h2>
+                <p class="text-slate-500 mt-2 font-medium">Vui lòng đăng nhập để quản lý tài sản của bạn</p>
+            </div>
+
+            <form action="login" method="post" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-2">
+                        Căn cước công dân/ Mã nhân viên
+                    </label>
+                    <input type="text" name="username"
+                           placeholder="Căn cước công dân/ Mã nhân viên"
+                           class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl p-4 outline-none font-bold transition-all">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
+                            Mật khẩu
+                        </label>
+                        <a href="#" class="text-[10px] font-bold text-blue-600 hover:underline">Quên mật khẩu?</a>
+                    </div>
+                    <input type="password" name="password"
+                           placeholder="••••••••"
+                           class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl p-4 outline-none font-bold transition-all">
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all transform hover:scale-[1.01]">
+                    ĐĂNG NHẬP NGAY
+                </button>
+            </form>
+
+
+            <p class="mt-10 text-center text-sm font-medium text-slate-500">
+                Chưa có tài khoản? <a href="register" class="text-blue-600 font-bold hover:underline">Mở tài khoản ngay</a>
+            </p>
+        </div>
+
+        <div class="hidden md:flex w-1/3 bg-slate-900 p-12 flex-col justify-end relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-20">
+                <div class="absolute top-[-10%] right-[-10%] w-64 h-64 bg-blue-600 rounded-full blur-[100px]"></div>
+            </div>
+            <div class="relative z-10">
+                <h3 class="text-white text-2xl font-bold leading-tight">Tiết kiệm thông minh,<br>Tương lai thịnh vượng.</h3>
+                <p class="text-slate-400 text-sm mt-4">Hệ thống quản lý sổ tiết kiệm bảo mật chuẩn quốc tế.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

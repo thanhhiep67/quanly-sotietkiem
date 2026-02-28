@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Sổ tiết kiệm của tôi - MyBank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+</head>
+<body class="bg-[#f8fafc] text-slate-900">
+<div class="flex h-screen overflow-hidden">
+    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl">
+        <div class="p-8 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><span class="material-symbols-outlined">account_balance_wallet</span></div>
+                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
+            <a href="tra-cuu-so" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
+            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">history</span> Giao dịch</a>
+            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
+        </nav>
+        <div class="p-4 border-t border-slate-800 space-y-2">
+            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-6xl mx-auto space-y-8">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-800">Sổ tiết kiệm</h2>
+                    <p class="text-slate-500">Danh sách các khoản tích lũy của bạn</p>
+                </div>
+                <!-- Nhóm nút bên phải -->
+                <div class="flex gap-4">
+                    <a href="mo-so-tiet-kiem"
+                       class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">add</span> Mở sổ mới
+                    </a>
+                    <a href="tra-cuu-yeu-cau"
+                       class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">search</span> Tra cứu yêu cầu mở sổ
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div th:each="item : ${danhSachSo}"
+                     class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
+
+                    <!-- Trạng thái -->
+                    <div class="absolute right-0 top-0 px-6 py-1 rounded-bl-2xl text-[10px] font-bold uppercase tracking-widest text-white"
+                         th:classappend="${item.so.trangThai == 'MO'} ? ' bg-emerald-500' : ' bg-gray-400'"
+                         th:text="${item.so.trangThai == 'MO'} ? 'Đang hoạt động' : 'Đã tất toán'">
+                    </div>
+
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1"
+                               th:text="'Mã sổ: ' + ${item.so.maSo}">
+                            </p>
+
+                            <h3 class="text-xl font-bold text-slate-800"
+                                th:text="${item.loai.tenLoai}">
+                            </h3>
+                        </div>
+
+                        <span class="material-symbols-outlined text-blue-600 text-3xl">
+                savings
+            </span>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between border-b border-slate-50 pb-2">
+                            <span class="text-slate-500 text-sm">Số dư gốc:</span>
+                            <span class="font-bold text-slate-800"
+                                  th:text="${#numbers.formatDecimal(item.so.soTienBanDau, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                </span>
+                        </div>
+
+                        <div class="flex justify-between border-b border-slate-50 pb-2">
+                            <span class="text-slate-500 text-sm">Lãi suất:</span>
+                            <span class="font-bold text-blue-600"
+                                  th:text="${item.so.laiSuatApDung} + '%/năm'">
+                </span>
+                        </div>
+
+                        <div class="flex justify-between border-b border-slate-50 pb-2">
+                            <span class="text-slate-500 text-sm">Ngày đáo hạn:</span>
+                            <span class="font-bold text-slate-800"
+                                  th:text="${#dates.format(item.so.ngayDaoHan, 'dd/MM/yyyy')}">
+                </span>
+                        </div>
+                    </div>
+
+                    <a th:href="@{/so-chi-tiet/{id}(id=${item.so.maSo})}"
+                       class="block w-full py-3 text-center bg-slate-50 rounded-xl font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
+                        Xem chi tiết lãi dự tính
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
