@@ -77,23 +77,38 @@
                         </div>
                         <div>
                             <label class="block text-xs font-black uppercase text-slate-400 tracking-widest mb-2">Ngày gửi</label>
-                            <input type="text" value="16/01/2026" disabled
+                            <input type="text"
+                                   th:value="${#dates.format(new java.util.Date(), 'dd/MM/yyyy')}"
+                                   disabled
                                    class="w-full bg-slate-100 border-none rounded-2xl p-4 text-slate-400 font-bold cursor-not-allowed">
+
                         </div>
                     </div>
 
                     <!-- Kết quả -->
-                    <div class="p-6 bg-blue-50 rounded-3xl border border-blue-100">
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                        <!-- Tiền lãi -->
                         <div class="flex justify-between items-center">
-                            <span class="text-blue-600 font-bold">Tiền lãi ước tính:</span>
-                            <span id="laiUocTinh" class="text-xl font-black text-blue-700">~ 0 đ</span>
+                            <span class="text-slate-600 font-semibold">Tiền lãi ước tính:</span>
+                            <span id="laiUocTinh" class="text-xl font-bold text-blue-600">~ 0 đ</span>
                         </div>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-blue-600 font-bold">Tổng tiền nhận (gốc + lãi):</span>
-                            <span id="tongTien" class="text-xl font-black text-green-700">~ 0 đ</span>
+
+                        <!-- Tổng tiền nhận -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-600 font-semibold">Tổng tiền nhận (gốc + lãi):</span>
+                            <span id="tongTien" class="text-xl font-bold text-green-600">~ 0 đ</span>
                         </div>
-                        <div id="errorMsg" class="text-red-600 font-bold mt-2 hidden">Số tiền tối thiểu là 100.000 VND</div>
+
+                        <!-- Thông báo lỗi -->
+                        <div id="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 font-semibold hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 9v2m0 4h.01M12 5a7 7 0 100 14a7 7 0 000-14z"/>
+                            </svg>
+                            <span>Số tiền tối thiểu là 100.000 VND</span>
+                        </div>
                     </div>
+
 
                     <!-- Thông báo -->
                     <div th:if="${message}" class="p-4 bg-green-100 text-green-700 rounded-xl">
@@ -111,7 +126,7 @@
     </main>
 </div>
 
-<<script>
+<script>
     function tinhLai() {
         const select = document.getElementById("loaiSo");
         const kyHanThang = parseInt(select.options[select.selectedIndex].dataset.kyhan);
@@ -133,15 +148,26 @@
             submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
         }
 
-        // Công thức: lãi = gốc * (lãi suất/100) * (kỳ hạn / 12)
-        const laiUocTinh = soTien * (laiSuatNam / 100) * (kyHanThang / 12);
-        const tongTien = soTien + laiUocTinh;
+        let laiUocTinh = 0;
+        let tongTien = soTien;
+
+        if (kyHanThang > 0) {
+            // Có kỳ hạn → tính lãi theo tháng/12
+            laiUocTinh = soTien * (laiSuatNam / 100) * (kyHanThang / 12);
+            tongTien = soTien + laiUocTinh;
+
+            document.getElementById("laiUocTinh").textContent = "~ " + format(laiUocTinh);
+            document.getElementById("tongTien").textContent = "~ " + format(tongTien);
+        } else {
+            // Không kỳ hạn → chỉ hiển thị lãi suất năm, không tính lãi ngay
+            document.getElementById("laiUocTinh").textContent = "Lãi suất: " + laiSuatNam + "%/năm";
+            document.getElementById("tongTien").textContent = "Tiền lãi sẽ được tính theo số ngày thực gửi khi rút";
+        }
 
         // Format số tiền
-        const format = (num) => num.toLocaleString("vi-VN") + " đ";
-
-        document.getElementById("laiUocTinh").textContent = "~ " + format(laiUocTinh);
-        document.getElementById("tongTien").textContent = "~ " + format(tongTien);
+        function format(num) {
+            return num.toLocaleString("vi-VN") + " đ";
+        }
     }
 
     // Gắn sự kiện
@@ -151,3 +177,4 @@
     // Tính ngay khi load trang
     window.addEventListener("DOMContentLoaded", tinhLai);
 </script>
+

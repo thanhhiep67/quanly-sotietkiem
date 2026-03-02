@@ -41,6 +41,8 @@ public class MoSoController {
         }
 
         model.addAttribute("loaiSoList", viewList);
+        model.addAttribute("ngayMoSo", new Date());
+
         return "qlstk/client/mo-so-tiet-kiem";
     }
 
@@ -66,6 +68,7 @@ public class MoSoController {
         yeuCauMoSoRepository.save(yc);
 
         model.addAttribute("message", "Yêu cầu mở sổ đã được gửi thành công!");
+
         return "redirect:/tra-cuu-yeu-cau";
     }
 }

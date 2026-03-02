@@ -8,4 +8,8 @@ import java.util.List;
 public interface SoTietKiemRepository extends MongoRepository<SoTietKiem, String> {
 
     List<SoTietKiem> findByKhachHangId(String khachHangId);
+
+    SoTietKiem findByMaSo(String soTkId);
+
+    long countByKhachHangId(String khachHangId);
 }

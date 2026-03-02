@@ -19,11 +19,9 @@ public class LoaiSoTK {
     private String id;
 
     private String tenLoai;
-    private int kyHanThang;
+    private Integer kyHanThang;   // đổi sang Integer
     private boolean choGuiThem;
     private boolean choRutMotPhan;
     private Date createdAt;
-
-    // getter/setter
 }
 

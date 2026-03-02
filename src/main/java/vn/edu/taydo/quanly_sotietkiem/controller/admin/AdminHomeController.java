@@ -39,11 +39,13 @@ public class AdminHomeController {
     KhachHangRepository khachHangRepository;
     @Autowired
     HomeAdminService homeAdminService;
+
     @GetMapping("")
     public String admin(Model model) {
-        List<YeuCauMoSo> list = yeuCauMoSoRepository.findAll();
-        List<YeuCauViewAdmin> viewList = new ArrayList<>();
+        // Chỉ lấy các yêu cầu có trạng thái CHO
+        List<YeuCauMoSo> list = yeuCauMoSoRepository.findByTrangThaiOrderByCreatedAtDesc("CHO");
 
+        List<YeuCauViewAdmin> viewList = new ArrayList<>();
         for (YeuCauMoSo yc : list) {
             LoaiSoTK loai = loaiSoTKRepository.findById(yc.getLoaiSoId()).orElse(null);
             KhachHang kh = khachHangRepository.findById(yc.getKhachHangId()).orElse(null);
@@ -57,25 +59,44 @@ public class AdminHomeController {
     }
 
 
+
+
+
     @PostMapping("/duyet-yeu-cau")
     public String duyetYeuCau(@RequestParam("id") String id, HttpServletRequest request) {
         YeuCauMoSo yc = yeuCauMoSoRepository.findById(id).orElse(null);
         String idNhanVien = homeAdminService.getTenNhanVien(request);
+
         if (yc != null && "CHO".equals(yc.getTrangThai())) {
             yc.setTrangThai("DUYET");
             yc.setNgayXuLy(new Date());
             yc.setNhanVienId(idNhanVien);
             yeuCauMoSoRepository.save(yc);
+
             // Tạo sổ tiết kiệm mới
             SoTietKiem stk = new SoTietKiem();
-            stk.setMaSo(UUID.randomUUID().toString());
+
+            // Sinh mã sổ theo dạng STK-KHxxx-xx
+            long countByKhachHang = soTietKiemRepository.countByKhachHangId(yc.getKhachHangId());
+            String maSo = "STK-" + yc.getKhachHangId() + "-" + String.format("%02d", countByKhachHang + 1);
+            stk.setMaSo(maSo);
+
             stk.setKhachHangId(yc.getKhachHangId());
             stk.setLoaiSoId(yc.getLoaiSoId());
-            stk.setNgayMoSo(new Date());
+            Date ngayMoSo = new Date();
+            stk.setNgayMoSo(ngayMoSo);
 
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.MONTH, 6); // ví dụ: thời hạn 6 tháng
-            stk.setNgayDaoHan(cal.getTime());
+            // Lấy loại sổ để biết kỳ hạn
+            LoaiSoTK loai = loaiSoTKRepository.findById(yc.getLoaiSoId()).orElse(null);
+            if (loai != null && loai.getKyHanThang() != null && loai.getKyHanThang() > 0) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(ngayMoSo);
+                cal.add(Calendar.MONTH, loai.getKyHanThang()); // cộng số tháng kỳ hạn
+                stk.setNgayDaoHan(cal.getTime());
+            } else {
+                stk.setNgayDaoHan(null); // không kỳ hạn
+            }
+
             stk.setTrangThai("MO");
             stk.setSoTienBanDau(yc.getSoTienGuiBanDau());
             stk.setSoDuHienTai(yc.getSoTienGuiBanDau());
@@ -89,6 +110,8 @@ public class AdminHomeController {
         }
         return "redirect:/admin";
     }
+
+
 
     @PostMapping("/tu-choi-yeu-cau")
     public String tuChoiYeuCau(@RequestParam("id") String id,

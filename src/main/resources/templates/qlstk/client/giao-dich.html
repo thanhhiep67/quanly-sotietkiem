@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -19,13 +19,13 @@
             </div>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
-            <a href="tra-cuu-so.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
-            <a href="giao-dich.html" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg font-bold"><span class="material-symbols-outlined">payments</span> Giao dịch</a>
-            <a href="lai-suat.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
+            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
+            <a href="tra-cuu-so" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
+            <a href="giao-dich" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg font-bold"><span class="material-symbols-outlined">payments</span> Giao dịch</a>
+            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
         </nav>
         <div class="p-4 border-t border-slate-800">
-            <a href="login.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
+            <a href="login" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
         </div>
     </aside>
 
@@ -40,33 +40,60 @@
                 <div class="absolute top-0 right-0 p-8 opacity-5">
                     <span class="material-symbols-outlined text-9xl">payments</span>
                 </div>
-                
-                <form class="space-y-6 relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <form th:action="@{/rut-tien}" method="post" class="space-y-6 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Chọn sổ tiết kiệm -->
                         <div>
-                            <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">Chọn sổ tiết kiệm</label>
-                            <select class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl p-4 outline-none font-bold text-slate-700 transition-all">
-                                <option>STK-8892 (Dư: 500.000.000 đ)</option>
-                                <option>STK-1102 (Dư: 12.450.000 đ)</option>
+                            <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">
+                                Chọn sổ tiết kiệm
+                            </label>
+                            <select name="soTkId"
+                                    class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl p-4 outline-none font-bold text-slate-700 shadow-sm transition-all">
+                                <option th:each="soView : ${soList}"
+                                        th:value="${soView.so.maSo}"
+                                        th:text="${soView.so.maSo + ' (Dư: ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ)'}">
+                                </option>
+
                             </select>
                         </div>
+
+                        <!-- Nhập số tiền -->
                         <div>
-                            <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">Số tiền muốn rút (VND)</label>
+                            <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">
+                                Số tiền muốn rút (VND)
+                            </label>
                             <div class="relative">
-                                <input type="number" placeholder="Nhập số tiền..." class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl p-4 outline-none font-bold transition-all">
-                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-blue-600 font-bold text-xs hover:underline uppercase">Tất cả</button>
+                                <input type="number" name="soTien"
+                                       placeholder="Nhập số tiền..."
+                                       class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl p-4 outline-none font-bold text-slate-700 shadow-sm transition-all">
                             </div>
                         </div>
                     </div>
 
+                    <!-- Thông báo -->
                     <div class="p-5 bg-amber-50 rounded-2xl border border-amber-100 flex gap-4 items-center">
                         <span class="material-symbols-outlined text-amber-600">info</span>
-                        <p class="text-xs text-amber-700 font-medium leading-relaxed">Tiền sẽ được chuyển ngay lập tức vào tài khoản thanh toán mặc định của bạn sau khi xác nhận.</p>
+                        <p class="text-xs text-amber-700 font-medium leading-relaxed">
+                            Tiền sẽ được chuyển ngay lập tức vào tài khoản thanh toán mặc định của bạn sau khi xác nhận.
+                        </p>
                     </div>
 
-                    <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl hover:bg-blue-600 transition-all transform hover:scale-[1.01]">
+                    <!-- Nút xác nhận -->
+                    <button type="submit"
+                            class="w-full bg-blue-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-xl hover:bg-blue-700 transition-all transform hover:scale-[1.02]">
                         XÁC NHẬN RÚT TIỀN
                     </button>
+                    <!-- Thông báo lỗi -->
+                    <div th:if="${error}" class="p-4 bg-red-50 text-red-600 rounded-xl font-medium mb-4">
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- Thông báo thành công -->
+                    <div th:if="${success}" class="p-4 bg-emerald-50 text-emerald-600 rounded-xl font-medium mb-4">
+                        <span th:text="${success}"></span>
+                    </div>
+
                 </form>
             </div>
 
@@ -87,27 +114,24 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50">
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-6 font-bold text-slate-700">
-                                    15/01/2026 <span class="block text-[10px] font-medium text-slate-400 mt-1">09:15:00</span>
-                                </td>
-                                <td class="p-6 font-medium text-slate-500 italic">STK-1102</td>
-                                <td class="p-6 text-right font-black text-red-600 text-base">-200.000.000 đ</td>
-                                <td class="p-6 text-center">
-                                    <span class="bg-emerald-50 text-emerald-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase">Thành công</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-6 font-bold text-slate-700">
-                                    10/01/2026 <span class="block text-[10px] font-medium text-slate-400 mt-1">16:45:22</span>
-                                </td>
-                                <td class="p-6 font-medium text-slate-500 italic">STK-0045</td>
-                                <td class="p-6 text-right font-black text-red-600 text-base">-50.000.000 đ</td>
-                                <td class="p-6 text-center">
-                                    <span class="bg-emerald-50 text-emerald-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase">Thành công</span>
-                                </td>
-                            </tr>
+                        <tr th:each="gd : ${lichSuRutTien}" class="hover:bg-slate-50 transition">
+                            <td class="p-6 font-bold text-slate-700">
+                                <span th:text="${#dates.format(gd.ngayGiaoDich, 'dd/MM/yyyy')}"></span>
+                                <span class="block text-[10px] font-medium text-slate-400 mt-1"
+                                      th:text="${#dates.format(gd.ngayGiaoDich, 'HH:mm:ss')}"></span>
+                            </td>
+                            <td class="p-6 font-medium text-slate-500 italic" th:text="${gd.soTkId}"></td>
+                            <td class="p-6 text-right font-black text-red-600 text-base"
+                                th:text="${'-' + #numbers.formatDecimal(gd.soTien,0,'POINT',0,'COMMA') + ' đ'}"></td>
+                            <td class="p-6 text-center">
+                                <span th:if="${gd.trangThai == 'COMPLETED'}"
+                                    class="bg-emerald-50 text-emerald-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase">Thành công</span>
+                                <span th:if="${gd.trangThai != 'COMPLETED'}"
+                                      class="bg-red-50 text-red-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase">Thất bại</span>
+                            </td>
+                        </tr>
                         </tbody>
+
                     </table>
                 </div>
                 <button class="w-full py-4 text-slate-400 text-xs font-bold hover:text-blue-600 transition">XEM TOÀN BỘ LỊCH SỬ</button>

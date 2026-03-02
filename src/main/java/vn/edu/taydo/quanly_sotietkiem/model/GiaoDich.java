@@ -19,14 +19,14 @@ public class GiaoDich {
     private String id;
 
     private String soTkId;
-    private String loaiGiaoDich; // RUT / GUI
+    private String khachHangId;   // thêm trường này
+    private String loaiGiaoDich;  // RUT / GUI
     private Date ngayGiaoDich;
     private double soTien;
     private double tienLaiPhatSinh;
     private double tongTienNhan;
     private String ghiChu;
+    private String trangThai; // PENDING, COMPLETED, FAILED
     private Date createdAt;
-
-    // getter/setter
 }
 
