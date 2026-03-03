@@ -30,7 +30,6 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Menu</p>
             <a href="index" class="active-nav flex items-center gap-3 px-4 py-3 rounded-xl transition">
                 <span class="material-symbols-outlined">grid_view</span> Tổng quan
             </a>
@@ -128,19 +127,24 @@
                         <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-600/20 rounded-full blur-[80px]"></div>
                         <div>
                             <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-2">Tài sản tiết kiệm</p>
-                            <h3 class="text-4xl font-black tracking-tighter">1.250.000.000 <span class="text-sm font-normal text-slate-500 uppercase tracking-widest ml-1">VND</span></h3>
+                            <h3 class="text-4xl font-black tracking-tighter">
+                                <span th:text="${#numbers.formatInteger(tongTaiSan, 0, 'POINT')}"></span>
+                                <span class="text-sm font-normal text-slate-500 uppercase tracking-widest ml-1">VND</span>
+                            </h3>
                         </div>
                         <div class="mt-12 bg-white/5 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
                             <div class="flex justify-between items-center mb-4">
                                 <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Sổ đang có</p>
-                                <span class="bg-blue-500 text-[10px] px-2 py-0.5 rounded-full font-bold">04 Sổ</span>
+                                <span class="bg-blue-500 text-[10px] px-2 py-0.5 rounded-full font-bold" th:text="${soLuongSo} + ' Sổ'"></span>
                             </div>
                             <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-blue-500 h-full w-[70%]"></div>
+                                <!-- Thanh progress: ví dụ hiển thị % số lượng sổ -->
+                                <div class="bg-blue-500 h-full" th:style="'width:' + (${soLuongSo} * 20) + '%'"></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>

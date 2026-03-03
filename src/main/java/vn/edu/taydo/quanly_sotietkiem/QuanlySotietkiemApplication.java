@@ -15,10 +15,4 @@ public class QuanlySotietkiemApplication {
 		SpringApplication.run(QuanlySotietkiemApplication.class, args);
 	}
 
-	@GetMapping("/hello")
-	public String hello() {
-		return "Hello, welcome to the Savings Management Application!";
-	}
-
-
 }

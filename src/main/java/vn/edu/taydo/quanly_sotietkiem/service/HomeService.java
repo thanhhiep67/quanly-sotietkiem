@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.edu.taydo.quanly_sotietkiem.config.JwtUtil;
 import vn.edu.taydo.quanly_sotietkiem.model.KhachHang;
+import vn.edu.taydo.quanly_sotietkiem.model.SoTietKiem;
 import vn.edu.taydo.quanly_sotietkiem.repository.KhachHangRepository;
+import vn.edu.taydo.quanly_sotietkiem.repository.SoTietKiemRepository;
 
 import java.util.Optional;
 
@@ -16,6 +18,9 @@ public class HomeService {
 
     @Autowired
     private KhachHangRepository khachHangRepository;
+
+    @Autowired
+    SoTietKiemRepository soTietKiemRepository;
 
     public String getTenKhachHang(HttpServletRequest request) {
         String token = null;
@@ -41,4 +46,16 @@ public class HomeService {
                 .map(KhachHang::getHoten)
                 .orElse(null);
     }
+
+    public double getTongTaiSanTietKiem(String khachHangId) {
+        return soTietKiemRepository.findByKhachHangId(khachHangId)
+                .stream()
+                .mapToDouble(SoTietKiem::getSoDuHienTai)
+                .sum();
+    }
+
+    public int getSoLuongSoTietKiem(String khachHangId) {
+        return soTietKiemRepository.findByKhachHangId(khachHangId).size();
+    }
+
 }

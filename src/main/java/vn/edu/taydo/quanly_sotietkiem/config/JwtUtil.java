@@ -59,4 +59,23 @@ public class JwtUtil {
         return null;
     }
 
+    public static Map<String, Object> getClaimsFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) {
+                    try {
+                        Claims claims = validateToken(cookie.getValue());
+                        return claims; // trả về toàn bộ claims dưới dạng Map
+                    } catch (ExpiredJwtException e) {
+                        throw new RuntimeException("Token đã hết hạn");
+                    } catch (JwtException e) {
+                        throw new RuntimeException("Token không hợp lệ");
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
 }

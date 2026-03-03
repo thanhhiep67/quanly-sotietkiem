@@ -55,7 +55,7 @@ public class GiaoDichController {
 
         // lịch sử giao dịch gần đây
         List<GiaoDich> lichSu = giaoDichRepository.findTop5ByKhachHangIdOrderByCreatedAtDesc(khachHangId);
-        model.addAttribute("lichSuRutTien", lichSu);
+        model.addAttribute("lichSuGiaoDich", lichSu);
 
         return "qlstk/client/giao-dich";
     }
@@ -164,5 +164,46 @@ public class GiaoDichController {
         ra.addFlashAttribute("success", "Rút tiền thành công, nhận " + tienNhan + " đ");
         return "redirect:/giao-dich";
     }
+
+    @PostMapping("/nap-tien")
+    public String napTien(HttpServletRequest request,
+                          @RequestParam String soTkId,
+                          @RequestParam double soTien,
+                          RedirectAttributes ra) {
+        String khachHangId = JwtUtil.getUserIdFromCookie(request);
+        if (khachHangId == null) {
+            return "redirect:/login";
+        }
+
+        SoTietKiem so = soTietKiemRepository.findByMaSo(soTkId);
+        if (so == null || !so.getKhachHangId().equals(khachHangId)) {
+            ra.addFlashAttribute("errorNap", "Không tìm thấy sổ tiết kiệm hợp lệ");
+            return "redirect:/giao-dich";
+        }
+
+        if (!"MO".equals(so.getTrangThai())) {
+            ra.addFlashAttribute("errorNap", "Sổ không còn hoạt động để nạp thêm tiền");
+            return "redirect:/giao-dich";
+        }
+
+        // Cập nhật số dư
+        so.setSoDuHienTai(so.getSoDuHienTai() + soTien);
+        soTietKiemRepository.save(so);
+
+        // Lưu giao dịch nạp tiền
+        GiaoDich gd = new GiaoDich();
+        gd.setKhachHangId(khachHangId);
+        gd.setSoTkId(soTkId);
+        gd.setSoTien(soTien);
+        gd.setLoaiGiaoDich("NAP");
+        gd.setTrangThai("COMPLETED");
+        gd.setCreatedAt(new Date());
+        gd.setNgayGiaoDich(new Date());
+        giaoDichRepository.save(gd);
+
+        ra.addFlashAttribute("successNap", "Nạp tiền thành công!");
+        return "redirect:/giao-dich";
+    }
+
 
 }
