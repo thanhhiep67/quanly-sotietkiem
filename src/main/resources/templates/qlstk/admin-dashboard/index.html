@@ -78,71 +78,73 @@
         </header>
 
         <div class="p-6 lg:p-8 space-y-8">
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <div class="flex justify-between items-start mb-4">
-                        <div class="bg-blue-50 p-3 rounded-lg text-blue-600"><span class="material-icons-outlined">payments</span></div>
-                        <span class="text-green-500 text-sm font-bold flex items-center gap-1"><span class="material-icons-outlined text-xs">trending_up</span>+8.4%</span>
+                        <div class="bg-blue-50 p-3 rounded-lg text-blue-600">
+                            <span class="material-icons-outlined">payments</span>
+                        </div>
+                        <span class="text-green-500 text-sm font-bold flex items-center gap-1">
+                <span class="material-icons-outlined text-xs">trending_up</span>+8.4%
+            </span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium">TỔNG DOANH SỐ GỬI</p>
-                    <h3 class="text-3xl font-bold mt-1 text-slate-800">128.500.000.000đ</h3>
+                    <h3 class="text-3xl font-bold mt-1 text-slate-800"
+                        th:text="${#numbers.formatDecimal(tongTaiSanHienTai,0,'POINT',0,'COMMA')} + 'đ'"></h3>
+
                 </div>
+
                 <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <div class="flex justify-between items-start mb-4">
-                        <div class="bg-purple-50 p-3 rounded-lg text-purple-600"><span class="material-icons-outlined">account_balance_wallet</span></div>
+                        <div class="bg-purple-50 p-3 rounded-lg text-purple-600">
+                            <span class="material-icons-outlined">account_balance_wallet</span>
+                        </div>
                         <span class="text-gray-400 text-sm font-medium">Ổn định</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium">SỔ ĐANG HOẠT ĐỘNG</p>
-                    <h3 class="text-3xl font-bold mt-1 text-slate-800">4.240 Sổ</h3>
+                    <h3 class="text-3xl font-bold mt-1 text-slate-800" th:text="${soDangHoatDong} + ' Sổ'"></h3>
                 </div>
+
                 <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <div class="flex justify-between items-start mb-4">
-                        <div class="bg-orange-50 p-3 rounded-lg text-orange-600"><span class="material-icons-outlined">people</span></div>
-                        <span class="text-green-500 text-sm font-bold flex items-center gap-1"><span class="material-icons-outlined text-xs">trending_up</span>+12%</span>
+                        <div class="bg-orange-50 p-3 rounded-lg text-orange-600">
+                            <span class="material-icons-outlined">people</span>
+                        </div>
+                        <span class="text-green-500 text-sm font-bold flex items-center gap-1">
+                <span class="material-icons-outlined text-xs">trending_up</span>+12%
+            </span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium">TỔNG KHÁCH HÀNG</p>
-                    <h3 class="text-3xl font-bold mt-1 text-slate-800">3.850</h3>
+                    <h3 class="text-3xl font-bold mt-1 text-slate-800" th:text="${tongKhachHang}"></h3>
                 </div>
             </div>
+
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                     <div class="flex items-center justify-between mb-8">
                         <h3 class="text-xl font-bold text-slate-800">Tăng trưởng doanh số</h3>
-                        <select class="bg-gray-50 border border-gray-200 text-sm p-2 rounded-lg outline-none">
-                            <option>7 ngày qua</option>
-                            <option>30 ngày qua</option>
-                        </select>
                     </div>
-                    <div class="h-80 flex items-center justify-center bg-gray-50 border border-dashed border-gray-200 rounded-xl relative">
-                        <div class="text-center">
-                            <span class="material-icons-outlined text-4xl text-gray-300">leaderboard</span>
-                            <p class="text-gray-400 mt-2">[ Khu vực biểu đồ thống kê ]</p>
-                        </div>
+                    <div class="h-80">
+                        <canvas id="baoCaoChart"></canvas>
                     </div>
                 </div>
 
                 <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 class="text-xl font-bold text-slate-800 mb-8">Tỷ lệ loại tiết kiệm</h3>
                     <div class="space-y-6">
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-2"><span>Kỳ hạn 3 tháng</span><span class="text-blue-600">45%</span></div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-600 rounded-full" style="width:45%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-2"><span>Kỳ hạn 6 tháng</span><span class="text-purple-600">30%</span></div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-purple-600 rounded-full" style="width:30%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-2"><span>Kỳ hạn 12 tháng</span><span class="text-orange-500">15%</span></div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-orange-500 rounded-full" style="width:15%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-2"><span>Khác</span><span class="text-gray-400">10%</span></div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gray-300 rounded-full" style="width:10%"></div></div>
+                        <div th:each="tk : ${thongKeLoaiSo}">
+                            <div class="flex justify-between text-sm font-medium mb-2">
+                                <span th:text="${tk.tenLoai}"></span>
+                                <span class="text-blue-600" th:text="${#numbers.formatDecimal(tk.pct,0,'POINT',0,'COMMA')} + '%'"></span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-600 rounded-full" th:style="'width:' + ${tk.pct} + '%'"></div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -210,5 +212,38 @@
 </div>
 
 <script src="../../../static/css/js/script.js"></script>
+<canvas id="doanhSoChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+
+        let labels = [[${chartLabels}]];
+        let dataValues = [[${chartValues}]];
+
+        const ctx = document.getElementById('baoCaoChart');
+
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Chênh lệch Thu - Chi',
+                        data: dataValues,
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false   // 👈 CÁI NÀY QUAN TRỌNG
+                }
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

@@ -2,25 +2,17 @@ package vn.edu.taydo.quanly_sotietkiem.controller.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import vn.edu.taydo.quanly_sotietkiem.DTO.YeuCauView;
+import org.springframework.web.bind.annotation.*;
 import vn.edu.taydo.quanly_sotietkiem.DTO.YeuCauViewAdmin;
-import vn.edu.taydo.quanly_sotietkiem.model.KhachHang;
-import vn.edu.taydo.quanly_sotietkiem.model.LoaiSoTK;
-import vn.edu.taydo.quanly_sotietkiem.model.YeuCauMoSo;
-import vn.edu.taydo.quanly_sotietkiem.model.SoTietKiem;
-import vn.edu.taydo.quanly_sotietkiem.repository.KhachHangRepository;
-import vn.edu.taydo.quanly_sotietkiem.repository.LoaiSoTKRepository;
-import vn.edu.taydo.quanly_sotietkiem.repository.YeuCauMoSoRepository;
-import vn.edu.taydo.quanly_sotietkiem.repository.SoTietKiemRepository;
+import vn.edu.taydo.quanly_sotietkiem.model.*;
+import vn.edu.taydo.quanly_sotietkiem.repository.*;
 import vn.edu.taydo.quanly_sotietkiem.service.HomeAdminService;
-import vn.edu.taydo.quanly_sotietkiem.service.HomeService;
+import vn.edu.taydo.quanly_sotietkiem.service.BaoCaoService;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Controller
@@ -29,22 +21,24 @@ public class AdminHomeController {
 
     @Autowired
     private YeuCauMoSoRepository yeuCauMoSoRepository;
-
     @Autowired
     private SoTietKiemRepository soTietKiemRepository;
-
     @Autowired
     private LoaiSoTKRepository loaiSoTKRepository;
     @Autowired
-    KhachHangRepository khachHangRepository;
+    private KhachHangRepository khachHangRepository;
     @Autowired
-    HomeAdminService homeAdminService;
+    private HomeAdminService homeAdminService;
+    @Autowired
+    private GiaoDichRepository giaoDichRepository;
+    @Autowired
+    private BaoCaoService baoCaoService;
 
     @GetMapping("")
-    public String admin(Model model) {
-        // Chỉ lấy các yêu cầu có trạng thái CHO
+    public String admin(Model model,
+                        @RequestParam(defaultValue = "7") int days) {
+        // Yêu cầu mở sổ chờ duyệt
         List<YeuCauMoSo> list = yeuCauMoSoRepository.findByTrangThaiOrderByCreatedAtDesc("CHO");
-
         List<YeuCauViewAdmin> viewList = new ArrayList<>();
         for (YeuCauMoSo yc : list) {
             LoaiSoTK loai = loaiSoTKRepository.findById(yc.getLoaiSoId()).orElse(null);
@@ -53,14 +47,49 @@ public class AdminHomeController {
                 viewList.add(new YeuCauViewAdmin(yc, loai, kh));
             }
         }
-
         model.addAttribute("yeuCauList", viewList);
+
+        // Thống kê tổng quan
+        Double tongTaiSanHienTai = soTietKiemRepository.sumSoDuHienTaiDangHoatDong();
+        long soDangHoatDong = soTietKiemRepository.countByTrangThai("MO");
+        long tongKhachHang = khachHangRepository.count();
+        model.addAttribute("tongTaiSanHienTai", tongTaiSanHienTai != null ? tongTaiSanHienTai : 0.0);
+        model.addAttribute("soDangHoatDong", soDangHoatDong);
+        model.addAttribute("tongKhachHang", tongKhachHang);
+
+        // Thống kê loại sổ
+        List<Map<String,Object>> thongKeLoaiSo = homeAdminService.thongKeLoaiSo();
+        model.addAttribute("thongKeLoaiSo", thongKeLoaiSo);
+
+        // Báo cáo doanh số (7 ngày hoặc 30 ngày)
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(days);
+
+        LocalDate temp = start;
+        while (!temp.isAfter(end)) {
+            baoCaoService.taoBaoCaoNgay(temp);
+            temp = temp.plusDays(1);
+        }
+
+        List<BaoCaoNgay> baoCaoList = baoCaoService.layBaoCao(start, end);
+        model.addAttribute("baoCaoList", baoCaoList);
+        model.addAttribute("days", days);
+
+// ===== CHUẨN THEO MODEL =====
+        List<String> chartLabels = new ArrayList<>();
+        List<Double> chartValues = new ArrayList<>();
+
+        for (BaoCaoNgay bc : baoCaoList) {
+            chartLabels.add(bc.getNgay().toString());
+            chartValues.add(bc.getChenhLech()); // dùng chênh lệch
+        }
+
+        model.addAttribute("chartLabels", chartLabels);
+        model.addAttribute("chartValues", chartValues);
+
+        System.out.println("Bao cao size: " + baoCaoList.size());
         return "qlstk/admin-dashboard/index";
     }
-
-
-
-
 
     @PostMapping("/duyet-yeu-cau")
     public String duyetYeuCau(@RequestParam("id") String id, HttpServletRequest request) {
@@ -75,26 +104,22 @@ public class AdminHomeController {
 
             // Tạo sổ tiết kiệm mới
             SoTietKiem stk = new SoTietKiem();
-
-            // Sinh mã sổ theo dạng STK-KHxxx-xx
             long countByKhachHang = soTietKiemRepository.countByKhachHangId(yc.getKhachHangId());
             String maSo = "STK-" + yc.getKhachHangId() + "-" + String.format("%02d", countByKhachHang + 1);
             stk.setMaSo(maSo);
-
             stk.setKhachHangId(yc.getKhachHangId());
             stk.setLoaiSoId(yc.getLoaiSoId());
             Date ngayMoSo = new Date();
             stk.setNgayMoSo(ngayMoSo);
 
-            // Lấy loại sổ để biết kỳ hạn
             LoaiSoTK loai = loaiSoTKRepository.findById(yc.getLoaiSoId()).orElse(null);
             if (loai != null && loai.getKyHanThang() != null && loai.getKyHanThang() > 0) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(ngayMoSo);
-                cal.add(Calendar.MONTH, loai.getKyHanThang()); // cộng số tháng kỳ hạn
+                cal.add(Calendar.MONTH, loai.getKyHanThang());
                 stk.setNgayDaoHan(cal.getTime());
             } else {
-                stk.setNgayDaoHan(null); // không kỳ hạn
+                stk.setNgayDaoHan(null);
             }
 
             stk.setTrangThai("MO");
@@ -111,8 +136,6 @@ public class AdminHomeController {
         return "redirect:/admin";
     }
 
-
-
     @PostMapping("/tu-choi-yeu-cau")
     public String tuChoiYeuCau(@RequestParam("id") String id,
                                @RequestParam("lyDoTuChoi") String lyDo) {
@@ -124,5 +147,12 @@ public class AdminHomeController {
             yeuCauMoSoRepository.save(yc);
         }
         return "redirect:/admin";
+    }
+
+    // Endpoint để tạo báo cáo ngày (có thể gọi tay hoặc chạy cron job)
+    @PostMapping("/tao-bao-cao-ngay")
+    @ResponseBody
+    public BaoCaoNgay taoBaoCaoNgay(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay) {
+        return baoCaoService.taoBaoCaoNgay(ngay);
     }
 }

@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Document(collection = "so_tiet_kiem")
@@ -26,7 +27,8 @@ public class SoTietKiem {
     private double soDuHienTai;
     private double laiSuatApDung;
     private String yeuCauMoSoId;
-    private String trangThai; // MO / DONG / DAO_HAN
+    private String trangThai;
+    private LocalDate ngayDongSo;// MO / DONG / DAO_HAN
 
     // getter/setter
 }

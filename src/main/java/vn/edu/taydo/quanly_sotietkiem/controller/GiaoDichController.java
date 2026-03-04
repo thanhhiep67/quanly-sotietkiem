@@ -17,6 +17,7 @@ import vn.edu.taydo.quanly_sotietkiem.repository.LaiSuatRepository;
 import vn.edu.taydo.quanly_sotietkiem.repository.LoaiSoTKRepository;
 import vn.edu.taydo.quanly_sotietkiem.repository.SoTietKiemRepository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Controller
@@ -143,6 +144,8 @@ public class GiaoDichController {
             tienNhan = so.getSoDuHienTai() + tienLai;
             so.setSoDuHienTai(0);
             so.setTrangThai("DONG");
+            so.setNgayDongSo(LocalDate.now());
+
         }
 
         soTietKiemRepository.save(so);
