@@ -16,7 +16,7 @@
 
 <div class="flex h-screen overflow-hidden">
 
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
+    <aside class="fixed top-0 left-0 h-screen w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
         <div class="p-6 border-b border-slate-800">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 p-3 rounded-xl">
@@ -30,8 +30,8 @@
             <div>
                 <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
                 <ul class="space-y-1">
-                    <li><a href="admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="admin/mo-so-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
+                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
+                    <li><a href="admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
                     <li><a href="admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
                     <li><a href="admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
                 </ul>
@@ -48,20 +48,24 @@
         </nav>
 
         <div class="p-4 border-t border-slate-800 bg-slate-950/40">
-            <div class="flex items-center gap-3 px-2 mb-4">
-                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">AD</div>
-                <div>
-                    <p class="text-sm font-medium text-white">Quản trị viên</p>
-                    <p class="text-xs text-slate-500">admin@system.com</p>
+            <div class="flex items-center gap-3 p-3 bg-slate-800/40 rounded-2xl mb-2">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold shadow-md">
+                    <span th:text="${username != null ? username.substring(0,1).toUpperCase() : 'A'}"></span>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-bold text-white truncate" th:text="${username}">Admin</p>
+                    <p class="text-xs text-slate-400" th:text="${role}">ADMIN</p>
                 </div>
             </div>
-            <button id="btn-logout" class="w-full flex items-center justify-center gap-2 py-3 bg-red-900/20 text-red-400 rounded-lg hover:bg-red-900/40 transition-all">
-                <span class="material-icons-outlined text-sm">logout</span> Đăng xuất
-            </button>
+
+
+            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition group">
+                <span class="font-semibold">Đăng xuất</span>
+            </a>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto flex flex-col">
+    <main class="ml-72 flex-1 overflow-y-auto flex flex-col">
         <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
             <div class="flex items-center gap-4">
                 <h2 class="text-xl font-bold text-slate-800">Bảng điều khiển</h2>
@@ -71,7 +75,7 @@
                     <span class="material-icons-outlined text-gray-500 p-2 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200 transition">notifications</span>
                     <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 </div>
-                <a href="mo-so-tiet-kiem.html" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                <a href="admin/mo-so" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
                     <span class="material-icons-outlined">add</span> Mở sổ mới
                 </a>
             </div>

@@ -24,6 +24,7 @@ public class KhachHang {
     private String sdt;
     private String cccd;
     private String diaChi;
+    private String email;
     private LocalDate ngaySinh;
     private LocalDateTime createdAt;
 }

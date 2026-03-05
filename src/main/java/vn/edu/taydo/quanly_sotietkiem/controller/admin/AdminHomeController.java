@@ -7,8 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.taydo.quanly_sotietkiem.DTO.YeuCauViewAdmin;
+import vn.edu.taydo.quanly_sotietkiem.config.JwtUtil;
 import vn.edu.taydo.quanly_sotietkiem.model.*;
 import vn.edu.taydo.quanly_sotietkiem.repository.*;
+import vn.edu.taydo.quanly_sotietkiem.service.AdminHomeService;
 import vn.edu.taydo.quanly_sotietkiem.service.HomeAdminService;
 import vn.edu.taydo.quanly_sotietkiem.service.BaoCaoService;
 
@@ -33,10 +35,12 @@ public class AdminHomeController {
     private GiaoDichRepository giaoDichRepository;
     @Autowired
     private BaoCaoService baoCaoService;
+    @Autowired
+    private AdminHomeService adminHomeService;
 
     @GetMapping("")
     public String admin(Model model,
-                        @RequestParam(defaultValue = "7") int days) {
+                        @RequestParam(defaultValue = "7") int days,HttpServletRequest request) {
         // Yêu cầu mở sổ chờ duyệt
         List<YeuCauMoSo> list = yeuCauMoSoRepository.findByTrangThaiOrderByCreatedAtDesc("CHO");
         List<YeuCauViewAdmin> viewList = new ArrayList<>();
@@ -87,7 +91,19 @@ public class AdminHomeController {
         model.addAttribute("chartLabels", chartLabels);
         model.addAttribute("chartValues", chartValues);
 
-        System.out.println("Bao cao size: " + baoCaoList.size());
+
+        Map<String, Object> claims = JwtUtil.getClaimsFromCookie(request);
+        if (claims == null) {
+            return "redirect:/login";
+        }
+
+        String userId = (String) claims.get("userId");
+        String role = (String) claims.get("role");
+        String tenNhanVien = adminHomeService.getTenNhanVien(userId);
+
+        model.addAttribute("username", tenNhanVien);
+        model.addAttribute("role", role);
+
         return "qlstk/admin-dashboard/index";
     }
 

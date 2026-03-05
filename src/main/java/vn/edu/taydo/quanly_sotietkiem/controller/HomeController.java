@@ -37,6 +37,7 @@ public class HomeController {
         String tenKhachHang = homeService.getTenKhachHang(request);
         if (tenKhachHang != null) {
             model.addAttribute("tenKhachHang", tenKhachHang);
+            model.addAttribute("role", role);
 
             // Lấy tổng tài sản tiết kiệm
             double tongTaiSan = homeService.getTongTaiSanTietKiem(khachHangId);

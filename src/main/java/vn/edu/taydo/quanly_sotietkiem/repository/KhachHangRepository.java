@@ -7,4 +7,7 @@ import java.util.Optional;
 
 public interface KhachHangRepository extends MongoRepository<KhachHang, String> {
     Optional<KhachHang> findByCccd(String cccd);
+
+
+
 }

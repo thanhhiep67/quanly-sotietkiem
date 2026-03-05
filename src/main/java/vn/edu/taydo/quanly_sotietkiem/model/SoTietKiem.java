@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SoTietKiem {
+
     @Id
     private String maSo;
 

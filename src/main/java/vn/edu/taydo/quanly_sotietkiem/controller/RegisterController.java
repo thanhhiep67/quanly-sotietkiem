@@ -35,6 +35,7 @@ public class RegisterController {
                            @RequestParam(required = false) String diaChi,
                            @RequestParam(required = false) String ngaySinh,
                            @RequestParam String gioiTinh,
+                           @RequestParam String email,
                            @RequestParam String password,
                            @RequestParam String confirmPassword,
                            Model model) {
@@ -63,6 +64,7 @@ public class RegisterController {
         kh.setTaikhoan_id(tk.getId());
         kh.setHoten(hoten);
         kh.setCccd(cccd);
+        kh.setCccd(email);
         kh.setSdt(sdt);
         kh.setGioiTinh(gioiTinh);
         kh.setDiaChi(diaChi);

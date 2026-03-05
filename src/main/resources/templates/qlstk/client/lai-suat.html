@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -19,13 +19,13 @@
             </div>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
-            <a href="tra-cuu-so.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
-            <a href="giao-dich.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">history</span> Giao dịch</a>
-            <a href="lai-suat.html" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
+            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
+            <a href="tra-cuu-so" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
+            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">history</span> Giao dịch</a>
+            <a href="lai-suat" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
         </nav>
         <div class="p-4 border-t border-slate-800">
-            <a href="login.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
+            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
         </div>
     </aside>
 
@@ -33,50 +33,28 @@
         <div class="max-w-6xl mx-auto space-y-12">
             <div class="text-center">
                 <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Bảng Lãi Suất Tiết Kiệm</h2>
-                <p class="text-slate-500 mt-2">Cập nhật mới nhất ngày 16/01/2026</p>
+                <p class="text-slate-500 mt-2">Cập nhật mới nhất ngày <span th:text="${ngayCapNhat}"></span></p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                <div th:each="item : ${laiSuatList}"
+                     class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all">
                     <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-8">
-                        <span class="material-symbols-outlined text-4xl">schedule</span>
+                        <span class="material-symbols-outlined text-4xl">percent</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Không kỳ hạn</h3>
-                    <p class="text-slate-500 text-sm mb-8">Linh hoạt nộp/rút tiền bất cứ lúc nào qua Internet Banking.</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2"
+                        th:text="${item.loaiSo.kyHanThang == null ? 'Không kỳ hạn' : item.loaiSo.kyHanThang + ' Tháng'}"></h3>
+                    <p class="text-slate-500 text-sm mb-8">Lãi suất áp dụng cho loại sổ này.</p>
                     <div class="flex items-baseline gap-1 mb-10">
-                        <span class="text-5xl font-black text-blue-600">0.2%</span>
+            <span class="text-5xl font-black text-blue-600"
+                  th:text="${item.laiSuat != null ? item.laiSuat.laiSuatNam + '%' : 'N/A'}"></span>
                         <span class="text-slate-400 font-bold">/năm</span>
                     </div>
-                    <a href="mo-so-tiet-kiem.html" class="block w-full text-center py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-blue-600 hover:text-white transition-all">Mở sổ ngay</a>
-                </div>
-
-                <div class="bg-[#0f172a] p-10 rounded-[3rem] shadow-2xl shadow-blue-200 border-2 border-blue-600 relative scale-105">
-                    <div class="absolute top-0 right-10 bg-blue-600 text-white px-4 py-1 rounded-b-xl text-[10px] font-black uppercase tracking-widest">Phổ biến</div>
-                    <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-8">
-                        <span class="material-symbols-outlined text-4xl">workspace_premium</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">6 Tháng</h3>
-                    <p class="text-slate-400 text-sm mb-8">Tối ưu lợi nhuận cho các khoản tiết kiệm trung hạn.</p>
-                    <div class="flex items-baseline gap-1 mb-10">
-                        <span class="text-5xl font-black text-blue-50">5.8%</span>
-                        <span class="text-slate-500 font-bold">/năm</span>
-                    </div>
-                    <a href="mo-so-tiet-kiem.html" class="block w-full text-center py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/50 hover:bg-blue-700 transition-all">Mở sổ ngay</a>
-                </div>
-
-                <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all">
-                    <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-8">
-                        <span class="material-symbols-outlined text-4xl">trending_up</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2">12 Tháng</h3>
-                    <p class="text-slate-500 text-sm mb-8">Lãi suất cao nhất dành cho các khoản tích lũy dài hạn.</p>
-                    <div class="flex items-baseline gap-1 mb-10">
-                        <span class="text-5xl font-black text-emerald-600">6.5%</span>
-                        <span class="text-slate-400 font-bold">/năm</span>
-                    </div>
-                    <a href="mo-so-tiet-kiem.html" class="block w-full text-center py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-emerald-600 hover:text-white transition-all">Mở sổ ngay</a>
+                    <a href="/mo-so-tiet-kiem" class="block w-full text-center py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-blue-600 hover:text-white transition-all">Mở sổ ngay</a>
                 </div>
             </div>
+
+
         </div>
     </main>
 </div>

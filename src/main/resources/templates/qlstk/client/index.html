@@ -30,7 +30,7 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="index" class="active-nav flex items-center gap-3 px-4 py-3 rounded-xl transition">
+            <a href="" class="active-nav flex items-center gap-3 px-4 py-3 rounded-xl transition">
                 <span class="material-symbols-outlined">grid_view</span> Tổng quan
             </a>
             <a href="tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition">
@@ -51,9 +51,10 @@
                 </div>
                 <div class="overflow-hidden">
                     <p class="text-sm font-bold text-white truncate" th:text="${tenKhachHang}">Nguyễn Văn A</p>
+                    <p class="text-xs text-slate-400"
+                       th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}"></p>
                 </div>
             </div>
-
 
             <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition group">
                 <span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
