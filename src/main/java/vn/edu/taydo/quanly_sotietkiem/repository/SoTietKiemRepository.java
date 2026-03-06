@@ -4,6 +4,8 @@ import org.bson.Document;
 
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.query.Param;
 import vn.edu.taydo.quanly_sotietkiem.model.LoaiSoThongKeMap;
 import vn.edu.taydo.quanly_sotietkiem.model.SoTietKiem;
 
@@ -40,4 +42,7 @@ public interface SoTietKiemRepository extends MongoRepository<SoTietKiem, String
     long countByNgayDongSoBetween(Date startOfDay, Date endOfDay);
 
     long countByNgayMoSoBetween(Date startOfDay, Date endOfDay);
+
+
+
 }

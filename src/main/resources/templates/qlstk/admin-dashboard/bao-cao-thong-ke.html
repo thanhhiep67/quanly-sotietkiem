@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="vi" class="light">
+<html lang="vi" class="light" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BÁO CÁO DOANH SỐ</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <link rel="stylesheet" href="admin-dashboard/css/styles.css">
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
 
 <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
     <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
         <div class="p-6 border-b border-slate-800">
             <div class="flex items-center gap-3">
@@ -29,23 +27,24 @@
             <div>
                 <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
                 <ul class="space-y-1">
-                    <li><a href="index.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="mo-so-tiet-kiem.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="quan-ly-khach-hang.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="quan-ly-loai-tiet-kiem.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
+                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
+                    <li><a href="/admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
+                    <li><a href="/admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
+                    <li><a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
                 </ul>
             </div>
             <div>
                 <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
                 <ul class="space-y-1">
-                    <li><a href="giao-dich.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="tra-cuu-so.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="bao-cao-thong-ke.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
+                    <li><a href="/admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
+                    <li><a href="/admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
+                    <li><a href="/admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
                 </ul>
             </div>
         </nav>
     </aside>
 
+    <!-- Main -->
     <main class="flex-1 overflow-y-auto flex flex-col">
         <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
             <h2 class="text-xl font-bold text-slate-800">Báo cáo doanh số</h2>
@@ -55,38 +54,45 @@
         </header>
 
         <div class="p-8 space-y-8">
+            <!-- Biểu đồ đường -->
             <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-slate-800">Biểu đồ đường: Xu hướng doanh số 30 ngày</h3>
-                    <div class="text-sm text-gray-500">Đơn vị: Triệu VNĐ</div>
-                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-6">Biểu đồ đường: Chênh lệch Thu - Chi</h3>
                 <div class="h-80 w-full">
                     <canvas id="lineChartReport"></canvas>
                 </div>
             </div>
 
-            
+            <!-- Biểu đồ cột -->
+            <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-800 mb-6">Biểu đồ cột: Thu vs Chi</h3>
+                <div class="h-80 w-full">
+                    <canvas id="barChartReport"></canvas>
+                </div>
+            </div>
 
+            <!-- Bảng dữ liệu -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-gray-100 flex justify-between">
-                    <h3 class="text-lg font-bold text-slate-800">Dữ liệu chi tiết</h3>
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-slate-800">Dữ liệu chi tiết 7 ngày gần nhất</h3>
                 </div>
                 <table class="w-full text-left">
                     <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase">
-                        <tr>
-                            <th class="px-6 py-4">Ngày</th>
-                            <th class="px-6 py-4 text-right">Tổng Thu</th>
-                            <th class="px-6 py-4 text-right">Tổng Chi</th>
-                            <th class="px-6 py-4 text-right">Chênh lệch</th>
-                        </tr>
+                    <tr>
+                        <th class="px-6 py-4">Ngày</th>
+                        <th class="px-6 py-4 text-right">Tổng Thu</th>
+                        <th class="px-6 py-4 text-right">Tổng Chi</th>
+                        <th class="px-6 py-4 text-right">Chênh lệch</th>
+                    </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-sm">
-                        <tr>
-                            <td class="px-6 py-4 font-medium">16/01/2026</td>
-                            <td class="px-6 py-4 text-right text-green-600">1,500tr</td>
-                            <td class="px-6 py-4 text-right text-red-500">450tr</td>
-                            <td class="px-6 py-4 text-right font-bold">+1,050tr</td>
-                        </tr>
+                    <tr th:each="baoCao : ${baoCaoList}">
+                        <td class="px-6 py-4 font-medium" th:text="${#temporals.format(baoCao.ngay, 'dd/MM/yyyy')}"></td>
+                        <td class="px-6 py-4 text-right text-green-600" th:text="${baoCao.tongThu}"></td>
+                        <td class="px-6 py-4 text-right text-red-500" th:text="${baoCao.tongChi}"></td>
+                        <td class="px-6 py-4 text-right font-bold"
+                            th:text="${baoCao.chenhLech >= 0 ? '+' + baoCao.chenhLech : baoCao.chenhLech}">
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -94,26 +100,28 @@
     </main>
 </div>
 
-<script>
-    const ctxLine = document.getElementById('lineChartReport').getContext('2d');
-    
-    // Tạo hiệu ứng đổ màu (gradient) cho đường biểu đồ
-    const gradient = ctxLine.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-    gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+<!-- Chart.js scripts -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Lấy dữ liệu từ Controller
+    const labels = [[${labels}]];
+    const tongThuData = [[${tongThu}]];
+    const tongChiData = [[${tongChi}]];
+    const chenhLechData = [[${chenhLech}]];
 
+    // Biểu đồ đường: Chênh lệch Thu - Chi
+    const ctxLine = document.getElementById('lineChartReport').getContext('2d');
     new Chart(ctxLine, {
         type: 'line',
         data: {
-            labels: ['01/01', '05/01', '10/01', '15/01', '20/01', '25/01', '30/01'],
+            labels: labels,
             datasets: [{
-                label: 'Doanh số thực tế',
-                data: [400, 750, 500, 900, 1100, 850, 1500],
-                borderColor: '#3b82f6', // Màu xanh dương
+                label: 'Chênh lệch',
+                data: chenhLechData,
+                borderColor: '#3b82f6',
                 borderWidth: 3,
-                backgroundColor: gradient,
-                fill: true,
-                tension: 0.4, // Tạo độ cong cho đường
+                fill: false,
+                tension: 0.4,
                 pointBackgroundColor: '#fff',
                 pointBorderColor: '#3b82f6',
                 pointHoverRadius: 6
@@ -122,21 +130,46 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
+            plugins: { legend: { display: true } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { borderDash: [5, 5] }
-                },
-                x: {
-                    grid: { display: false }
-                }
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
             }
         }
     });
+
+    // Biểu đồ cột: Thu vs Chi
+    const ctxBar = document.getElementById('barChartReport').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Tổng Thu',
+                    data: tongThuData,
+                    backgroundColor: 'rgba(34,197,94,0.7)' // xanh lá
+                },
+                {
+                    label: 'Tổng Chi',
+                    data: tongChiData,
+                    backgroundColor: 'rgba(239,68,68,0.7)' // đỏ
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+    /*]]>*/
 </script>
+
+
+
 
 <script src="../../../static/css/js/script.js"></script>
 </body>

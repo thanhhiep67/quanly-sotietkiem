@@ -66,6 +66,7 @@ public class AdminQLLsTkController {
 
         // Tạo loại sổ
         LoaiSoTK loaiSo = new LoaiSoTK();
+        loaiSo.setId(generateLoaiSoId());
         loaiSo.setTenLoai(tenLoai);
         loaiSo.setKyHanThang(kyHanThang);
         loaiSo.setChoGuiThem(choGuiThem);
@@ -94,5 +95,13 @@ public class AdminQLLsTkController {
         loaiSoTKRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Xóa loại tiết kiệm thành công!");
         return "redirect:/admin/quan-ly-loai-tiet-kiem";
+    }
+
+
+    public String generateLoaiSoId() {
+        // Lấy số lượng hiện có
+        long count = loaiSoTKRepository.count();
+        // Sinh ID theo dạng LS + số thứ tự
+        return String.format("LS%03d", count + 1);
     }
 }

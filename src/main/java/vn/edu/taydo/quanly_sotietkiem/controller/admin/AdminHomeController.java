@@ -40,7 +40,9 @@ public class AdminHomeController {
 
     @GetMapping("")
     public String admin(Model model,
-                        @RequestParam(defaultValue = "7") int days,HttpServletRequest request) {
+                        @RequestParam(defaultValue = "7") int days,
+                        HttpServletRequest request) {
+
         // Yêu cầu mở sổ chờ duyệt
         List<YeuCauMoSo> list = yeuCauMoSoRepository.findByTrangThaiOrderByCreatedAtDesc("CHO");
         List<YeuCauViewAdmin> viewList = new ArrayList<>();
@@ -69,29 +71,22 @@ public class AdminHomeController {
         LocalDate end = LocalDate.now();
         LocalDate start = end.minusDays(days);
 
-        LocalDate temp = start;
-        while (!temp.isAfter(end)) {
-            baoCaoService.taoBaoCaoNgay(temp);
-            temp = temp.plusDays(1);
-        }
-
+        // KHÔNG cần gọi taoBaoCaoNgay nữa vì đã có Scheduled Task
         List<BaoCaoNgay> baoCaoList = baoCaoService.layBaoCao(start, end);
         model.addAttribute("baoCaoList", baoCaoList);
         model.addAttribute("days", days);
 
-// ===== CHUẨN THEO MODEL =====
+        // Chuẩn bị dữ liệu cho Chart.js
         List<String> chartLabels = new ArrayList<>();
         List<Double> chartValues = new ArrayList<>();
-
         for (BaoCaoNgay bc : baoCaoList) {
             chartLabels.add(bc.getNgay().toString());
-            chartValues.add(bc.getChenhLech()); // dùng chênh lệch
+            chartValues.add(bc.getChenhLech());
         }
-
         model.addAttribute("chartLabels", chartLabels);
         model.addAttribute("chartValues", chartValues);
 
-
+        // Thông tin đăng nhập
         Map<String, Object> claims = JwtUtil.getClaimsFromCookie(request);
         if (claims == null) {
             return "redirect:/login";
@@ -106,6 +101,7 @@ public class AdminHomeController {
 
         return "qlstk/admin-dashboard/index";
     }
+
 
     @PostMapping("/duyet-yeu-cau")
     public String duyetYeuCau(@RequestParam("id") String id, HttpServletRequest request) {

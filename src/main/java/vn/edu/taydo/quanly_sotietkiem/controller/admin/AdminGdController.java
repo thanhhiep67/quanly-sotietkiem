@@ -37,7 +37,7 @@ public class AdminGdController {
         return "qlstk/admin-dashboard/giao-dich";
     }
 
-    // Tìm kiếm khách hàng theo CCCD và hiển thị danh sách sổ
+    // Tìm kiếm khách hàng theo CCCD và hiển thị danh sách sổ + lịch sử giao dịch
     @GetMapping("/tim-kiem")
     public String timKiemTheoCccd(@RequestParam String cccd, Model model, RedirectAttributes redirectAttributes) {
         Optional<KhachHang> khOpt = khachHangRepository.findByCccd(cccd);
@@ -48,9 +48,11 @@ public class AdminGdController {
 
         KhachHang kh = khOpt.get();
         List<SoTietKiem> soList = soTietKiemRepository.findByKhachHangId(kh.getId());
+        List<GiaoDich> gdList = giaoDichRepository.findByKhachHangIdOrderByNgayGiaoDichDesc(kh.getId());
 
         model.addAttribute("khachHang", kh);
         model.addAttribute("soList", soList);
+        model.addAttribute("gdList", gdList);
         return "qlstk/admin-dashboard/giao-dich";
     }
 
@@ -74,18 +76,17 @@ public class AdminGdController {
         if ("RUT".equals(loai)) {
             if (stk.getNgayDaoHan() != null && today.before(stk.getNgayDaoHan())) {
                 redirectAttributes.addFlashAttribute("error", "Chưa tới ngày đáo hạn, không thể rút!");
-                return "redirect:/admin/giao-dich";
+                return "redirect:/admin/giao-dich/tim-kiem?cccd=" + getCccdByKhachHangId(stk.getKhachHangId());
             }
             if (stk.getSoDuHienTai() < soTien) {
                 redirectAttributes.addFlashAttribute("error", "Số dư không đủ để rút!");
-                return "redirect:/admin/giao-dich";
+                return "redirect:/admin/giao-dich/tim-kiem?cccd=" + getCccdByKhachHangId(stk.getKhachHangId());
             }
             stk.setSoDuHienTai(stk.getSoDuHienTai() - soTien);
             stk.setTrangThai("DONG");
             stk.setNgayDongSo(LocalDate.now());
-        } else if ("NAP".equals(loai)) {
+        } else if ("GUI".equals(loai) || "NAP".equals(loai)) {
             stk.setSoDuHienTai(stk.getSoDuHienTai() + soTien);
-            System.out.println("scsaucbsdc" + stk.getSoDuHienTai());
         }
 
         // lưu giao dịch
@@ -94,8 +95,9 @@ public class AdminGdController {
         gd.setKhachHangId(stk.getKhachHangId());
         gd.setSoTien(soTien);
         gd.setLoaiGiaoDich(loai);
-        gd.setGhiChu("GUI".equals(loai) ? "Gửi tiền tiết kiệm" : "Rút tiền tiết kiệm");
+        gd.setGhiChu("RUT".equals(loai) ? "Rút tiền tiết kiệm" : "Gửi tiền tiết kiệm");
         gd.setTrangThai("COMPLETED");
+        gd.setCreatedAt(new Date());
         gd.setNgayGiaoDich(ngayThucHien != null ? ngayThucHien : today);
         giaoDichRepository.save(gd);
 
@@ -103,9 +105,15 @@ public class AdminGdController {
         soTietKiemRepository.save(stk);
 
         redirectAttributes.addFlashAttribute("message", "Thực hiện giao dịch thành công!");
-        return "redirect:/admin/giao-dich";
+        return "redirect:/admin/giao-dich/tim-kiem?cccd=" + getCccdByKhachHangId(stk.getKhachHangId());
     }
 
+    // Hàm tiện ích để lấy CCCD từ khachHangId
+    private String getCccdByKhachHangId(String khachHangId) {
+        return khachHangRepository.findById(khachHangId)
+                .map(KhachHang::getCccd)
+                .orElse("");
+    }
 
 
 }

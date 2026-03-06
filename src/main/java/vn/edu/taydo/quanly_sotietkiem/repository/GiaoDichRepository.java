@@ -24,4 +24,6 @@ public interface GiaoDichRepository extends MongoRepository<GiaoDich, String> {
 
     List<GiaoDich> findByLoaiGiaoDichAndNgayGiaoDichBetween(
             String loai, Date start, Date end);
+
+    List<GiaoDich> findByKhachHangIdOrderByNgayGiaoDichDesc(String id);
 }
