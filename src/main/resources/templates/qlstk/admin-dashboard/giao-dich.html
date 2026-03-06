@@ -1,183 +1,338 @@
 <!DOCTYPE html>
-<html lang="vi" class="light" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>GIAO DỊCH - Gửi & Rút tiền</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/admin-dashboard/css/styles.css">
-</head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+    <link rel="stylesheet" href="/css/shared.css"/>
+    <style>
+        /* ── Customer info card ── */
+        .kh-card {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-3) 100%);
+            border-radius: 14px; padding: 20px 24px;
+            display: flex; align-items: center; gap: 16px;
+            position: relative; overflow: hidden;
+        }
+        .kh-card::after {
+            content: ''; position: absolute; right: -20px; top: -20px;
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 1px solid rgba(201,168,76,.2); pointer-events: none;
+        }
+        .kh-avatar {
+            width: 48px; height: 48px; flex-shrink: 0; border-radius: 13px;
+            background: rgba(201,168,76,.2); border: 1px solid rgba(201,168,76,.35);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .kh-avatar .material-icons-outlined { font-size: 24px; color: var(--gold-lt); }
+        .kh-name  { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--white); }
+        .kh-cccd  { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 3px; letter-spacing: .5px; }
 
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <span class="material-icons-outlined text-white text-3xl">savings</span>
+        /* ── Sổ table inline form ── */
+        .so-form-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .input-sm {
+            padding: 9px 12px;
+            border: 1.5px solid var(--gray-1); border-radius: 9px;
+            font-family: 'DM Sans', sans-serif; font-size: 13px;
+            color: var(--text); background: var(--cream); outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance: none;
+        }
+        .input-sm:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.1); background: var(--white); }
+        .input-sm.w-money { width: 140px; }
+        .input-sm.w-date  { width: 148px; }
+
+        .select-sm {
+            padding: 9px 32px 9px 12px;
+            border: 1.5px solid var(--gray-1); border-radius: 9px;
+            font-family: 'DM Sans', sans-serif; font-size: 13px;
+            color: var(--text); background: var(--cream); outline: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B8B0A4' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 8px center;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .select-sm:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
+
+        .btn-execute {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 9px 16px; border-radius: 9px;
+            font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+            background: linear-gradient(135deg, var(--navy-2), var(--navy-3));
+            color: var(--white); border: none; cursor: pointer;
+            transition: all .2s; white-space: nowrap;
+        }
+        .btn-execute:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(11,31,58,.25); }
+        .btn-execute .material-icons-outlined { font-size: 15px; color: var(--gold-lt); }
+
+        .td-maso { font-family: 'DM Serif Display', serif; font-size: 14px; font-weight: 700; color: var(--navy-3); }
+        .td-sodu { font-weight: 600; color: var(--navy); font-size: 14px; }
+
+        /* ── History table ── */
+        .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px; color: var(--navy); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title .material-icons-outlined { font-size: 20px; color: var(--gold); }
+
+        .badge-nap { background: rgba(45,125,90,.1);  color: var(--green); }
+        .badge-rut { background: rgba(185,64,64,.09); color: var(--red);   }
+
+        .td-date-sm { font-size: 12.5px; color: var(--gray-2); }
+        .td-amount  { font-weight: 600; color: var(--navy); }
+        .td-note    { font-size: 12.5px; color: var(--gray-2); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* ── Confirm modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(11,31,58,.55); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 50;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: 18px; padding: 32px 28px;
+            width: 100%; max-width: 380px;
+            box-shadow: 0 20px 60px rgba(11,31,58,.22);
+            animation: modalIn .2s ease;
+        }
+        @keyframes modalIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+        .modal-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(201,168,76,.12); border: 1px solid rgba(201,168,76,.25);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+        }
+        .modal-icon .material-icons-outlined { font-size: 26px; color: var(--gold); }
+        .modal-title { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--navy); margin-bottom: 8px; }
+        .modal-desc  { font-size: 13.5px; color: var(--gray-2); line-height: 1.55; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+        .btn-cancel {
+            padding: 10px 20px; border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500;
+            border: 1.5px solid var(--gray-1); color: var(--gray-2);
+            background: none; cursor: pointer; transition: all .2s;
+        }
+        .btn-cancel:hover { border-color: var(--navy); color: var(--navy); }
+        .btn-confirm {
+            padding: 10px 20px; border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+            background: linear-gradient(135deg, var(--navy-2), var(--navy-3));
+            color: var(--white); border: none; cursor: pointer; transition: all .2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-confirm .material-icons-outlined { font-size: 16px; color: var(--gold-lt); }
+        .btn-confirm:hover { box-shadow: 0 4px 14px rgba(11,31,58,.25); }
+    </style>
+</head>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-icons-outlined">savings</span></div>
+        <div class="logo-text">VietSave Bank<span>Hệ thống nội bộ</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Chính</p>
+            <a href="/admin" class="nav-item"><span class="material-icons-outlined">dashboard</span>Tổng quan</a>
+            <a href="/admin/mo-so" class="nav-item"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a>
+            <a href="/admin/quan-ly-khach-hang" class="nav-item"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a>
+            <a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item"><span class="material-icons-outlined">settings_suggest</span>Loại tiết kiệm</a>
+        </div>
+        <div class="nav-group">
+            <p class="nav-section-label">Nghiệp vụ</p>
+            <a href="/admin/giao-dich" class="nav-item active"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a>
+            <a href="/admin/tra-cuu-so" class="nav-item"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a>
+            <a href="/admin/bao-cao-thong-ke" class="nav-item"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a>
+        </div>
+    </nav>
+
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <h2 class="header-title">Giao dịch Gửi / Rút tiền</h2>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Alerts -->
+        <div th:if="${message}" class="alert alert-success" id="alertMessage">
+            <span class="material-icons-outlined">check_circle</span>
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error" id="alertError">
+            <span class="material-icons-outlined">error_outline</span>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Search bar -->
+        <div class="search-bar">
+            <form th:action="@{/admin/giao-dich/tim-kiem}" method="get"
+                  style="display:flex;gap:12px;align-items:center;flex:1;">
+                <div class="search-wrap">
+                    <span class="material-icons-outlined search-icon">badge</span>
+                    <input type="text" name="cccd" class="search-input"
+                           placeholder="Nhập số CCCD khách hàng để tra cứu sổ..."/>
                 </div>
-                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
+                <button type="submit" class="btn-search">
+                    <span class="material-icons-outlined">search</span>
+                    Tìm kiếm
+                </button>
+            </form>
+        </div>
+
+        <!-- Thông tin khách hàng -->
+        <div th:if="${khachHang != null}" class="kh-card">
+            <div class="kh-avatar"><span class="material-icons-outlined">person</span></div>
+            <div>
+                <div class="kh-name" th:text="${khachHang.hoten}"></div>
+                <div class="kh-cccd">CCCD: <span th:text="${khachHang.cccd}"></span></div>
             </div>
         </div>
-        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="/admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="/admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
-                </ul>
+
+        <!-- Danh sách sổ -->
+        <div th:if="${soList != null}" class="table-panel">
+            <div class="table-header">
+                <div class="table-title">Sổ tiết kiệm</div>
             </div>
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="/admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="/admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto flex flex-col">
-        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center sticky top-0 z-10">
-            <h2 class="text-xl font-bold text-slate-800">Giao dịch Gửi/Rút tiền</h2>
-        </header>
-
-        <div class="p-8">
-            <div class="max-w-5xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-
-                <!-- Thông báo -->
-                <div th:if="${message}" id="alertMessage"
-                     class="mb-4 p-4 rounded-lg bg-green-100 text-green-700 border border-green-300">
-                    <span th:text="${message}"></span>
-                </div>
-                <div th:if="${error}" id="alertError"
-                     class="mb-4 p-4 rounded-lg bg-red-100 text-red-700 border border-red-300">
-                    <span th:text="${error}"></span>
-                </div>
-
-                <!-- Form tìm kiếm CCCD -->
-                <form th:action="@{/admin/giao-dich/tim-kiem}" method="get" class="flex gap-4 mb-6">
-                    <input type="text" name="cccd" placeholder="Nhập số CCCD khách hàng..."
-                           class="flex-1 border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20">
-                    <button type="submit"
-                            class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">
-                        Tìm kiếm
-                    </button>
-                </form>
-
-                <!-- Thông tin khách hàng -->
-                <div th:if="${khachHang != null}" class="mb-6">
-                    <h3 class="text-lg font-bold text-slate-700">Khách hàng: <span th:text="${khachHang.hoten}"></span></h3>
-                    <p class="text-gray-600">CCCD: <span th:text="${khachHang.cccd}"></span></p>
-                </div>
-
-                <!-- Danh sách sổ tiết kiệm -->
-                <div th:if="${soList != null}">
-                    <table class="w-full text-left border rounded-xl overflow-hidden shadow-sm">
-                        <thead class="bg-gray-50 text-gray-600 text-xs font-bold uppercase tracking-wider">
-                        <tr>
-                            <th class="px-6 py-3">Mã sổ</th>
-                            <th class="px-6 py-3">Số dư hiện tại</th>
-                            <th class="px-6 py-3 text-center">Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                        <tr th:each="so : ${soList}" class="hover:bg-blue-50 transition">
-                            <!-- Mã sổ -->
-                            <td class="px-6 py-4 font-medium text-blue-700" th:text="${so.maSo}"></td>
-                            <!-- Số dư -->
-                            <td class="px-6 py-4 font-semibold text-slate-800" th:text="${#numbers.formatDecimal(so.soDuHienTai, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                            <!-- Form giao dịch -->
-                            <td class="px-6 py-4">
-                                <form th:action="@{/admin/giao-dich/thuc-hien}" method="post"
-                                      class="flex flex-wrap gap-3 items-center justify-center"
-                                      onsubmit="return confirmTransaction()">
-
-                                    <!-- Hidden mã sổ -->
-                                    <input type="hidden" name="maSo" th:value="${so.maSo}"/>
-
-                                    <!-- Số tiền -->
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Mã sổ</th>
+                        <th>Số dư hiện tại</th>
+                        <th style="text-align:center;">Thực hiện giao dịch</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="so : ${soList}">
+                        <td class="td-maso" th:text="${so.maSo}"></td>
+                        <td class="td-sodu"
+                            th:text="${#numbers.formatDecimal(so.soDuHienTai, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                        <td>
+                            <form th:action="@{/admin/giao-dich/thuc-hien}" method="post"
+                                  onsubmit="return openTransactionModal(event, this)">
+                                <input type="hidden" name="maSo" th:value="${so.maSo}"/>
+                                <div class="so-form-row" style="justify-content:center;">
                                     <input type="number" name="soTien" min="1000" step="1000"
-                                           placeholder="Nhập số tiền"
-                                           class="border border-gray-300 p-2 rounded-lg w-32 focus:ring-2 focus:ring-blue-500"/>
-
-                                    <!-- Ngày thực hiện (mặc định hôm nay) -->
+                                           placeholder="Số tiền" class="input-sm w-money"/>
                                     <input type="date" name="ngayThucHien"
                                            th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
-                                           class="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500"/>
-
-                                    <!-- Loại giao dịch -->
-                                    <select name="loai" class="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        <option value="NAP">Gửi tiền</option>
-                                        <option value="RUT">Rút tiền</option>
+                                           class="input-sm w-date"/>
+                                    <select name="loai" class="select-sm">
+                                        <option value="NAP">↑ Gửi tiền</option>
+                                        <option value="RUT">↓ Rút tiền</option>
                                     </select>
-
-                                    <!-- Nút submit -->
-                                    <button type="submit"
-                                            class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-blue-700 transition">
+                                    <button type="submit" class="btn-execute">
+                                        <span class="material-icons-outlined">bolt</span>
                                         Thực hiện
                                     </button>
-                                </form>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Lịch sử giao dịch -->
-                <div th:if="${gdList != null}" class="mt-10">
-                    <h3 class="text-lg font-bold text-slate-700 mb-4">Lịch sử giao dịch của khách hàng</h3>
-                    <table class="w-full text-left border rounded-xl overflow-hidden shadow-sm">
-                        <thead class="bg-gray-50 text-gray-600 text-xs font-bold uppercase tracking-wider">
+        <!-- Lịch sử giao dịch -->
+        <div th:if="${gdList != null}">
+            <div class="section-title">
+                <span class="material-icons-outlined">history</span>
+                Lịch sử giao dịch
+            </div>
+            <div class="table-panel">
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
                         <tr>
-                            <th class="px-6 py-3">Ngày giao dịch</th>
-                            <th class="px-6 py-3">Mã sổ</th>
-                            <th class="px-6 py-3">Loại</th>
-                            <th class="px-6 py-3">Số tiền</th>
-                            <th class="px-6 py-3">Trạng thái</th>
-                            <th class="px-6 py-3">Ghi chú</th>
+                            <th>Ngày GD</th>
+                            <th>Mã sổ</th>
+                            <th>Loại</th>
+                            <th>Số tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Ghi chú</th>
                         </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                        <tr th:each="gd : ${gdList}" class="hover:bg-blue-50 transition">
-                            <td class="px-6 py-4" th:text="${#dates.format(gd.ngayGiaoDich, 'dd/MM/yyyy')}"></td>
-                            <td class="px-6 py-4" th:text="${gd.soTkId}"></td>
-                            <td class="px-6 py-4 font-medium" th:text="${gd.loaiGiaoDich}"></td>
-                            <td class="px-6 py-4 font-semibold text-slate-800"
+                        <tbody>
+                        <tr th:each="gd : ${gdList}">
+                            <td class="td-date-sm" th:text="${#dates.format(gd.ngayGiaoDich, 'dd/MM/yyyy')}"></td>
+                            <td class="td-maso"    th:text="${gd.soTkId}"></td>
+                            <td>
+                                <span th:if="${gd.loaiGiaoDich == 'NAP'}"
+                                      class="badge badge-nap">↑ Gửi</span>
+                                <span th:if="${gd.loaiGiaoDich == 'RUT'}"
+                                      class="badge badge-rut">↓ Rút</span>
+                                <span th:if="${gd.loaiGiaoDich != 'NAP' and gd.loaiGiaoDich != 'RUT'}"
+                                      class="badge" th:text="${gd.loaiGiaoDich}"></span>
+                            </td>
+                            <td class="td-amount"
                                 th:text="${#numbers.formatDecimal(gd.soTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
-                            <td class="px-6 py-4" th:text="${gd.trangThai}"></td>
-                            <td class="px-6 py-4 text-gray-600" th:text="${gd.ghiChu}"></td>
+                            <td th:text="${gd.trangThai}"></td>
+                            <td class="td-note" th:text="${gd.ghiChu}"></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </main>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 Hệ thống quản lý sổ tiết kiệm · Version 1.0.0</footer>
+</main>
+
+<!-- ════ MODAL XÁC NHẬN GIAO DỊCH ════ -->
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <span class="material-icons-outlined">swap_horiz</span>
+        </div>
+        <div class="modal-title">Xác nhận giao dịch</div>
+        <div class="modal-desc">Bạn có chắc chắn muốn thực hiện giao dịch này? Thao tác không thể hoàn tác sau khi xác nhận.</div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-confirm" id="btnConfirmSubmit">
+                <span class="material-icons-outlined">check</span>
+                Xác nhận
+            </button>
+        </div>
+    </div>
 </div>
 
-<!-- Script -->
 <script>
-    // Ẩn thông báo sau 5s
-    setTimeout(function() {
-        const msg = document.getElementById("alertMessage");
-        const err = document.getElementById("alertError");
-        if (msg) msg.style.display = "none";
-        if (err) err.style.display = "none";
-    }, 5000);
+    let pendingForm = null;
 
-    // Xác nhận giao dịch
-    function confirmTransaction() {
-        return confirm("Bạn có chắc chắn muốn thực hiện giao dịch này?");
+    function openTransactionModal(e, form) {
+        e.preventDefault();
+        pendingForm = form;
+        document.getElementById('confirmModal').classList.add('open');
+        return false;
     }
+    function closeModal() {
+        document.getElementById('confirmModal').classList.remove('open');
+        pendingForm = null;
+    }
+    document.getElementById('btnConfirmSubmit').addEventListener('click', function() {
+        if (pendingForm) pendingForm.submit();
+    });
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Ẩn alert sau 5s
+    setTimeout(function() {
+        ['alertMessage','alertError'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }
+        });
+    }, 5000);
 </script>
 </body>
 </html>

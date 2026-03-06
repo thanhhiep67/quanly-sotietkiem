@@ -1,251 +1,703 @@
 <!DOCTYPE html>
-<html lang="vi" class="light" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>QUẢN LÝ TIẾT KIỆM - Tổng quan</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --navy:    #0B1F3A;
+            --navy-2:  #122849;
+            --navy-3:  #1A3660;
+            --gold:    #C9A84C;
+            --gold-lt: #E2C97E;
+            --cream:   #F8F4EE;
+            --gray-1:  #E8E2D9;
+            --gray-2:  #B8B0A4;
+            --text:    #1C1410;
+            --white:   #FFFFFF;
+            --green:   #2D7D5A;
+            --red:     #B94040;
+        }
 
-    <script src="https://cdn.tailwindcss.com"></script>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    <link rel="stylesheet" href="admin-dashboard/css/styles.css">
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ── SIDEBAR ─────────────────────────────── */
+        aside {
+            width: 280px;
+            min-width: 280px;
+            background: var(--navy);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        aside::before {
+            content: '';
+            position: absolute;
+            bottom: -80px; right: -80px;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201,168,76,.13) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .sidebar-logo {
+            padding: 28px 28px 24px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px rgba(201,168,76,.35);
+            flex-shrink: 0;
+        }
+        .logo-icon .material-icons-outlined { font-size: 22px; color: var(--navy); }
+
+        .logo-text {
+            font-family: 'DM Serif Display', serif;
+            font-size: 17px;
+            color: var(--white);
+            letter-spacing: .5px;
+            line-height: 1.2;
+        }
+        .logo-text span {
+            display: block; font-size: 10px; font-family: 'DM Sans', sans-serif;
+            font-weight: 300; color: var(--gray-2); letter-spacing: 2px;
+            text-transform: uppercase; margin-top: 2px;
+        }
+
+        nav { flex: 1; padding: 28px 16px; overflow-y: auto; }
+
+        .nav-section-label {
+            font-size: 9.5px; font-weight: 600; letter-spacing: 2.5px;
+            text-transform: uppercase; color: rgba(255,255,255,.22);
+            padding: 0 12px; margin-bottom: 10px;
+        }
+
+        .nav-group { margin-bottom: 32px; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px; border-radius: 10px;
+            font-size: 13.5px; font-weight: 400;
+            color: rgba(255,255,255,.52);
+            text-decoration: none;
+            transition: all .2s ease;
+            position: relative; margin-bottom: 2px;
+        }
+        .nav-item .material-icons-outlined { font-size: 19px; }
+        .nav-item:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.88); }
+        .nav-item.active {
+            background: rgba(201,168,76,.14);
+            color: var(--gold-lt);
+            font-weight: 500;
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute; left: 0; top: 20%; bottom: 20%;
+            width: 3px; background: var(--gold);
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* ── SIDEBAR FOOTER (nhân viên) ───────────── */
+        .sidebar-footer {
+            flex-shrink: 0;
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,.07);
+            background: rgba(0,0,0,.15);
+        }
+
+        .user-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .user-avatar {
+            width: 38px; height: 38px; flex-shrink: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .user-info { overflow: hidden; flex: 1; }
+        .user-name {
+            font-size: 13px; font-weight: 600;
+            color: var(--white); white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .user-role {
+            font-size: 10.5px; color: var(--gold);
+            letter-spacing: 1px; text-transform: uppercase;
+            font-weight: 500; margin-top: 1px;
+        }
+
+        .logout-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 10px;
+            font-size: 13px; font-weight: 500;
+            color: rgba(185,64,64,.85);
+            text-decoration: none;
+            transition: all .2s ease;
+            cursor: pointer; border: none; background: none; width: 100%;
+        }
+        .logout-btn:hover {
+            background: rgba(185,64,64,.1);
+            color: #e06060;
+        }
+        .logout-btn .material-icons-outlined { font-size: 17px; }
+
+        /* ── MAIN ─────────────────────────────────── */
+        main {
+            flex: 1; overflow-y: auto;
+            display: flex; flex-direction: column;
+            background: var(--cream);
+            min-width: 0;
+        }
+
+        header {
+            height: 64px;
+            background: rgba(248,244,238,.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--gray-1);
+            padding: 0 36px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px; color: var(--navy); letter-spacing: .2px;
+        }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+
+        .notif-btn {
+            position: relative;
+            width: 38px; height: 38px;
+            background: var(--gray-1); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; color: var(--gray-2);
+            transition: background .2s;
+        }
+        .notif-btn:hover { background: var(--gray-1); color: var(--navy); }
+        .notif-dot {
+            position: absolute; top: 7px; right: 7px;
+            width: 8px; height: 8px;
+            background: var(--red); border-radius: 50%;
+            border: 2px solid var(--cream);
+        }
+
+        .btn-new-so {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 9px 18px;
+            background: linear-gradient(135deg, var(--navy-2), var(--navy-3));
+            color: var(--white);
+            border-radius: 10px;
+            font-size: 13.5px; font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(11,31,58,.22);
+            transition: all .2s ease;
+            border: none; cursor: pointer;
+        }
+        .btn-new-so:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(11,31,58,.3); }
+        .btn-new-so .material-icons-outlined { font-size: 17px; color: var(--gold); }
+
+        /* ── PAGE BODY ────────────────────────────── */
+        .page-body { padding: 32px 36px; display: flex; flex-direction: column; gap: 28px; }
+
+        /* ── STAT CARDS ───────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 16px rgba(11,31,58,.06);
+            border: 1px solid rgba(232,226,217,.6);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+
+        .stat-icon-row { display: flex; align-items: center; justify-content: space-between; }
+
+        .stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stat-icon .material-icons-outlined { font-size: 22px; }
+        .stat-icon.blue  { background: rgba(37,99,235,.09);  color: #2563EB; }
+        .stat-icon.gold  { background: rgba(201,168,76,.12); color: var(--gold); }
+        .stat-icon.green { background: rgba(45,125,90,.1);   color: var(--green); }
+
+        .stat-label {
+            font-size: 10.5px; font-weight: 600;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            color: var(--gray-2);
+        }
+
+        .stat-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px; color: var(--navy);
+            line-height: 1;
+        }
+
+        /* ── MIDDLE ROW ───────────────────────────── */
+        .mid-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 16px rgba(11,31,58,.06);
+            border: 1px solid rgba(232,226,217,.6);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 24px 0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .panel-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 17px; color: var(--navy);
+        }
+
+        .panel-body { padding: 20px 24px 24px; }
+
+        /* Chart */
+        .chart-wrap { height: 240px; position: relative; }
+
+        /* Progress bars */
+        .progress-list { display: flex; flex-direction: column; gap: 18px; }
+
+        .progress-item {}
+        .progress-row {
+            display: flex; justify-content: space-between;
+            font-size: 13px; margin-bottom: 7px;
+        }
+        .progress-name { color: var(--text); font-weight: 500; }
+        .progress-pct  { color: var(--gold); font-weight: 600; font-size: 12px; }
+
+        .progress-track {
+            height: 6px; background: var(--gray-1);
+            border-radius: 99px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--navy-2), var(--navy-3));
+            border-radius: 99px;
+            transition: width .6s ease;
+        }
+
+        /* ── TABLE ────────────────────────────────── */
+        .table-panel { background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 16px rgba(11,31,58,.06); border: 1px solid rgba(232,226,217,.6); }
+
+        .table-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-1);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .table-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--navy); }
+
+        .btn-view-all {
+            font-size: 12px; font-weight: 600; color: var(--gold);
+            text-decoration: none; letter-spacing: .3px;
+            transition: color .2s;
+            border: none; background: none; cursor: pointer;
+        }
+        .btn-view-all:hover { color: var(--navy); }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead tr { background: var(--cream); }
+        thead th {
+            padding: 11px 20px;
+            font-size: 10.5px; font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            color: var(--gray-2); text-align: left;
+            white-space: nowrap;
+        }
+
+        tbody tr { border-top: 1px solid var(--gray-1); transition: background .15s; }
+        tbody tr:hover { background: rgba(248,244,238,.6); }
+
+        tbody td { padding: 13px 20px; font-size: 13.5px; color: var(--text); vertical-align: middle; }
+
+        .td-id { font-weight: 600; color: var(--navy-3); font-size: 12.5px; }
+        .td-name { font-weight: 500; }
+        .td-amount { font-weight: 600; color: var(--navy); }
+        .td-date { color: var(--gray-2); font-size: 12.5px; }
+
+        /* badges */
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 99px;
+            font-size: 11px; font-weight: 700; letter-spacing: .4px;
+            text-transform: uppercase; white-space: nowrap;
+        }
+        .badge::before { content:''; width:5px; height:5px; border-radius:50%; }
+        .badge-cho    { background: rgba(217,158,38,.12); color: #a07010; }
+        .badge-cho::before { background: #D99E26; }
+        .badge-duyet  { background: rgba(45,125,90,.1);  color: var(--green); }
+        .badge-duyet::before { background: var(--green); }
+        .badge-tuchoi { background: rgba(185,64,64,.09); color: var(--red); }
+        .badge-tuchoi::before { background: var(--red); }
+
+        /* action forms */
+        .action-cell { display: flex; align-items: center; gap: 8px; }
+
+        .action-cell form { display: flex; align-items: center; gap: 6px; }
+
+        .input-lydo {
+            border: 1.5px solid var(--gray-1);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            color: var(--text);
+            background: var(--cream);
+            outline: none;
+            width: 120px;
+            transition: border-color .2s;
+        }
+        .input-lydo:focus { border-color: var(--gold); }
+
+        .btn-duyet {
+            padding: 6px 14px; border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+            background: linear-gradient(135deg, var(--navy-2), var(--navy-3));
+            color: var(--white); border: none; cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-duyet:hover { transform: translateY(-1px); }
+
+        .btn-tuchoi {
+            padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+            background: rgba(185,64,64,.1);
+            color: var(--red); border: 1px solid rgba(185,64,64,.2);
+            cursor: pointer; transition: all .2s;
+        }
+        .btn-tuchoi:hover { background: rgba(185,64,64,.18); }
+
+        /* ── FOOTER ───────────────────────────────── */
+        footer {
+            margin-top: auto; padding: 20px 36px;
+            background: var(--white);
+            border-top: 1px solid var(--gray-1);
+            font-size: 12px; color: var(--gray-2);
+            text-align: center; flex-shrink: 0;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+<body>
 
-<div class="flex h-screen overflow-hidden">
-
-    <aside class="fixed top-0 left-0 h-screen w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <span class="material-icons-outlined text-white text-3xl">savings</span>
-                </div>
-                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
-            </div>
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon">
+            <span class="material-icons-outlined">savings</span>
         </div>
+        <div class="logo-text">
+            VietSave Bank
+            <span>Hệ thống nội bộ</span>
+        </div>
+    </div>
 
-        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
-                <ul class="space-y-1">
-                    <li><a href="admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
-                </ul>
-            </div>
-        </nav>
-
-        <div class="p-4 border-t border-slate-800 bg-slate-950/40">
-            <div class="flex items-center gap-3 p-3 bg-slate-800/40 rounded-2xl mb-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold shadow-md">
-                    <span th:text="${username != null ? username.substring(0,1).toUpperCase() : 'A'}"></span>
-                </div>
-                <div class="overflow-hidden">
-                    <p class="text-sm font-bold text-white truncate" th:text="${username}">Admin</p>
-                    <p class="text-xs text-slate-400" th:text="${role}">ADMIN</p>
-                </div>
-            </div>
-
-
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition group">
-                <span class="font-semibold">Đăng xuất</span>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Chính</p>
+            <a href="/admin" class="nav-item active">
+                <span class="material-icons-outlined">dashboard</span>Tổng quan
+            </a>
+            <a href="/admin/mo-so" class="nav-item">
+                <span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm
+            </a>
+            <a href="/admin/quan-ly-khach-hang" class="nav-item">
+                <span class="material-icons-outlined">group</span>Quản lý khách hàng
+            </a>
+            <a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item">
+                <span class="material-icons-outlined">settings_suggest</span>Loại tiết kiệm
             </a>
         </div>
-    </aside>
+        <div class="nav-group">
+            <p class="nav-section-label">Nghiệp vụ</p>
+            <a href="/admin/giao-dich" class="nav-item">
+                <span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)
+            </a>
+            <a href="/admin/tra-cuu-so" class="nav-item">
+                <span class="material-icons-outlined">manage_search</span>Tra cứu sổ
+            </a>
+            <a href="/admin/bao-cao-thong-ke" class="nav-item">
+                <span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số
+            </a>
+        </div>
+    </nav>
 
-    <main class="ml-72 flex-1 overflow-y-auto flex flex-col">
-        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
-            <div class="flex items-center gap-4">
-                <h2 class="text-xl font-bold text-slate-800">Bảng điều khiển</h2>
+    <!-- Nhân viên -->
+    <div class="sidebar-footer">
+        <div class="user-card">
+            <div class="user-avatar"
+                 th:text="${username != null ? username.substring(0,1).toUpperCase() : 'A'}">A</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${username}">Admin</div>
+                <div class="user-role" th:text="${role}">ADMIN</div>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="relative">
-                    <span class="material-icons-outlined text-gray-500 p-2 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200 transition">notifications</span>
-                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </div>
-                <a href="admin/mo-so" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
-                    <span class="material-icons-outlined">add</span> Mở sổ mới
-                </a>
-            </div>
-        </header>
+        </div>
+        <a href="/logout" class="logout-btn">
+            <span class="material-icons-outlined">logout</span>
+            Đăng xuất
+        </a>
+    </div>
+</aside>
 
-        <div class="p-6 lg:p-8 space-y-8">
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <h2 class="header-title">Bảng điều khiển</h2>
+        <div class="header-actions">
+            <button class="notif-btn">
+                <span class="material-icons-outlined" style="font-size:20px">notifications</span>
+                <span class="notif-dot"></span>
+            </button>
+            <a href="/admin/mo-so" class="btn-new-so">
+                <span class="material-icons-outlined">add</span>
+                Mở sổ mới
+            </a>
+        </div>
+    </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="bg-blue-50 p-3 rounded-lg text-blue-600">
-                            <span class="material-icons-outlined">payments</span>
-                        </div>
-                        <span class="text-green-500 text-sm font-bold flex items-center gap-1">
-                <span class="material-icons-outlined text-xs">trending_up</span>+8.4%
-            </span>
+    <div class="page-body">
+
+        <!-- ── Stat Cards ── -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon-row">
+                    <div class="stat-icon blue">
+                        <span class="material-icons-outlined">payments</span>
                     </div>
-                    <p class="text-gray-500 text-sm font-medium">TỔNG DOANH SỐ GỬI</p>
-                    <h3 class="text-3xl font-bold mt-1 text-slate-800"
-                        th:text="${#numbers.formatDecimal(tongTaiSanHienTai,0,'POINT',0,'COMMA')} + 'đ'"></h3>
-
                 </div>
-
-                <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="bg-purple-50 p-3 rounded-lg text-purple-600">
-                            <span class="material-icons-outlined">account_balance_wallet</span>
-                        </div>
-                        <span class="text-gray-400 text-sm font-medium">Ổn định</span>
-                    </div>
-                    <p class="text-gray-500 text-sm font-medium">SỔ ĐANG HOẠT ĐỘNG</p>
-                    <h3 class="text-3xl font-bold mt-1 text-slate-800" th:text="${soDangHoatDong} + ' Sổ'"></h3>
-                </div>
-
-                <div class="stats-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="bg-orange-50 p-3 rounded-lg text-orange-600">
-                            <span class="material-icons-outlined">people</span>
-                        </div>
-                        <span class="text-green-500 text-sm font-bold flex items-center gap-1">
-                <span class="material-icons-outlined text-xs">trending_up</span>+12%
-            </span>
-                    </div>
-                    <p class="text-gray-500 text-sm font-medium">TỔNG KHÁCH HÀNG</p>
-                    <h3 class="text-3xl font-bold mt-1 text-slate-800" th:text="${tongKhachHang}"></h3>
+                <div class="stat-label">Tổng doanh số gửi</div>
+                <div class="stat-value"
+                     th:text="${#numbers.formatDecimal(tongTaiSanHienTai,0,'POINT',0,'COMMA')} + 'đ'">
+                    —
                 </div>
             </div>
 
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="flex items-center justify-between mb-8">
-                        <h3 class="text-xl font-bold text-slate-800">Tăng trưởng doanh số</h3>
+            <div class="stat-card">
+                <div class="stat-icon-row">
+                    <div class="stat-icon gold">
+                        <span class="material-icons-outlined">account_balance_wallet</span>
                     </div>
-                    <div class="h-80">
+                </div>
+                <div class="stat-label">Sổ đang hoạt động</div>
+                <div class="stat-value"
+                     th:text="${soDangHoatDong} + ' Sổ'">
+                    —
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-row">
+                    <div class="stat-icon green">
+                        <span class="material-icons-outlined">people</span>
+                    </div>
+                </div>
+                <div class="stat-label">Tổng khách hàng</div>
+                <div class="stat-value" th:text="${tongKhachHang}">—</div>
+            </div>
+        </div>
+
+        <!-- ── Charts Row ── -->
+        <div class="mid-grid">
+
+            <!-- Line chart -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Tăng trưởng doanh số</div>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-wrap">
                         <canvas id="baoCaoChart"></canvas>
                     </div>
                 </div>
+            </div>
 
-                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-                    <h3 class="text-xl font-bold text-slate-800 mb-8">Tỷ lệ loại tiết kiệm</h3>
-                    <div class="space-y-6">
-                        <div th:each="tk : ${thongKeLoaiSo}">
-                            <div class="flex justify-between text-sm font-medium mb-2">
-                                <span th:text="${tk.tenLoai}"></span>
-                                <span class="text-blue-600" th:text="${#numbers.formatDecimal(tk.pct,0,'POINT',0,'COMMA')} + '%'"></span>
+            <!-- Progress bars -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Tỷ lệ loại tiết kiệm</div>
+                </div>
+                <div class="panel-body">
+                    <div class="progress-list">
+                        <div class="progress-item" th:each="tk : ${thongKeLoaiSo}">
+                            <div class="progress-row">
+                                <span class="progress-name" th:text="${tk.tenLoai}">—</span>
+                                <span class="progress-pct"
+                                      th:text="${#numbers.formatDecimal(tk.pct,0,'POINT',0,'COMMA')} + '%'">—</span>
                             </div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-600 rounded-full" th:style="'width:' + ${tk.pct} + '%'"></div>
+                            <div class="progress-track">
+                                <div class="progress-fill" th:style="'width:' + ${tk.pct} + '%'"></div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-slate-800">Yêu cầu mở sổ</h3>
-                    <button class="text-blue-600 text-sm font-semibold hover:underline">Xem tất cả</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider">
-                        <tr>
-                            <th class="px-6 py-4">Mã yêu cầu</th>
-                            <th class="px-6 py-4">Khách hàng</th>
-                            <th class="px-6 py-4">Thời hạn</th>
-                            <th class="px-6 py-4">Số tiền gửi</th>
-                            <th class="px-6 py-4">Ngày tạo</th>
-                            <th class="px-6 py-4">Trạng thái</th>
-                            <th class="px-6 py-4">Hành động</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                        <tr th:each="yc : ${yeuCauList}" class="hover:bg-gray-50 transition">
-                            <td class="px-6 py-4 font-medium text-blue-600" th:text="${yc.id}"></td>
-                            <td class="px-6 py-4 text-slate-700" th:text="${yc.tenKhachHang}"></td>
-                            <td class="px-6 py-4 text-slate-700" th:text="${yc.thoiHan} + ' tháng'"></td>
-                            <td class="px-6 py-4 font-bold text-slate-800" th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
-                            <td class="px-6 py-4 text-gray-500" th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
-                            <td class="px-6 py-4">
-                    <span th:switch="${yc.trangThai}">
-                        <span th:case="'CHO'" class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Chờ duyệt</span>
-                        <span th:case="'DUYET'" class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Đã duyệt</span>
-                        <span th:case="'TU CHOI'" class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Từ chối</span>
-                    </span>
-                            </td>
-                            <td class="px-6 py-4 flex gap-2">
-                                <!-- Nút duyệt -->
-                                <form th:if="${yc.trangThai == 'CHO'}" th:action="@{/admin/duyet-yeu-cau}" method="post">
-                                    <input type="hidden" name="id" th:value="${yc.id}" />
-                                    <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-xs font-bold">
-                                        Duyệt
-                                    </button>
-                                </form>
-                                <!-- Nút từ chối -->
-                                <form th:if="${yc.trangThai == 'CHO'}" th:action="@{/admin/tu-choi-yeu-cau}" method="post">
-                                    <input type="hidden" name="id" th:value="${yc.id}" />
-                                    <input type="text" name="lyDoTuChoi" placeholder="Lý do" class="border rounded px-2 py-1 text-xs"/>
-                                    <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 text-xs font-bold">
-                                        Từ chối
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
             </div>
         </div>
 
-        <footer class="mt-auto p-6 bg-white border-t border-gray-200 text-center text-sm text-gray-500">
-            © 2026 Hệ thống quản lý sổ tiết kiệm. Version 1.0.0
-        </footer>
-    </main>
-</div>
+        <!-- ── Table ── -->
+        <div class="table-panel">
+            <div class="table-header">
+                <div class="table-title">Yêu cầu mở sổ</div>
+                <button class="btn-view-all">Xem tất cả →</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Mã YC</th>
+                        <th>Khách hàng</th>
+                        <th>Thời hạn</th>
+                        <th>Số tiền gửi</th>
+                        <th>Ngày tạo</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="yc : ${yeuCauList}">
+                        <td class="td-id" th:text="${yc.id}"></td>
+                        <td class="td-name" th:text="${yc.tenKhachHang}"></td>
+                        <td th:text="${yc.thoiHan} + ' tháng'"></td>
+                        <td class="td-amount"
+                            th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
+                        <td class="td-date"
+                            th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <span th:switch="${yc.trangThai}">
+                                <span th:case="'CHO'"      class="badge badge-cho">Chờ duyệt</span>
+                                <span th:case="'DUYET'"    class="badge badge-duyet">Đã duyệt</span>
+                                <span th:case="'TU CHOI'"  class="badge badge-tuchoi">Từ chối</span>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-cell">
+                                <form th:if="${yc.trangThai == 'CHO'}"
+                                      th:action="@{/admin/duyet-yeu-cau}" method="post">
+                                    <input type="hidden" name="id" th:value="${yc.id}"/>
+                                    <button type="submit" class="btn-duyet">Duyệt</button>
+                                </form>
+                                <form th:if="${yc.trangThai == 'CHO'}"
+                                      th:action="@{/admin/tu-choi-yeu-cau}" method="post">
+                                    <input type="hidden" name="id" th:value="${yc.id}"/>
+                                    <input type="text" name="lyDoTuChoi"
+                                           placeholder="Lý do từ chối"
+                                           class="input-lydo"/>
+                                    <button type="submit" class="btn-tuchoi">Từ chối</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-<script src="../../../static/css/js/script.js"></script>
-<canvas id="doanhSoChart"></canvas>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </div><!-- /page-body -->
 
+    <footer>© 2026 Hệ thống quản lý sổ tiết kiệm · Version 1.0.0</footer>
+</main>
+
+<!-- Chart.js -->
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
-
-        let labels = [[${chartLabels}]];
-        let dataValues = [[${chartValues}]];
+        const labels     = [[${chartLabels}]];
+        const dataValues = [[${chartValues}]];
 
         const ctx = document.getElementById('baoCaoChart');
+        if (!ctx) return;
 
-        if (ctx) {
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Chênh lệch Thu - Chi',
-                        data: dataValues,
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    }]
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Chênh lệch Thu – Chi',
+                    data: dataValues,
+                    borderColor: '#0B1F3A',
+                    backgroundColor: 'rgba(11,31,58,.06)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#C9A84C',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: { family: 'DM Sans', size: 12 },
+                            color: '#B8B0A4'
+                        }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false   // 👈 CÁI NÀY QUAN TRỌNG
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(232,226,217,.5)' },
+                        ticks: { font: { family: 'DM Sans', size: 11 }, color: '#B8B0A4' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(232,226,217,.5)' },
+                        ticks: { font: { family: 'DM Sans', size: 11 }, color: '#B8B0A4' }
+                    }
                 }
-            });
-        }
+            }
+        });
     });
 </script>
 

@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 @SpringBootApplication
 
 @EnableScheduling
+@Controller
 public class QuanlySotietkiemApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(QuanlySotietkiemApplication.class, args);
 	}
+	@GetMapping("/home")
+	public String home() {
+		return "qlstk/client/rut-tien";}
 
 }

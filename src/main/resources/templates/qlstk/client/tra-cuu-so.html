@@ -1,115 +1,259 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Sổ tiết kiệm của tôi - MyBank</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sổ tiết kiệm - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
+    <style>
+        /* ── Grid ── */
+        .so-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        /* ── Sổ card ── */
+        .so-card {
+            background: var(--white); border-radius: 20px; overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 20px rgba(13,115,119,.07);
+            border: 1px solid rgba(221,232,232,.8);
+            transition: all .22s ease; position: relative;
+            display: flex; flex-direction: column;
+        }
+        .so-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(13,115,119,.14);
+        }
+
+        /* status ribbon */
+        .so-status {
+            position: absolute; top: 0; right: 0;
+            padding: 5px 16px; border-radius: 0 20px 0 14px;
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--white);
+        }
+        .so-status.active { background: var(--green); }
+        .so-status.closed { background: var(--gray-2); }
+
+        /* card header */
+        .so-card-head {
+            background: linear-gradient(135deg, #0A2828 0%, var(--teal) 100%);
+            padding: 24px 24px 20px; position: relative; overflow: hidden;
+        }
+        .so-card-head::after {
+            content: ''; position: absolute; right: -20px; top: -20px;
+            width: 130px; height: 130px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.1); pointer-events: none;
+        }
+        .so-card-head::before {
+            content: ''; position: absolute; right: 16px; top: 16px;
+            width: 70px; height: 70px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.07); pointer-events: none;
+        }
+        .so-maso {
+            font-size: 10px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 8px;
+        }
+        .so-ten-loai {
+            font-family: 'DM Serif Display', serif;
+            font-size: 19px; color: var(--white); line-height: 1.2;
+        }
+        .so-icon {
+            position: absolute; right: 24px; bottom: 20px;
+            width: 42px; height: 42px; border-radius: 11px;
+            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .so-icon .material-symbols-outlined { font-size: 22px; color: var(--teal-lt); }
+
+        /* card body */
+        .so-card-body { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; gap: 0; }
+
+        .so-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 11px 0; border-bottom: 1px solid var(--gray-1);
+        }
+        .so-row:last-of-type { border-bottom: none; }
+        .so-row-label {
+            font-size: 12px; color: var(--gray-2); font-weight: 500;
+            display: flex; align-items: center; gap: 7px;
+        }
+        .so-row-label .material-symbols-outlined { font-size: 15px; }
+        .so-row-value { font-size: 13.5px; font-weight: 600; color: var(--text); }
+        .so-row-value.highlight { color: var(--teal); }
+        .so-row-value.gold { color: var(--gold); font-family: 'DM Serif Display', serif; font-size: 15px; }
+
+        /* card footer */
+        .so-card-footer { padding: 0 24px 20px; margin-top: auto; }
+        .btn-detail {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 12px;
+            background: var(--mint); border: 1.5px solid var(--gray-1);
+            border-radius: 12px; text-decoration: none;
+            font-size: 13.5px; font-weight: 600; color: var(--teal);
+            transition: all .2s;
+        }
+        .btn-detail:hover { background: rgba(13,115,119,.1); border-color: var(--teal-3); }
+        .btn-detail .material-symbols-outlined { font-size: 17px; }
+
+        /* page header */
+        .page-top {
+            display: flex; align-items: flex-end; justify-content: space-between;
+        }
+        .page-top-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); }
+        .page-top-sub   { font-size: 13px; color: var(--gray-2); margin-top: 4px; }
+        .page-top-actions { display: flex; gap: 10px; }
+    </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900">
-<div class="flex h-screen overflow-hidden">
-    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl">
-        <div class="p-8 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><span class="material-symbols-outlined">account_balance_wallet</span></div>
-                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
-            </div>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="tra-cuu-so" class="nav-item active"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat" class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
         </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
-            <a href="tra-cuu-so" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
-            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">history</span> Giao dịch</a>
-            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
-        </nav>
-        <div class="p-4 border-t border-slate-800 space-y-2">
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Sổ tiết kiệm</div>
+            <div class="header-sub">Danh sách các khoản tích lũy của bạn</div>
         </div>
-    </aside>
+        <div class="header-right">
+            <a href="tra-cuu-yeu-cau" class="btn-ghost">
+                <span class="material-symbols-outlined">manage_search</span>
+                Tra cứu yêu cầu
+            </a>
+            <a href="mo-so-tiet-kiem" class="btn-primary">
+                <span class="material-symbols-outlined">add</span>
+                Mở sổ mới
+            </a>
+        </div>
+    </header>
 
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="max-w-6xl mx-auto space-y-8">
-            <div class="flex justify-between items-end">
-                <div>
-                    <h2 class="text-3xl font-black text-slate-800">Sổ tiết kiệm</h2>
-                    <p class="text-slate-500">Danh sách các khoản tích lũy của bạn</p>
-                </div>
-                <!-- Nhóm nút bên phải -->
-                <div class="flex gap-4">
-                    <a href="mo-so-tiet-kiem"
-                       class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition flex items-center gap-2">
-                        <span class="material-symbols-outlined">add</span> Mở sổ mới
-                    </a>
-                    <a href="tra-cuu-yeu-cau"
-                       class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition flex items-center gap-2">
-                        <span class="material-symbols-outlined">search</span> Tra cứu yêu cầu mở sổ
-                    </a>
-                </div>
-            </div>
+    <div class="page-body">
 
+        <!-- Grid sổ -->
+        <div class="so-grid">
+            <div th:each="item : ${danhSachSo}" class="so-card">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div th:each="item : ${danhSachSo}"
-                     class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
-
-                    <!-- Trạng thái -->
-                    <div class="absolute right-0 top-0 px-6 py-1 rounded-bl-2xl text-[10px] font-bold uppercase tracking-widest text-white"
-                         th:classappend="${item.so.trangThai == 'MO'} ? ' bg-emerald-500' : ' bg-gray-400'"
-                         th:text="${item.so.trangThai == 'MO'} ? 'Đang hoạt động' : 'Đã tất toán'">
-                    </div>
-
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1"
-                               th:text="'Mã sổ: ' + ${item.so.maSo}">
-                            </p>
-
-                            <h3 class="text-xl font-bold text-slate-800"
-                                th:text="${item.loai.tenLoai}">
-                            </h3>
-                        </div>
-
-                        <span class="material-symbols-outlined text-blue-600 text-3xl">
-                savings
-            </span>
-                    </div>
-
-                    <div class="space-y-4 mb-8">
-                        <div class="flex justify-between border-b border-slate-50 pb-2">
-                            <span class="text-slate-500 text-sm">Số dư gốc:</span>
-                            <span class="font-bold text-slate-800"
-                                  th:text="${#numbers.formatDecimal(item.so.soTienBanDau, 0, 'COMMA', 0, 'POINT')} + ' đ'">
-                </span>
-                        </div>
-
-                        <div class="flex justify-between border-b border-slate-50 pb-2">
-                            <span class="text-slate-500 text-sm">Lãi suất:</span>
-                            <span class="font-bold text-blue-600"
-                                  th:text="${item.so.laiSuatApDung} + '%/năm'">
-                </span>
-                        </div>
-
-                        <div class="flex justify-between border-b border-slate-50 pb-2">
-                            <span class="text-slate-500 text-sm">Ngày đáo hạn:</span>
-                            <span class="font-bold text-slate-800"
-                                  th:text="${item.so.ngayDaoHan != null ? #dates.format(item.so.ngayDaoHan, 'dd/MM/yyyy') : 'Không kỳ hạn'}">
-                </span>
-                        </div>
-
-                    </div>
-
-                    <a th:href="@{/so-chi-tiet/{id}(id=${item.so.maSo})}"
-                       class="block w-full py-3 text-center bg-slate-50 rounded-xl font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
-                        Xem chi tiết lãi dự tính
-                    </a>
-
+                <!-- Ribbon trạng thái -->
+                <div class="so-status"
+                     th:classappend="${item.so.trangThai == 'MO'} ? 'active' : 'closed'"
+                     th:text="${item.so.trangThai == 'MO'} ? 'Đang hoạt động' : 'Đã tất toán'">
                 </div>
 
-            </div>
+                <!-- Header card -->
+                <div class="so-card-head">
+                    <div class="so-maso" th:text="'Mã sổ: ' + ${item.so.maSo}"></div>
+                    <div class="so-ten-loai" th:text="${item.loai.tenLoai}"></div>
+                    <div class="so-icon">
+                        <span class="material-symbols-outlined">savings</span>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="so-card-body">
+
+                    <div class="so-row">
+                        <div class="so-row-label">
+                            <span class="material-symbols-outlined">payments</span>
+                            Số dư gốc
+                        </div>
+                        <div class="so-row-value gold"
+                             th:text="${#numbers.formatDecimal(item.so.soTienBanDau, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                        </div>
+                    </div>
+
+                    <div class="so-row">
+                        <div class="so-row-label">
+                            <span class="material-symbols-outlined">account_balance</span>
+                            Số dư hiện tại
+                        </div>
+                        <div class="so-row-value highlight"
+                             th:text="${#numbers.formatDecimal(item.so.soDuHienTai, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                        </div>
+                    </div>
+
+                    <div class="so-row">
+                        <div class="so-row-label">
+                            <span class="material-symbols-outlined">percent</span>
+                            Lãi suất
+                        </div>
+                        <div class="so-row-value highlight"
+                             th:text="${item.so.laiSuatApDung} + ' %/năm'">
+                        </div>
+                    </div>
+
+                    <div class="so-row">
+                        <div class="so-row-label">
+                            <span class="material-symbols-outlined">calendar_today</span>
+                            Ngày mở sổ
+                        </div>
+                        <div class="so-row-value"
+                             th:text="${#dates.format(item.so.ngayMoSo, 'dd/MM/yyyy')}">
+                        </div>
+                    </div>
+
+                    <div class="so-row">
+                        <div class="so-row-label">
+                            <span class="material-symbols-outlined">event</span>
+                            Ngày đáo hạn
+                        </div>
+                        <div class="so-row-value"
+                             th:text="${item.so.ngayDaoHan != null ? #dates.format(item.so.ngayDaoHan, 'dd/MM/yyyy') : 'Không kỳ hạn'}">
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="so-card-footer">
+                    <a th:href="@{/so-chi-tiet/{id}(id=${item.so.maSo})}" class="btn-detail">
+                        <span class="material-symbols-outlined">analytics</span>
+                        Xem chi tiết & lãi dự tính
+                    </a>
+                </div>
+
+            </div><!-- /so-card -->
         </div>
-    </main>
-</div>
+
+        <!-- Empty state -->
+        <div th:if="${danhSachSo == null or #lists.isEmpty(danhSachSo)}"
+             class="panel" style="padding:60px 24px;text-align:center;">
+            <span class="material-symbols-outlined" style="font-size:52px;color:var(--gray-1);display:block;margin-bottom:14px;">savings</span>
+            <div style="font-family:'DM Serif Display',serif;font-size:19px;color:var(--text);margin-bottom:8px;">Chưa có sổ tiết kiệm nào</div>
+            <div style="font-size:13px;color:var(--gray-2);margin-bottom:24px;">Hãy mở sổ đầu tiên để bắt đầu tích lũy</div>
+            <a href="mo-so-tiet-kiem" class="btn-primary" style="display:inline-flex;">
+                <span class="material-symbols-outlined">add</span>
+                Mở sổ ngay
+            </a>
+        </div>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
 </body>
 </html>

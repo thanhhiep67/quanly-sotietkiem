@@ -26,4 +26,6 @@ public interface GiaoDichRepository extends MongoRepository<GiaoDich, String> {
             String loai, Date start, Date end);
 
     List<GiaoDich> findByKhachHangIdOrderByNgayGiaoDichDesc(String id);
+
+    List<GiaoDich> findByKhachHangIdOrderByCreatedAtDesc(String khachHangId);
 }

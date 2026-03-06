@@ -1,161 +1,346 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Tổng quan Khách hàng - MyBank</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tổng quan - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .active-nav { background: #2563eb !important; color: white !important; shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+        /* ── Hero asset card ── */
+        .asset-hero {
+            background: linear-gradient(135deg, #0A2828 0%, var(--teal) 100%);
+            border-radius: 20px; padding: 32px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 32px rgba(13,115,119,.3);
+            color: var(--white);
+        }
+        .asset-hero::before {
+            content:''; position:absolute; right:-40px; top:-40px;
+            width:200px; height:200px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.1);
+        }
+        .asset-hero::after {
+            content:''; position:absolute; right:20px; top:20px;
+            width:110px; height:110px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.07);
+        }
+        .asset-hero-label {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:rgba(255,255,255,.5);
+            margin-bottom:10px;
+        }
+        .asset-hero-value {
+            font-family:'DM Serif Display',serif;
+            font-size:36px; color:var(--white); line-height:1;
+            margin-bottom:4px;
+        }
+        .asset-hero-unit { font-size:12px; color:rgba(255,255,255,.4); letter-spacing:1px; }
+        .asset-hero-footer {
+            margin-top:24px; padding-top:20px;
+            border-top:1px solid rgba(255,255,255,.1);
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .so-pill {
+            background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+            border-radius:99px; padding:5px 14px;
+            font-size:12px; font-weight:600; color:rgba(255,255,255,.8);
+            display:inline-flex; align-items:center; gap:6px;
+        }
+        .so-pill .material-symbols-outlined { font-size:15px; color:var(--teal-lt); }
+        .so-progress-track {
+            flex:1; max-width:120px; height:5px;
+            background:rgba(255,255,255,.15); border-radius:99px; overflow:hidden; margin-left:16px;
+        }
+        .so-progress-fill {
+            height:100%; background:var(--teal-lt); border-radius:99px;
+            transition:width .6s ease;
+        }
+
+        /* ── Quick action cards ── */
+        .quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .quick-card {
+            border-radius:16px; padding:22px;
+            text-decoration:none; display:flex; flex-direction:column; gap:14px;
+            transition:all .22s ease; position:relative; overflow:hidden;
+            border:1px solid rgba(221,232,232,.8);
+            background:var(--white);
+            box-shadow:0 2px 4px rgba(0,0,0,.03),0 4px 16px rgba(13,115,119,.06);
+        }
+        .quick-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(13,115,119,.14); }
+        .quick-card-icon {
+            width:44px; height:44px; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .quick-card-icon .material-symbols-outlined { font-size:22px; }
+        .quick-card-icon.teal  { background:rgba(13,115,119,.1);  color:var(--teal); }
+        .quick-card-icon.green { background:rgba(26,138,90,.1);   color:var(--green); }
+        .quick-card-icon.gold  { background:rgba(212,168,67,.12); color:var(--gold); }
+        .quick-card-icon.red   { background:rgba(192,64,64,.09);  color:var(--red); }
+        .quick-card-title { font-family:'DM Serif Display',serif; font-size:15px; color:var(--text); }
+        .quick-card-sub   { font-size:12px; color:var(--gray-2); margin-top:2px; }
+        .quick-card-arrow {
+            position:absolute; bottom:18px; right:18px;
+            font-size:18px; color:var(--gray-1);
+            font-family:'Material Symbols Outlined';
+            transition:color .2s, transform .2s;
+        }
+        .quick-card:hover .quick-card-arrow { color:var(--teal-3); transform:translateX(3px); }
+
+        /* ── Two-col layout ── */
+        .two-col { display:grid; grid-template-columns:1fr 320px; gap:20px; }
+
+        /* ── Chart ── */
+        .chart-wrap { height:220px; position:relative; }
+
+        /* ── Recent transactions ── */
+        .txn-list { display:flex; flex-direction:column; }
+        .txn-item {
+            display:flex; align-items:center; gap:14px;
+            padding:14px 0; border-bottom:1px solid var(--gray-1);
+        }
+        .txn-item:last-child { border-bottom:none; }
+        .txn-icon {
+            width:38px; height:38px; flex-shrink:0; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .txn-icon .material-symbols-outlined { font-size:18px; }
+        .txn-icon.nap { background:rgba(26,138,90,.1);  color:var(--green); }
+        .txn-icon.rut { background:rgba(192,64,64,.09); color:var(--red);   }
+        .txn-info { flex:1; min-width:0; }
+        .txn-name  { font-size:13.5px; font-weight:600; color:var(--text); }
+        .txn-date  { font-size:11.5px; color:var(--gray-2); margin-top:2px; }
+        .txn-amount { font-family:'DM Serif Display',serif; font-size:14px; font-weight:700; white-space:nowrap; }
+        .txn-amount.nap { color:var(--green); }
+        .txn-amount.rut { color:var(--red); }
+
+        /* ── Stat row ── */
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900">
+<body>
 
-<div class="flex h-screen overflow-hidden">
-    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl ">
-        <div class="p-8 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-900/50">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="" class="nav-item active">
+                <span class="material-symbols-outlined">grid_view</span>Tổng quan
+            </a>
+            <a href="tra-cuu-so" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm
+            </a>
+            <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+
+            <a href="lai-suat" class="nav-item">
+                <span class="material-symbols-outlined">percent</span>Lãi suất
+            </a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-card">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
                 </div>
-                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
+            </div>
+        </div>
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Trung tâm điều khiển</div>
+            <div class="header-sub">Cập nhật lúc: <span th:text="${lastUpdate}">--:--</span></div>
+        </div>
+        <div class="header-right">
+            <div style="display:flex;flex-direction:column;text-align:right;">
+                <span style="font-size:10px;font-weight:700;color:var(--gray-2);letter-spacing:1px;text-transform:uppercase;">Tỷ giá USD/VND</span>
+                <span style="font-size:14px;font-weight:700;color:var(--green);">25.430</span>
+            </div>
+            <div style="width:1px;height:28px;background:var(--gray-1);"></div>
+            <button class="notif-btn">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="notif-dot"></span>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Stat cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon teal"><span class="material-symbols-outlined">savings</span></div>
+                <div class="stat-label">Tổng tài sản</div>
+                <div class="stat-value"
+                     th:text="${#numbers.formatInteger(tongTaiSan != null ? tongTaiSan : 0, 0, 'POINT')} + ' đ'">— đ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><span class="material-symbols-outlined">receipt_long</span></div>
+                <div class="stat-label">Sổ đang có</div>
+                <div class="stat-value" th:text="${soLuongSo != null ? soLuongSo : 0} + ' Sổ'">— Sổ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gold"><span class="material-symbols-outlined">percent</span></div>
+                <div class="stat-label">Lãi dự kiến</div>
+                <div class="stat-value" th:text="${laiDuKien != null ? #numbers.formatInteger(laiDuKien, 0, 'POINT') + ' đ' : '—'}">—</div>
             </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="" class="active-nav flex items-center gap-3 px-4 py-3 rounded-xl transition">
-                <span class="material-symbols-outlined">grid_view</span> Tổng quan
-            </a>
-            <a href="tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition">
-                <span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm
-            </a>
-            <a href="giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition">
-                <span class="material-symbols-outlined">history</span> Giao dịch
-            </a>
-            <a href="lai-suat" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl transition">
-                <span class="material-symbols-outlined">percent</span> Lãi suất
-            </a>
-        </nav>
+        <!-- Hero + Quick actions -->
+        <div class="two-col">
 
-        <div class="p-4 border-t border-slate-800 space-y-2">
-            <div class="flex items-center gap-3 p-3 bg-slate-800/40 rounded-2xl mb-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold shadow-md">
-                    <span th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1) : 'A'}"></span>
-                </div>
-                <div class="overflow-hidden">
-                    <p class="text-sm font-bold text-white truncate" th:text="${tenKhachHang}">Nguyễn Văn A</p>
-                    <p class="text-xs text-slate-400"
-                       th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}"></p>
+            <!-- Hero asset card -->
+            <div class="asset-hero">
+                <div class="asset-hero-label">Tài sản tiết kiệm của bạn</div>
+                <div class="asset-hero-value"
+                     th:text="${#numbers.formatInteger(tongTaiSan != null ? tongTaiSan : 0, 0, 'POINT')}">0</div>
+                <div class="asset-hero-unit">VND</div>
+                <div class="asset-hero-footer">
+                    <div class="so-pill">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <span th:text="${soLuongSo != null ? soLuongSo : 0} + ' sổ đang hoạt động'">0 sổ đang hoạt động</span>
+                    </div>
+                    <div class="so-progress-track">
+                        <div class="so-progress-fill"
+                             th:style="'width:' + (${soLuongSo != null ? soLuongSo * 20 : 0}) + '%'"></div>
+                    </div>
                 </div>
             </div>
 
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition group">
-                <span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
-                <span class="font-semibold">Đăng xuất</span>
-            </a>
+            <!-- Quick actions -->
+            <div class="quick-grid">
+                <a href="mo-so-tiet-kiem" class="quick-card">
+                    <div class="quick-card-icon teal">
+                        <span class="material-symbols-outlined">add_circle</span>
+                    </div>
+                    <div>
+                        <div class="quick-card-title">Mở sổ mới</div>
+                        <div class="quick-card-sub">Bắt đầu tích lũy</div>
+                    </div>
+                    <span class="quick-card-arrow">arrow_forward</span>
+                </a>
+                <a href="giao-dich" class="quick-card">
+                    <div class="quick-card-icon red">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                    <div>
+                        <div class="quick-card-title">Rút tiền</div>
+                        <div class="quick-card-sub">Về tài khoản liên kết</div>
+                    </div>
+                    <span class="quick-card-arrow">arrow_forward</span>
+                </a>
+                <a href="tra-cuu-so" class="quick-card">
+                    <div class="quick-card-icon green">
+                        <span class="material-symbols-outlined">manage_search</span>
+                    </div>
+                    <div>
+                        <div class="quick-card-title">Tra cứu sổ</div>
+                        <div class="quick-card-sub">Xem chi tiết</div>
+                    </div>
+                    <span class="quick-card-arrow">arrow_forward</span>
+                </a>
+                <a href="lai-suat" class="quick-card">
+                    <div class="quick-card-icon gold">
+                        <span class="material-symbols-outlined">percent</span>
+                    </div>
+                    <div>
+                        <div class="quick-card-title">Lãi suất</div>
+                        <div class="quick-card-sub">Biểu lãi hiện hành</div>
+                    </div>
+                    <span class="quick-card-arrow">arrow_forward</span>
+                </a>
+            </div>
         </div>
-    </aside>
 
-    <main class="flex-1 overflow-y-auto">
-        <header class="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-10">
-            <div>
-                <h2 class="text-xl font-bold text-slate-800 tracking-tight">Trung tâm điều khiển</h2>
-                <p class="text-xs text-slate-400 font-medium">Cập nhật lúc: 22:00, 16/01/2026</p>
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="hidden sm:flex flex-col text-right">
-                    <p class="text-xs font-bold text-slate-400">Tỷ giá USD/VND</p>
-                    <p class="text-sm font-black text-emerald-500">25.430</p>
+        <!-- Chart + Recent transactions -->
+        <div class="two-col">
+
+            <!-- Chart -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Xu hướng tài sản</div>
+                    <span style="font-size:10.5px;font-weight:700;color:var(--teal);background:rgba(13,115,119,.08);padding:4px 10px;border-radius:99px;letter-spacing:.8px;text-transform:uppercase;">Live</span>
                 </div>
-                <div class="w-px h-8 bg-slate-100"></div>
-                <button class="relative p-2 text-slate-400 hover:text-blue-600 transition">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
-            </div>
-        </header>
-
-        <div class="p-8 max-w-7xl mx-auto space-y-10">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <a href="mo-so-tiet-kiem" class="flex items-center justify-between bg-blue-600 hover:bg-blue-700 p-2 text-white rounded-[2.5rem] shadow-2xl shadow-blue-200 transition transform hover:-translate-y-1">
-                    <div class="flex items-center gap-6 p-5">
-                        <div class="bg-white/20 p-5 rounded-full shadow-inner">
-                            <span class="material-symbols-outlined text-4xl">add_circle</span>
-                        </div>
-                        <div>
-                            <p class="text-2xl font-black tracking-tight">Mở sổ tiết kiệm</p>
-                            <p class="text-blue-100/70 text-sm font-medium">Bắt đầu kế hoạch tích lũy</p>
-                        </div>
-                    </div>
-                    <span class="material-symbols-outlined mr-10 opacity-40 text-3xl">arrow_forward</span>
-                </a>
-
-                <a href="giao-dich" class="flex items-center justify-between bg-[#1e293b] hover:bg-[#0f172a] p-2 text-white rounded-[2.5rem] shadow-2xl shadow-slate-200 transition transform hover:-translate-y-1">
-                    <div class="flex items-center gap-6 p-5">
-                        <div class="bg-white/10 p-5 rounded-full shadow-inner text-blue-400">
-                            <span class="material-symbols-outlined text-4xl">payments</span>
-                        </div>
-                        <div>
-                            <p class="text-2xl font-black tracking-tight">Rút tiền</p>
-                            <p class="text-slate-400 text-sm font-medium">Về tài khoản liên kết</p>
-                        </div>
-                    </div>
-                    <span class="material-symbols-outlined mr-10 opacity-40 text-3xl text-blue-400">arrow_forward</span>
-                </a>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
-                    <div class="flex justify-between items-center mb-10">
-                        <h3 class="font-black text-slate-800 text-xl tracking-tight">Xu hướng tài sản</h3>
-                        <span class="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-widest">Live Update</span>
-                    </div>
-                    <div class="h-80">
+                <div class="panel-body">
+                    <div class="chart-wrap">
                         <canvas id="chartClientLine"></canvas>
                     </div>
                 </div>
+            </div>
 
-                <div class="space-y-8">
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden h-full flex flex-col justify-between">
-                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-600/20 rounded-full blur-[80px]"></div>
-                        <div>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-2">Tài sản tiết kiệm</p>
-                            <h3 class="text-4xl font-black tracking-tighter">
-                                <span th:text="${#numbers.formatInteger(tongTaiSan, 0, 'POINT')}"></span>
-                                <span class="text-sm font-normal text-slate-500 uppercase tracking-widest ml-1">VND</span>
-                            </h3>
+            <!-- Recent transactions -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Giao dịch gần đây</div>
+                    <a href="giao-dich" class="btn-teal-outline" style="font-size:12px;padding:6px 12px;">
+                        Xem tất cả
+                    </a>
+                </div>
+                <div class="panel-body" style="padding-top:8px;padding-bottom:8px;">
+                    <div class="txn-list">
+                        <!-- Thymeleaf loop — dùng gdGanNhat từ controller -->
+                        <div class="txn-item" th:each="gd : ${lichSuGiaoDich}">
+                            <div class="txn-icon"
+                                 th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'">
+        <span class="material-symbols-outlined"
+              th:text="${gd.loaiGiaoDich == 'NAP'} ? 'arrow_downward' : 'arrow_upward'"></span>
+                            </div>
+                            <div class="txn-info">
+                                <div class="txn-name"
+                                     th:text="${gd.loaiGiaoDich == 'NAP' ? 'Gửi tiền' : 'Rút tiền'}"></div>
+                                <div class="txn-date"
+                                     th:text="${#dates.format(gd.ngayGiaoDich, 'dd/MM/yyyy')}"></div>
+                            </div>
+                            <div class="txn-amount"
+                                 th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'"
+                                 th:text="${(gd.loaiGiaoDich == 'NAP' ? '+' : '-') + #numbers.formatInteger(gd.soTien, 0, 'POINT') + ' đ'}">
+                            </div>
                         </div>
-                        <div class="mt-12 bg-white/5 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
-                            <div class="flex justify-between items-center mb-4">
-                                <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Sổ đang có</p>
-                                <span class="bg-blue-500 text-[10px] px-2 py-0.5 rounded-full font-bold" th:text="${soLuongSo} + ' Sổ'"></span>
-                            </div>
-                            <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                <!-- Thanh progress: ví dụ hiển thị % số lượng sổ -->
-                                <div class="bg-blue-500 h-full" th:style="'width:' + (${soLuongSo} * 20) + '%'"></div>
-                            </div>
+                        <div th:if="${lichSuGiaoDich == null or #lists.isEmpty(lichSuGiaoDich)}"
+                             class="empty-state" style="padding:32px 0;">
+                            <span class="material-symbols-outlined">history</span>
+                            Chưa có giao dịch nào.
+                        </div>
+                        <!-- Empty state -->
+                        <div th:if="${lichSuGiaoDich == null or #lists.isEmpty(lichSuGiaoDich)}" class="empty-state" style="padding:32px 0;">
+                            <span class="material-symbols-outlined">history</span>
+                            Chưa có giao dịch nào.
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
-    </main>
-</div>
 
+        </div>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
+<!-- Chart.js -->
 <script>
     const ctx = document.getElementById('chartClientLine').getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(37, 99, 235, 0.3)');
-    gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(13,115,119,0.22)');
+    gradient.addColorStop(1, 'rgba(13,115,119,0)');
 
     new Chart(ctx, {
         type: 'line',
@@ -163,24 +348,26 @@
             labels: ['T9', 'T10', 'T11', 'T12', 'T1'],
             datasets: [{
                 data: [850, 1100, 1050, 1250, 1280],
-                borderColor: '#2563eb',
-                borderWidth: 5,
-                tension: 0.5,
+                borderColor: '#0D7377',
+                borderWidth: 3,
+                tension: 0.45,
                 fill: true,
                 backgroundColor: gradient,
-                pointRadius: 6,
+                pointRadius: 5,
                 pointBackgroundColor: '#fff',
-                pointBorderColor: '#2563eb',
-                pointBorderWidth: 3
+                pointBorderColor: '#0D7377',
+                pointBorderWidth: 2.5
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
                 y: { display: false },
-                x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 12 }, color: '#94a3b8' } }
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'DM Sans', size: 11, weight: '600' }, color: '#9BB5B5' }
+                }
             }
         }
     });

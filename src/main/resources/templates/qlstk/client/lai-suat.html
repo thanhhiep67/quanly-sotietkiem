@@ -1,62 +1,239 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Bảng lãi suất - MyBank</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bảng lãi suất - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
+    <style>
+        /* ── Page hero ── */
+        .page-hero {
+            background: linear-gradient(135deg, #0A2828 0%, var(--teal) 100%);
+            border-radius: 20px; padding: 36px 40px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 32px rgba(13,115,119,.25);
+        }
+        .page-hero::after {
+            content:''; position:absolute; right:-40px; top:-40px;
+            width:220px; height:220px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.1);
+        }
+        .page-hero::before {
+            content:''; position:absolute; right:40px; top:40px;
+            width:110px; height:110px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.07);
+        }
+        .hero-label {
+            font-size:10px; font-weight:700; letter-spacing:2.5px;
+            text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:10px;
+        }
+        .hero-title {
+            font-family:'DM Serif Display',serif;
+            font-size:28px; color:var(--white); margin-bottom:6px;
+        }
+        .hero-sub { font-size:13px; color:rgba(255,255,255,.45); font-weight:300; }
+        .hero-sub span { color:var(--teal-lt); font-weight:500; }
+
+        /* ── Rate cards grid ── */
+        .rate-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .rate-card {
+            background: var(--white); border-radius: 20px;
+            border: 1px solid rgba(221,232,232,.8); overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 20px rgba(13,115,119,.07);
+            transition: all .22s ease; display: flex; flex-direction: column;
+        }
+        .rate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 36px rgba(13,115,119,.16);
+        }
+
+        /* Card accent bar top */
+        .rate-card-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--teal), var(--teal-lt));
+        }
+        .rate-card-bar.no-term { background: linear-gradient(90deg, var(--gray-2), var(--gray-1)); }
+
+        .rate-card-body { padding: 26px 26px 20px; flex:1; }
+
+        .rate-icon {
+            width: 48px; height: 48px; border-radius: 13px;
+            background: rgba(13,115,119,.1); border: 1px solid rgba(13,115,119,.15);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 18px;
+        }
+        .rate-icon .material-symbols-outlined { font-size: 23px; color: var(--teal); }
+        .rate-icon.no-term { background: rgba(184,176,164,.15); border-color: var(--gray-1); }
+        .rate-icon.no-term .material-symbols-outlined { color: var(--gray-2); }
+
+        .rate-kyhan {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px; color: var(--text); margin-bottom: 5px;
+        }
+        .rate-desc { font-size: 12.5px; color: var(--gray-2); margin-bottom: 22px; }
+
+        .rate-value-wrap {
+            display: flex; align-items: baseline; gap: 5px; margin-bottom: 6px;
+        }
+        .rate-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 44px; line-height: 1; color: var(--teal); font-weight: 700;
+        }
+        .rate-value.na { font-size: 28px; color: var(--gray-2); }
+        .rate-unit { font-size: 14px; color: var(--gray-2); font-weight: 500; }
+
+        .rate-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(13,115,119,.08); border: 1px solid rgba(13,115,119,.15);
+            border-radius: 99px; padding: 4px 12px;
+            font-size: 11px; font-weight: 600; color: var(--teal);
+            margin-top: 10px;
+        }
+        .rate-badge .material-symbols-outlined { font-size: 13px; }
+
+        .rate-card-footer { padding: 0 26px 24px; }
+        .btn-mo-so {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 13px;
+            background: var(--mint); border: 1.5px solid var(--gray-1);
+            border-radius: 12px; text-decoration: none;
+            font-size: 13.5px; font-weight: 600; color: var(--teal);
+            transition: all .2s;
+        }
+        .btn-mo-so:hover { background: rgba(13,115,119,.1); border-color: var(--teal-3); }
+        .btn-mo-so .material-symbols-outlined { font-size: 17px; }
+
+        /* note box */
+        .note-box {
+            background: rgba(212,168,67,.08); border: 1px solid rgba(212,168,67,.25);
+            border-radius: 14px; padding: 18px 22px;
+            display: flex; align-items: flex-start; gap: 12px;
+            font-size: 13px; color: #7a5a10; line-height: 1.6;
+        }
+        .note-box .material-symbols-outlined { font-size: 20px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+    </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900">
-<div class="flex h-screen overflow-hidden">
-    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl">
-        <div class="p-8 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><span class="material-symbols-outlined">account_balance_wallet</span></div>
-                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="tra-cuu-so" class="nav-item"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat" class="nav-item active"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Bảng lãi suất</div>
+            <div class="header-sub">Lãi suất tiết kiệm hiện hành</div>
+        </div>
+        <a href="mo-so-tiet-kiem" class="btn-primary" style="text-decoration:none;">
+            <span class="material-symbols-outlined">add</span>
+            Mở sổ ngay
+        </a>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Hero -->
+        <div class="page-hero">
+            <div class="hero-label">VietSave Bank</div>
+            <div class="hero-title">Bảng Lãi Suất Tiết Kiệm</div>
+            <div class="hero-sub">
+                Cập nhật mới nhất ngày
+                <span th:text="${ngayCapNhat}">--/--/----</span>
             </div>
         </div>
-        <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">grid_view</span> Tổng quan</a>
-            <a href="tra-cuu-so" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
-            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition"><span class="material-symbols-outlined">history</span> Giao dịch</a>
-            <a href="lai-suat" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">percent</span> Lãi suất</a>
-        </nav>
-        <div class="p-4 border-t border-slate-800">
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold"><span class="material-symbols-outlined">logout</span> Đăng xuất</a>
+
+        <!-- Note -->
+        <div class="note-box">
+            <span class="material-symbols-outlined">info</span>
+            <div>Lãi suất được áp dụng tại thời điểm mở sổ và giữ nguyên đến khi đáo hạn. Sổ không kỳ hạn áp dụng lãi suất <strong>0,5%/năm</strong>, tính theo số ngày thực gửi khi rút tiền.</div>
         </div>
-    </aside>
 
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="max-w-6xl mx-auto space-y-12">
-            <div class="text-center">
-                <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Bảng Lãi Suất Tiết Kiệm</h2>
-                <p class="text-slate-500 mt-2">Cập nhật mới nhất ngày <span th:text="${ngayCapNhat}"></span></p>
-            </div>
+        <!-- Rate cards -->
+        <div class="rate-grid">
+            <div th:each="item : ${laiSuatList}" class="rate-card">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div th:each="item : ${laiSuatList}"
-                     class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-8">
-                        <span class="material-symbols-outlined text-4xl">percent</span>
+                <div class="rate-card-bar"
+                     th:classappend="${item.loaiSo.kyHanThang == 0} ? 'no-term' : ''"></div>
+
+                <div class="rate-card-body">
+                    <div class="rate-icon"
+                         th:classappend="${item.loaiSo.kyHanThang == 0} ? 'no-term' : ''">
+                        <span class="material-symbols-outlined"
+                              th:text="${item.loaiSo.kyHanThang == 0} ? 'all_inclusive' : 'schedule'">schedule</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2"
-                        th:text="${item.loaiSo.kyHanThang == 0 ? 'Không kỳ hạn' : item.loaiSo.kyHanThang + ' Tháng'}"></h3>
-                    <p class="text-slate-500 text-sm mb-8">Lãi suất áp dụng cho loại sổ này.</p>
-                    <div class="flex items-baseline gap-1 mb-10">
-            <span class="text-5xl font-black text-blue-600"
-                  th:text="${item.laiSuat != null ? item.laiSuat.laiSuatNam + '%' : 'N/A'}"></span>
-                        <span class="text-slate-400 font-bold">/năm</span>
+
+                    <div class="rate-kyhan"
+                         th:text="${item.loaiSo.kyHanThang == 0 ? 'Không kỳ hạn' : item.loaiSo.kyHanThang + ' Tháng'}">
                     </div>
-                    <a href="/mo-so-tiet-kiem" class="block w-full text-center py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-blue-600 hover:text-white transition-all">Mở sổ ngay</a>
+                    <div class="rate-desc"
+                         th:text="${item.loaiSo.tenLoai}">
+                    </div>
+
+                    <div class="rate-value-wrap">
+                        <span class="rate-value"
+                              th:classappend="${item.laiSuat == null} ? 'na' : ''"
+                              th:text="${item.laiSuat != null ? item.laiSuat.laiSuatNam + '%' : 'N/A'}">
+                        </span>
+                        <span class="rate-unit" th:if="${item.laiSuat != null}">/năm</span>
+                    </div>
+
+                    <div class="rate-badge" th:if="${item.laiSuat != null}">
+                        <span class="material-symbols-outlined">trending_up</span>
+                        <span th:if="${item.loaiSo.kyHanThang > 0}"
+                              th:text="'Lãi trả khi đáo hạn'"></span>
+                        <span th:if="${item.loaiSo.kyHanThang == 0}"
+                              th:text="'Linh hoạt rút bất kỳ'"></span>
+                    </div>
                 </div>
+
+                <div class="rate-card-footer">
+                    <a href="/mo-so-tiet-kiem" class="btn-mo-so">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        Mở sổ ngay
+                    </a>
+                </div>
+
             </div>
-
-
         </div>
-    </main>
-</div>
+
+        <!-- Empty state -->
+        <div th:if="${laiSuatList == null or #lists.isEmpty(laiSuatList)}"
+             class="panel" style="padding:60px 24px;text-align:center;">
+            <span class="material-symbols-outlined" style="font-size:48px;color:var(--gray-1);display:block;margin-bottom:12px;">percent</span>
+            <div style="font-size:15px;color:var(--gray-2);">Chưa có dữ liệu lãi suất.</div>
+        </div>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
 </body>
 </html>

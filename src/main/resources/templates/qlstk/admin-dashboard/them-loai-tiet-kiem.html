@@ -1,99 +1,236 @@
 <!DOCTYPE html>
-<html lang="vi" class="light" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>THÊM LOẠI TIẾT KIỆM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/admin-dashboard/css/styles.css">
+    <link rel="stylesheet" href="/css/shared.css"/>
+    <style>
+        .form-card {
+            width: 100%; max-width: 600px;
+            background: var(--white); border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 8px 32px rgba(11,31,58,.08);
+            overflow: hidden; margin: 0 auto;
+        }
+        .form-card-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-3) 100%);
+            padding: 28px 36px; position: relative; overflow: hidden;
+        }
+        .form-card-header::after {
+            content: ''; position: absolute; right: -30px; top: -30px;
+            width: 160px; height: 160px; border-radius: 50%;
+            border: 1px solid rgba(201,168,76,.18);
+        }
+        .form-card-header::before {
+            content: ''; position: absolute; right: 10px; top: 10px;
+            width: 90px; height: 90px; border-radius: 50%;
+            border: 1px solid rgba(201,168,76,.1);
+        }
+        .form-card-icon {
+            width: 44px; height: 44px;
+            background: rgba(201,168,76,.18); border: 1px solid rgba(201,168,76,.35);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 14px;
+        }
+        .form-card-icon .material-icons-outlined { font-size: 22px; color: var(--gold-lt); }
+        .form-card-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); }
+        .form-card-sub   { font-size: 12.5px; color: rgba(255,255,255,.45); margin-top: 4px; font-weight: 300; }
+        .form-card-body  { padding: 32px 36px; }
+
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+        .form-grid-2 .form-group.full { grid-column: 1 / -1; }
+
+        /* Checkbox toggle */
+        .toggle-group {
+            display: flex; flex-direction: column; gap: 12px;
+            margin-bottom: 24px;
+        }
+        .toggle-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--cream);
+            border: 1.5px solid var(--gray-1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+        }
+        .toggle-item:hover { border-color: var(--gold); background: rgba(201,168,76,.04); }
+        .toggle-item.checked { border-color: var(--gold); background: rgba(201,168,76,.06); }
+
+        .toggle-label { display: flex; align-items: center; gap: 12px; }
+        .toggle-label .material-icons-outlined { font-size: 20px; color: var(--gray-2); }
+        .toggle-item.checked .toggle-label .material-icons-outlined { color: var(--gold); }
+        .toggle-text { font-size: 13.5px; font-weight: 500; color: var(--text); }
+
+        /* custom switch */
+        .switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; inset: 0; cursor: pointer;
+            background: var(--gray-1); border-radius: 99px;
+            transition: background .2s;
+        }
+        .slider::before {
+            content: ''; position: absolute;
+            width: 18px; height: 18px; border-radius: 50%;
+            left: 3px; top: 3px;
+            background: var(--white);
+            box-shadow: 0 1px 4px rgba(0,0,0,.2);
+            transition: transform .2s;
+        }
+        input:checked + .slider { background: var(--gold); }
+        input:checked + .slider::before { transform: translateX(18px); }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <span class="material-icons-outlined text-white text-3xl">savings</span>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-icons-outlined">savings</span></div>
+        <div class="logo-text">VietSave Bank<span>Hệ thống nội bộ</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Chính</p>
+            <a href="/admin" class="nav-item"><span class="material-icons-outlined">dashboard</span>Tổng quan</a>
+            <a href="/admin/mo-so" class="nav-item"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a>
+            <a href="/admin/quan-ly-khach-hang" class="nav-item"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a>
+            <a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item active"><span class="material-icons-outlined">settings_suggest</span>Loại tiết kiệm</a>
+        </div>
+        <div class="nav-group">
+            <p class="nav-section-label">Nghiệp vụ</p>
+            <a href="/admin/giao-dich" class="nav-item"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a>
+            <a href="/admin/tra-cuu-so" class="nav-item"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a>
+            <a href="/admin/bao-cao-thong-ke" class="nav-item"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a>
+        </div>
+    </nav>
+
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <h2 class="header-title">Thêm loại tiết kiệm mới</h2>
+        <a href="/admin/quan-ly-loai-tiet-kiem" class="btn-ghost" style="text-decoration:none;">
+            <span class="material-icons-outlined" style="font-size:17px;">arrow_back</span>
+            Quay lại
+        </a>
+    </header>
+
+    <div class="page-body">
+        <div class="form-card">
+
+            <div class="form-card-header">
+                <div class="form-card-icon">
+                    <span class="material-icons-outlined">style</span>
                 </div>
-                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
+                <div class="form-card-title">Loại tiết kiệm mới</div>
+                <div class="form-card-sub">Cấu hình kỳ hạn, lãi suất và các quy định gửi rút</div>
             </div>
-        </div>
-        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="/admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="/admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
-                </ul>
-            </div>
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="/admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="/admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
 
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto flex flex-col">
-        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
-            <h2 class="text-xl font-bold text-slate-800">Thêm loại tiết kiệm mới</h2>
-        </header>
+            <div class="form-card-body">
+                <form th:action="@{/admin/quan-ly-loai-tiet-kiem/them}" method="post">
+                    <div class="form-grid-2">
 
-        <div class="p-8">
-            <div class="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-                <!-- Form thêm loại tiết kiệm -->
-                <form th:action="@{/admin/quan-ly-loai-tiet-kiem/them}" method="post" class="space-y-6">
+                        <!-- Tên loại -->
+                        <div class="form-group full">
+                            <div class="form-label">Tên loại <span class="required">*</span></div>
+                            <div class="input-wrap">
+                                <input type="text" name="tenLoai" placeholder="VD: Kỳ hạn 6 tháng"/>
+                                <span class="material-icons-outlined input-icon">label</span>
+                            </div>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tên loại</label>
-                        <input type="text" name="tenLoai" class="w-full border p-3 rounded-xl" placeholder="Ví dụ: Kỳ hạn 3 tháng">
+                        <!-- Kỳ hạn -->
+                        <div class="form-group">
+                            <div class="form-label">Kỳ hạn <span class="required">*</span>
+                                <span class="form-hint">tháng</span>
+                            </div>
+                            <div class="input-wrap">
+                                <input type="number" name="kyHanThang" placeholder="VD: 6" min="0"/>
+                                <span class="material-icons-outlined input-icon">schedule</span>
+                            </div>
+                        </div>
+
+                        <!-- Lãi suất -->
+                        <div class="form-group">
+                            <div class="form-label">Lãi suất <span class="required">*</span>
+                                <span class="form-hint">%/năm</span>
+                            </div>
+                            <div class="input-wrap">
+                                <input type="number" step="0.01" name="laiSuatNam" placeholder="VD: 5.5" min="0"/>
+                                <span class="material-icons-outlined input-icon">percent</span>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Kỳ hạn (tháng)</label>
-                        <input type="number" name="kyHanThang" class="w-full border p-3 rounded-xl" placeholder="Nhập số tháng">
+                    <!-- Toggle switches -->
+                    <div class="form-label" style="margin-bottom:12px;">Quy định giao dịch</div>
+                    <div class="toggle-group">
+
+                        <label class="toggle-item" id="toggleGuiThem">
+                            <div class="toggle-label">
+                                <span class="material-icons-outlined">add_circle_outline</span>
+                                <div>
+                                    <div class="toggle-text">Cho phép gửi thêm</div>
+                                    <div style="font-size:11.5px;color:var(--gray-2);margin-top:2px;">Khách hàng có thể nạp tiền thêm vào sổ</div>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="choGuiThem" id="cbGuiThem"
+                                       onchange="syncToggle(this,'toggleGuiThem')"/>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+
+                        <label class="toggle-item" id="toggleRutPhan">
+                            <div class="toggle-label">
+                                <span class="material-icons-outlined">remove_circle_outline</span>
+                                <div>
+                                    <div class="toggle-text">Cho phép rút một phần</div>
+                                    <div style="font-size:11.5px;color:var(--gray-2);margin-top:2px;">Khách hàng có thể rút một phần số tiền</div>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="choRutMotPhan" id="cbRutPhan"
+                                       onchange="syncToggle(this,'toggleRutPhan')"/>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="choGuiThem" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label class="text-sm font-semibold text-gray-700">Cho phép gửi thêm</label>
+                    <div class="divider"></div>
+
+                    <div class="form-actions">
+                        <a href="/admin/quan-ly-loai-tiet-kiem" class="btn-ghost" style="text-decoration:none;">
+                            <span class="material-icons-outlined" style="font-size:17px;">close</span>
+                            Hủy
+                        </a>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons-outlined">save</span>
+                            Lưu loại tiết kiệm
+                        </button>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="choRutMotPhan" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label class="text-sm font-semibold text-gray-700">Cho phép rút một phần</label>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Lãi suất (%/tháng)</label>
-                        <input type="number" step="0.01" name="laiSuatNam" class="w-full border p-3 rounded-xl" placeholder="Ví dụ: 0.5">
-                    </div>
-
-                    <div class="pt-6 border-t flex justify-end gap-3">
-                        <a href="/admin/quan-ly-loai-tiet-kiem" class="px-6 py-2.5 border rounded-xl hover:bg-gray-50">Hủy</a>
-                        <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700">Lưu loại tiết kiệm</button>
-                    </div>
                 </form>
-
             </div>
         </div>
-    </main>
-</div>
+    </div>
+
+    <footer>© 2026 Hệ thống quản lý sổ tiết kiệm · Version 1.0.0</footer>
+</main>
+
+<script>
+    function syncToggle(checkbox, rowId) {
+        const row = document.getElementById(rowId);
+        if (checkbox.checked) row.classList.add('checked');
+        else row.classList.remove('checked');
+    }
+</script>
 </body>
 </html>

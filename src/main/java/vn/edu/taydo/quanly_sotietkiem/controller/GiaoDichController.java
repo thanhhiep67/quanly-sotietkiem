@@ -55,8 +55,9 @@ public class GiaoDichController {
         model.addAttribute("soList", viewList);
 
         // lịch sử giao dịch gần đây
-        List<GiaoDich> lichSu = giaoDichRepository.findTop5ByKhachHangIdOrderByCreatedAtDesc(khachHangId);
+        List<GiaoDich> lichSu = giaoDichRepository.findByKhachHangIdOrderByCreatedAtDesc(khachHangId);
         model.addAttribute("lichSuGiaoDich", lichSu);
+
 
         return "qlstk/client/giao-dich";
     }

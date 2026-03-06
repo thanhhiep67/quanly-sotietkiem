@@ -1,207 +1,352 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Giao dịch - MyBank</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-
+    <title>Giao dịch - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        /* ── Transaction cards ── */
+        .txn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        .txn-card {
+            background: var(--white); border-radius: 18px; overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 16px rgba(13,115,119,.06);
+            border: 1px solid rgba(221,232,232,.8);
+        }
+        .txn-card-header {
+            padding: 22px 26px 18px;
+            display: flex; align-items: center; gap: 14px;
+            border-bottom: 1px solid var(--gray-1);
+        }
+        .txn-card-header-icon {
+            width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .txn-card-header-icon .material-symbols-outlined { font-size: 22px; }
+        .txn-card-header-icon.rut  { background: rgba(192,64,64,.1);   color: var(--red); }
+        .txn-card-header-icon.nap  { background: rgba(26,138,90,.1);   color: var(--green); }
+        .txn-card-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); }
+        .txn-card-sub   { font-size: 12px; color: var(--gray-2); margin-top: 2px; }
+        .txn-card-body  { padding: 22px 26px 26px; }
+
+        /* select & input overrides (no icon padding for these) */
+        .txn-card-body select,
+        .txn-card-body input[type="number"] {
+            padding: 13px 16px;
+        }
+        .txn-card-body .select-wrap::after { right: 14px; }
+
+        .form-group-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--gray-2); margin-bottom: 8px;
+            display: block;
+        }
+
+        .btn-rut {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #9e2020, var(--red));
+            color: var(--white); border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 14px rgba(192,64,64,.25);
+            letter-spacing: .5px;
+        }
+        .btn-rut:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,64,64,.35); }
+        .btn-rut .material-symbols-outlined { font-size: 18px; }
+
+        .btn-nap {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #145c38, var(--green));
+            color: var(--white); border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 14px rgba(26,138,90,.25);
+            letter-spacing: .5px;
+        }
+        .btn-nap:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,138,90,.35); }
+        .btn-nap .material-symbols-outlined { font-size: 18px; }
+
+        /* inline alert (bên trong form) */
+        .alert-inline {
+            display: flex; align-items: center; gap: 8px;
+            padding: 11px 14px; border-radius: 10px;
+            font-size: 13px; margin-top: 14px;
+        }
+        .alert-inline .material-symbols-outlined { font-size: 17px; flex-shrink: 0; }
+        .alert-inline-success { background: rgba(26,138,90,.08); border: 1px solid rgba(26,138,90,.22); color: #145c38; }
+        .alert-inline-error   { background: rgba(192,64,64,.07); border: 1px solid rgba(192,64,64,.2);  color: #7a2020; }
+
+        /* amount preview */
+        .amount-preview {
+            font-size: 12.5px; color: var(--teal); font-weight: 600;
+            min-height: 18px; margin-top: 6px;
+        }
+
+        /* history table */
+        .td-time   { font-size: 13px; color: var(--text); font-weight: 500; }
+        .td-maso   { font-family: 'DM Serif Display', serif; font-size: 13px; color: var(--teal); }
+        .td-amount { font-family: 'DM Serif Display', serif; font-size: 14px; font-weight: 700; text-align: right; }
+        .td-amount.nap { color: var(--green); }
+        .td-amount.rut { color: var(--red); }
+        thead th.right { text-align: right; }
+        thead th.center { text-align: center; }
+        tbody td.center { text-align: center; }
+
+        .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 19px; color: var(--text);
+            display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+        }
+        .section-title .material-symbols-outlined { font-size: 21px; color: var(--teal); }
     </style>
 </head>
+<body>
 
-<body class="bg-slate-50 text-slate-900">
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="tra-cuu-so" class="nav-item"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="giao-dich" class="nav-item active"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat" class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
 
-<div class="flex min-h-screen">
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Giao dịch</div>
+            <div class="header-sub">Nạp hoặc rút tiền từ sổ tiết kiệm của bạn</div>
+        </div>
+    </header>
 
-    <!-- SIDEBAR -->
-    <aside class="w-72 bg-slate-900 text-slate-400 flex flex-col">
-        <div class="p-8 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl text-white">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
+    <div class="page-body">
+
+        <!-- Flash alerts (RedirectAttributes — hiện sau redirect) -->
+        <div th:if="${error}" class="alert alert-error" id="alertError">
+            <span class="material-symbols-outlined">error_outline</span>
+            <span th:text="${error}"></span>
+        </div>
+        <div th:if="${success}" class="alert alert-success" id="alertSuccess">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${errorNap}" class="alert alert-error" id="alertErrorNap">
+            <span class="material-symbols-outlined">error_outline</span>
+            <span th:text="${errorNap}"></span>
+        </div>
+        <div th:if="${successNap}" class="alert alert-success" id="alertSuccessNap">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span th:text="${successNap}"></span>
+        </div>
+
+        <!-- 2 form cards -->
+        <div class="txn-grid">
+
+            <!-- ── RÚT TIỀN ── -->
+            <div class="txn-card">
+                <div class="txn-card-header">
+                    <div class="txn-card-header-icon rut">
+                        <span class="material-symbols-outlined">arrow_upward</span>
+                    </div>
+                    <div>
+                        <div class="txn-card-title">Rút tiền</div>
+                        <div class="txn-card-sub">Nhận tiền về tài khoản liên kết</div>
+                    </div>
                 </div>
-                <h1 class="text-white text-xl font-bold">MyBank</h1>
+                <div class="txn-card-body">
+                    <form th:action="@{/rut-tien}" method="post">
+
+                        <div class="form-group">
+                            <label class="form-group-label">Chọn sổ</label>
+                            <div class="input-wrap select-wrap">
+                                <select name="soTkId" id="selectRut" onchange="previewRut()">
+                                    <option th:each="soView : ${soList}"
+                                            th:value="${soView.so.maSo}"
+                                            th:attr="data-du=${soView.so.soDuHienTai}"
+                                            th:text="${soView.so.maSo + ' — ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ'}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group-label">Số tiền rút</label>
+                            <div class="input-wrap">
+                                <input type="number" name="soTien" id="inputRut"
+                                       placeholder="Nhập số tiền..." min="1000" step="1000"
+                                       oninput="previewRut()"/>
+                            </div>
+                            <div class="amount-preview" id="previewRut"></div>
+                        </div>
+
+                        <button type="submit" class="btn-rut">
+                            <span class="material-symbols-outlined">arrow_upward</span>
+                            Xác nhận rút
+                        </button>
+
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
-                <span class="material-symbols-outlined">grid_view</span>
-                Tổng quan
-            </a>
-            <a href="tra-cuu-so" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
-                <span class="material-symbols-outlined">receipt_long</span>
-                Sổ tiết kiệm
-            </a>
-            <a href="giao-dich" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl font-bold">
-                <span class="material-symbols-outlined">payments</span>
-                Giao dịch
-            </a>
-            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
-                <span class="material-symbols-outlined">percent</span>
-                Lãi suất
-            </a>
-        </nav>
+            <!-- ── NẠP TIỀN ── -->
+            <div class="txn-card">
+                <div class="txn-card-header">
+                    <div class="txn-card-header-icon nap">
+                        <span class="material-symbols-outlined">arrow_downward</span>
+                    </div>
+                    <div>
+                        <div class="txn-card-title">Nạp tiền</div>
+                        <div class="txn-card-sub">Gửi thêm tiền vào sổ tiết kiệm</div>
+                    </div>
+                </div>
+                <div class="txn-card-body">
+                    <form th:action="@{/nap-tien}" method="post">
 
-        <div class="p-4 border-t border-slate-800">
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 font-semibold">
-                <span class="material-symbols-outlined">logout</span>
-                Đăng xuất
-            </a>
-        </div>
-    </aside>
+                        <div class="form-group">
+                            <label class="form-group-label">Chọn sổ</label>
+                            <div class="input-wrap select-wrap">
+                                <select name="soTkId">
+                                    <option th:each="soView : ${soList}"
+                                            th:value="${soView.so.maSo}"
+                                            th:text="${soView.so.maSo + ' — ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ'}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 p-10 space-y-10">
+                        <div class="form-group">
+                            <label class="form-group-label">Số tiền nạp</label>
+                            <div class="input-wrap">
+                                <input type="number" name="soTien" id="inputNap"
+                                       placeholder="Nhập số tiền..." min="1000" step="1000"
+                                       oninput="previewNap(this.value)"/>
+                            </div>
+                            <div class="amount-preview" id="previewNap"></div>
+                        </div>
 
-        <!-- HEADER -->
+                        <button type="submit" class="btn-nap">
+                            <span class="material-symbols-outlined">arrow_downward</span>
+                            Xác nhận nạp
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+        </div><!-- /txn-grid -->
+
+        <!-- Lịch sử giao dịch -->
         <div>
-            <h2 class="text-3xl font-black text-slate-800">Giao dịch sổ tiết kiệm</h2>
-            <p class="text-slate-500">Thực hiện nạp hoặc rút tiền từ sổ tiết kiệm của bạn</p>
-        </div>
-
-        <!-- 2 CARDS -->
-        <div class="grid md:grid-cols-2 gap-8">
-
-            <!-- RÚT TIỀN -->
-            <div class="bg-white p-8 rounded-3xl shadow border border-slate-100">
-                <h3 class="text-lg font-bold text-red-600 mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined">arrow_downward</span>
-                    Rút tiền
-                </h3>
-
-                <form th:action="@{/rut-tien}" method="post" class="space-y-5">
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase">Chọn sổ</label>
-                        <select name="soTkId"
-                                class="w-full mt-2 p-4 rounded-xl bg-slate-50 border focus:border-red-500 outline-none font-semibold">
-                            <option th:each="soView : ${soList}"
-                                    th:value="${soView.so.maSo}"
-                                    th:text="${soView.so.maSo + ' (Dư: ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ)'}">
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase">Số tiền rút</label>
-                        <input type="number" name="soTien"
-                               class="w-full mt-2 p-4 rounded-xl bg-slate-50 border focus:border-red-500 outline-none font-semibold"
-                               placeholder="Nhập số tiền...">
-                    </div>
-
-                    <button type="submit"
-                            class="w-full bg-red-600 text-white py-4 rounded-xl font-bold hover:bg-red-700 transition">
-                        XÁC NHẬN RÚT
-                    </button>
-
-                    <div th:if="${error}" class="text-red-600 text-sm font-medium" th:text="${error}"></div>
-                    <div th:if="${success}" class="text-green-600 text-sm font-medium" th:text="${success}"></div>
-
-                </form>
-            </div>
-
-            <!-- NẠP TIỀN -->
-            <div class="bg-white p-8 rounded-3xl shadow border border-slate-100">
-                <h3 class="text-lg font-bold text-green-600 mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined">arrow_upward</span>
-                    Nạp tiền
-                </h3>
-
-                <form th:action="@{/nap-tien}" method="post" class="space-y-5">
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase">Chọn sổ</label>
-                        <select name="soTkId"
-                                class="w-full mt-2 p-4 rounded-xl bg-slate-50 border focus:border-green-500 outline-none font-semibold">
-                            <option th:each="soView : ${soList}"
-                                    th:value="${soView.so.maSo}"
-                                    th:text="${soView.so.maSo + ' (Dư: ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ)'}">
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase">Số tiền nạp</label>
-                        <input type="number" name="soTien"
-                               class="w-full mt-2 p-4 rounded-xl bg-slate-50 border focus:border-green-500 outline-none font-semibold"
-                               placeholder="Nhập số tiền...">
-                    </div>
-
-                    <button type="submit"
-                            class="w-full bg-green-600 text-white py-4 rounded-xl font-bold hover:bg-green-700 transition">
-                        XÁC NHẬN NẠP
-                    </button>
-
-                    <div th:if="${errorNap}" class="text-red-600 text-sm font-medium" th:text="${errorNap}"></div>
-                    <div th:if="${successNap}" class="text-green-600 text-sm font-medium" th:text="${successNap}"></div>
-
-                </form>
-            </div>
-
-        </div>
-
-        <!-- LỊCH SỬ GIAO DỊCH -->
-        <div>
-            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined text-blue-600">history</span>
+            <div class="section-title">
+                <span class="material-symbols-outlined">history</span>
                 Lịch sử giao dịch gần đây
-            </h3>
-
-            <div class="bg-white rounded-2xl shadow border border-slate-100 overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-100 text-xs uppercase text-slate-500">
-                    <tr>
-                        <th class="p-4 text-left">Thời gian</th>
-                        <th class="p-4 text-left">Mã sổ</th>
-                        <th class="p-4 text-center">Loại</th>
-                        <th class="p-4 text-right">Số tiền</th>
-                        <th class="p-4 text-center">Trạng thái</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr th:each="gd : ${lichSuGiaoDich}" class="border-t hover:bg-slate-50">
-
-                        <td class="p-4 font-semibold"
-                            th:text="${#dates.format(gd.ngayGiaoDich,'dd/MM/yyyy HH:mm')}"></td>
-
-                        <td class="p-4" th:text="${gd.soTkId}"></td>
-
-                        <td class="p-4 text-center">
-                                <span th:if="${gd.loaiGiaoDich == 'NAP'}"
-                                      class="text-green-600 font-bold">NẠP</span>
-                            <span th:if="${gd.loaiGiaoDich == 'RUT'}"
-                                  class="text-red-600 font-bold">RÚT</span>
-                        </td>
-
-                        <td class="p-4 text-right font-bold"
-                            th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'text-green-600' : 'text-red-600'"
-                            th:text="${gd.loaiGiaoDich == 'NAP'
-                                    ? '+' + #numbers.formatDecimal(gd.soTien,0,'POINT',0,'COMMA') + ' đ'
-                                    : '-' + #numbers.formatDecimal(gd.soTien,0,'POINT',0,'COMMA') + ' đ'}">
-                        </td>
-
-                        <td class="p-4 text-center">
-                                <span th:if="${gd.trangThai == 'COMPLETED'}"
-                                      class="text-green-600 font-semibold">Thành công</span>
-                            <span th:if="${gd.trangThai != 'COMPLETED'}"
-                                  class="text-red-600 font-semibold">Thất bại</span>
-                        </td>
-
-                    </tr>
-                    </tbody>
-                </table>
+            </div>
+            <div class="table-panel">
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Mã sổ</th>
+                            <th class="center">Loại</th>
+                            <th class="right">Số tiền</th>
+                            <th class="center">Trạng thái</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="gd : ${lichSuGiaoDich}">
+                            <td class="td-time"
+                                th:text="${#dates.format(gd.ngayGiaoDich,'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="td-maso" th:text="${gd.soTkId}"></td>
+                            <td class="center">
+                                <span class="badge"
+                                      th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'badge-active' : 'badge-closed'"
+                                      th:text="${gd.loaiGiaoDich == 'NAP'} ? '↓ Nạp' : '↑ Rút'">
+                                </span>
+                            </td>
+                            <td class="td-amount"
+                                th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'"
+                                th:text="${(gd.loaiGiaoDich == 'NAP' ? '+' : '-') + #numbers.formatInteger(gd.soTien, 0, 'POINT') + ' đ'}">
+                            </td>
+                            <td class="center">
+                                <span class="badge"
+                                      th:classappend="${gd.trangThai == 'COMPLETED'} ? 'badge-active' : 'badge-closed'"
+                                      th:text="${gd.trangThai == 'COMPLETED'} ? 'Thành công' : 'Thất bại'">
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${lichSuGiaoDich == null or #lists.isEmpty(lichSuGiaoDich)}">
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <span class="material-symbols-outlined">history</span>
+                                    Chưa có giao dịch nào.
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-    </main>
-</div>
+    </div><!-- /page-body -->
 
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
+<script>
+    // Auto-hide alerts sau 5s
+    setTimeout(function() {
+        ['alertError','alertSuccess','alertErrorNap','alertSuccessNap'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }
+        });
+    }, 5000);
+    function formatVND(n) {
+        if (!n || isNaN(n) || n < 1) return '';
+        return parseInt(n).toLocaleString('vi-VN') + ' đ';
+    }
+
+    function previewRut() {
+        const val = document.getElementById('inputRut').value;
+        const el  = document.getElementById('previewRut');
+        const sel = document.getElementById('selectRut');
+        const du  = parseFloat(sel.selectedOptions[0]?.dataset?.du || 0);
+        if (!val || isNaN(val) || val < 1) { el.textContent = ''; return; }
+        const n = parseInt(val);
+        if (n > du) {
+            el.style.color = 'var(--red)';
+            el.textContent = '⚠ Vượt quá số dư: ' + formatVND(du);
+        } else {
+            el.style.color = 'var(--teal)';
+            el.textContent = '≈ ' + formatVND(n);
+        }
+    }
+
+    function previewNap(val) {
+        const el = document.getElementById('previewNap');
+        if (!val || isNaN(val) || val < 1) { el.textContent = ''; return; }
+        el.textContent = '≈ ' + formatVND(val);
+    }
+</script>
 </body>
 </html>

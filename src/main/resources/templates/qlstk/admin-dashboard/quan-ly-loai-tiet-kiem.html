@@ -1,151 +1,234 @@
 <!DOCTYPE html>
-<html lang="vi" class="light" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>QUẢN LÝ LOẠI TIẾT KIỆM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/admin-dashboard/css/styles.css">
+    <link rel="stylesheet" href="/css/shared.css"/>
+    <style>
+        /* ── Page-specific ── */
+        .td-rate {
+            font-family: 'DM Serif Display', serif;
+            font-size: 14px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+        .td-name { font-weight: 600; color: var(--navy); }
+        .td-id   { font-size: 12px; font-weight: 600; color: var(--navy-3); font-family: 'DM Serif Display', serif; }
+        .td-date { font-size: 12.5px; color: var(--gray-2); }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 99px;
+            font-size: 11px; font-weight: 600; letter-spacing: .3px;
+        }
+        .chip-yes { background: rgba(45,125,90,.1);  color: var(--green); }
+        .chip-no  { background: rgba(184,176,164,.15); color: var(--gray-2); }
+
+        /* ── Delete Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(11,31,58,.55);
+            backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 50;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: 18px;
+            padding: 32px 28px;
+            width: 100%; max-width: 380px;
+            box-shadow: 0 20px 60px rgba(11,31,58,.22);
+            animation: modalIn .2s ease;
+        }
+        @keyframes modalIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+        .modal-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(185,64,64,.1);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+        }
+        .modal-icon .material-icons-outlined { font-size: 26px; color: var(--red); }
+        .modal-title { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--navy); margin-bottom: 8px; }
+        .modal-desc  { font-size: 13.5px; color: var(--gray-2); line-height: 1.55; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+        .btn-cancel {
+            padding: 10px 20px; border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500;
+            border: 1.5px solid var(--gray-1); color: var(--gray-2);
+            background: none; cursor: pointer; transition: all .2s; text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+        .btn-cancel:hover { border-color: var(--navy); color: var(--navy); }
+
+        .btn-danger {
+            padding: 10px 20px; border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+            background: var(--red); color: var(--white);
+            border: none; cursor: pointer; transition: all .2s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-danger:hover { background: #9e3030; }
+        .btn-danger .material-icons-outlined { font-size: 16px; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <span class="material-icons-outlined text-white text-3xl">savings</span>
-                </div>
-                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
-            </div>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-icons-outlined">savings</span></div>
+        <div class="logo-text">VietSave Bank<span>Hệ thống nội bộ</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Chính</p>
+            <a href="/admin" class="nav-item"><span class="material-icons-outlined">dashboard</span>Tổng quan</a>
+            <a href="/admin/mo-so" class="nav-item"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a>
+            <a href="/admin/quan-ly-khach-hang" class="nav-item"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a>
+            <a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item active"><span class="material-icons-outlined">settings_suggest</span>Loại tiết kiệm</a>
         </div>
-        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="/admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="/admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
-                </ul>
+        <div class="nav-group">
+            <p class="nav-section-label">Nghiệp vụ</p>
+            <a href="/admin/giao-dich" class="nav-item"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a>
+            <a href="/admin/tra-cuu-so" class="nav-item"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a>
+            <a href="/admin/bao-cao-thong-ke" class="nav-item"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a>
+        </div>
+    </nav>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <h2 class="header-title">Loại tiết kiệm</h2>
+        <a href="/admin/quan-ly-loai-tiet-kiem/them" class="btn-primary">
+            <span class="material-icons-outlined">add</span>
+            Thêm loại mới
+        </a>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Alerts -->
+        <div th:if="${message}" class="alert alert-success" id="alertMessage">
+            <span class="material-icons-outlined">check_circle</span>
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error" id="alertError">
+            <span class="material-icons-outlined">error_outline</span>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-panel">
+            <div class="table-header">
+                <div class="table-title">Danh sách loại tiết kiệm</div>
             </div>
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="/admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="/admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
-
-
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto flex flex-col">
-        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
-            <h2 class="text-xl font-bold text-slate-800">Danh sách loại tiết kiệm</h2>
-            <a href="/admin/quan-ly-loai-tiet-kiem/them"
-               class="bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
-                <span class="material-icons-outlined text-sm">add</span> Thêm loại mới
-            </a>
-        </header>
-
-        <div class="p-8">
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <!-- Thông báo -->
-                <div th:if="${message}" id="alertMessage"
-                     class="mb-4 p-4 rounded-lg bg-green-100 text-green-700 border border-green-300">
-                    <span th:text="${message}"></span>
-                </div>
-                <div th:if="${error}" id="alertError"
-                     class="mb-4 p-4 rounded-lg bg-red-100 text-red-700 border border-red-300">
-                    <span th:text="${error}"></span>
-                </div>
-
-                <!-- Bảng danh sách loại tiết kiệm -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider">
-                        <tr>
-                            <th class="px-6 py-4">Mã sổ</th>
-                            <th class="px-6 py-4">Tên loại</th>
-                            <th class="px-6 py-4">Kỳ hạn (tháng)</th>
-                            <th class="px-6 py-4">Cho gửi thêm</th>
-                            <th class="px-6 py-4">Cho rút một phần</th>
-                            <th class="px-6 py-4">Lãi suất (%/năm)</th>
-                            <th class="px-6 py-4">Ngày tạo</th>
-                            <th class="px-6 py-4 text-right">Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                        <tr th:each="loai : ${loaiSoList}" class="hover:bg-blue-50/30 transition">
-                            <td class="px-6 py-4" th:text="${loai.id}"></td>
-                            <td class="px-6 py-4 font-bold text-slate-700" th:text="${loai.tenLoai}"></td>
-                            <td class="px-6 py-4" th:text="${loai.kyHanThang}"></td>
-                            <td class="px-6 py-4 text-gray-500" th:text="${loai.choGuiThem ? 'Có' : 'Không'}"></td>
-                            <td class="px-6 py-4 text-gray-500" th:text="${loai.choRutMotPhan ? 'Có' : 'Không'}"></td>
-                            <td class="px-6 py-4 text-blue-600 font-semibold"
-                                th:text="${laiSuatMap[loai.id]} + ' %/năm'"></td>
-                            <td class="px-6 py-4 text-gray-500" th:text="${#dates.format(loai.createdAt, 'dd/MM/yyyy')}"></td>
-                            <td class="px-6 py-4 text-right">
-                                <button type="button"
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên loại</th>
+                        <th>Kỳ hạn</th>
+                        <th>Cho gửi thêm</th>
+                        <th>Cho rút một phần</th>
+                        <th>Lãi suất</th>
+                        <th>Ngày tạo</th>
+                        <th style="text-align:right;">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="loai : ${loaiSoList}">
+                        <td class="td-id"   th:text="${loai.id}"></td>
+                        <td class="td-name" th:text="${loai.tenLoai}"></td>
+                        <td>
+                            <span th:text="${loai.kyHanThang} + ' tháng'"></span>
+                        </td>
+                        <td>
+                            <span th:if="${loai.choGuiThem}"   class="chip chip-yes">✓ Có</span>
+                            <span th:unless="${loai.choGuiThem}" class="chip chip-no">✗ Không</span>
+                        </td>
+                        <td>
+                            <span th:if="${loai.choRutMotPhan}"   class="chip chip-yes">✓ Có</span>
+                            <span th:unless="${loai.choRutMotPhan}" class="chip chip-no">✗ Không</span>
+                        </td>
+                        <td class="td-rate"
+                            th:text="${laiSuatMap[loai.id]} + ' %/năm'"></td>
+                        <td class="td-date"
+                            th:text="${#dates.format(loai.createdAt, 'dd/MM/yyyy')}"></td>
+                        <td>
+                            <div class="action-group">
+                                <button type="button" class="btn-icon btn-icon-del"
                                         th:attr="data-delete-url=@{'/admin/quan-ly-loai-tiet-kiem/xoa/' + ${loai.id}}"
                                         onclick="openConfirmModal(this.getAttribute('data-delete-url'))"
-                                        class="text-red-500 p-2 hover:bg-red-50 rounded-lg transition ml-2">
+                                        title="Xoá">
                                     <span class="material-icons-outlined">delete</span>
                                 </button>
-                            </td>
-                        </tr>
-                        </tbody>
-
-                    </table>
-                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Empty state -->
+                    <tr th:if="${#lists.isEmpty(loaiSoList)}">
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <span class="material-icons-outlined">style</span>
+                                Chưa có loại tiết kiệm nào.
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </main>
-</div>
 
-<!-- Modal xác nhận xóa -->
-<div id="confirmModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full">
-        <p class="mb-4 text-slate-700 font-semibold">Bạn có chắc chắn muốn xóa loại tiết kiệm này?</p>
-        <div class="flex justify-end gap-3">
-            <button onclick="closeConfirmModal()" class="px-4 py-2 border rounded-lg">Hủy</button>
-            <a id="confirmDeleteBtn" href="#" class="px-4 py-2 bg-red-600 text-white rounded-lg">Xóa</a>
+    </div><!-- /page-body -->
+
+    <footer>© 2026 Hệ thống quản lý sổ tiết kiệm · Version 1.0.0</footer>
+</main>
+
+<!-- ════ MODAL XÁC NHẬN XOÁ ════ -->
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <span class="material-icons-outlined">delete_forever</span>
+        </div>
+        <div class="modal-title">Xoá loại tiết kiệm?</div>
+        <div class="modal-desc">Hành động này không thể hoàn tác. Loại tiết kiệm sẽ bị xoá vĩnh viễn khỏi hệ thống.</div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Hủy</button>
+            <a id="confirmDeleteBtn" href="#" class="btn-danger">
+                <span class="material-icons-outlined">delete</span>
+                Xác nhận xoá
+            </a>
         </div>
     </div>
 </div>
 
-<!-- Script -->
 <script>
     function openConfirmModal(deleteUrl) {
-        const modal = document.getElementById("confirmModal");
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        document.getElementById("confirmDeleteBtn").setAttribute("href", deleteUrl);
+        document.getElementById('confirmDeleteBtn').setAttribute('href', deleteUrl);
+        document.getElementById('confirmModal').classList.add('open');
     }
     function closeConfirmModal() {
-        const modal = document.getElementById("confirmModal");
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
+        document.getElementById('confirmModal').classList.remove('open');
     }
-
-    // Ẩn thông báo sau 5s
+    // Đóng modal khi click ra ngoài
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirmModal();
+    });
+    // Ẩn alert sau 5s
     setTimeout(function() {
-        const msg = document.getElementById("alertMessage");
-        const err = document.getElementById("alertError");
-        if (msg) msg.style.display = "none";
-        if (err) err.style.display = "none";
+        ['alertMessage','alertError'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }
+        });
     }, 5000);
 </script>
 </body>

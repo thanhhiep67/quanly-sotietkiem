@@ -1,119 +1,222 @@
 <!DOCTYPE html>
-<html lang="vi" class="light" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CHỈNH SỬA KHÁCH HÀNG</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/admin-dashboard/css/styles.css">
+    <link rel="stylesheet" href="/css/shared.css"/>
+    <style>
+        .form-card {
+            width: 100%; max-width: 660px;
+            background: var(--white); border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 8px 32px rgba(11,31,58,.08);
+            overflow: hidden; margin: 0 auto;
+        }
+        .form-card-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-3) 100%);
+            padding: 28px 36px; position: relative; overflow: hidden;
+        }
+        .form-card-header::after {
+            content: ''; position: absolute; right: -30px; top: -30px;
+            width: 160px; height: 160px; border-radius: 50%;
+            border: 1px solid rgba(201,168,76,.18);
+        }
+        .form-card-header::before {
+            content: ''; position: absolute; right: 10px; top: 10px;
+            width: 90px; height: 90px; border-radius: 50%;
+            border: 1px solid rgba(201,168,76,.1);
+        }
+        .form-card-icon {
+            width: 44px; height: 44px;
+            background: rgba(201,168,76,.18); border: 1px solid rgba(201,168,76,.35);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 14px;
+        }
+        .form-card-icon .material-icons-outlined { font-size: 22px; color: var(--gold-lt); }
+        .form-card-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); }
+        .form-card-sub   { font-size: 12.5px; color: rgba(255,255,255,.45); margin-top: 4px; font-weight: 300; }
+        .form-card-body  { padding: 32px 36px; }
+
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+        .form-grid-2 .form-group.full { grid-column: 1 / -1; }
+
+        /* readonly field */
+        .input-readonly {
+            background: var(--gray-1) !important;
+            color: var(--gray-2) !important;
+            cursor: not-allowed;
+        }
+        .input-readonly:focus {
+            border-color: var(--gray-1) !important;
+            box-shadow: none !important;
+        }
+        .readonly-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 600; letter-spacing: .8px;
+            text-transform: uppercase; color: var(--gray-2);
+            background: var(--gray-1); padding: 2px 8px; border-radius: 99px;
+            margin-left: 8px;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <span class="material-icons-outlined text-white text-3xl">savings</span>
-                </div>
-                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
-            </div>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-icons-outlined">savings</span></div>
+        <div class="logo-text">VietSave Bank<span>Hệ thống nội bộ</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Chính</p>
+            <a href="/admin" class="nav-item"><span class="material-icons-outlined">dashboard</span>Tổng quan</a>
+            <a href="/admin/mo-so" class="nav-item"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a>
+            <a href="/admin/quan-ly-khach-hang" class="nav-item active"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a>
+            <a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item"><span class="material-icons-outlined">settings_suggest</span>Loại tiết kiệm</a>
         </div>
-        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="/admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="/admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
-                </ul>
-            </div>
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="/admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="/admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg">
-                        <span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
+        <div class="nav-group">
+            <p class="nav-section-label">Nghiệp vụ</p>
+            <a href="/admin/giao-dich" class="nav-item"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a>
+            <a href="/admin/tra-cuu-so" class="nav-item"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a>
+            <a href="/admin/bao-cao-thong-ke" class="nav-item"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a>
+        </div>
+    </nav>
 
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto flex flex-col">
-        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
-            <h2 class="text-xl font-bold text-slate-800">Chỉnh sửa khách hàng</h2>
-        </header>
+</aside>
 
-        <div class="p-8">
-            <div class="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-                <!-- Form thêm loại tiết kiệm -->
-                <form th:action="@{/admin/quan-ly-khach-hang/edit}" th:object="${khachHang}" method="post" class="space-y-6">
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <h2 class="header-title">Chỉnh sửa khách hàng</h2>
+        <a href="/admin/quan-ly-khach-hang" class="btn-ghost" style="text-decoration:none;">
+            <span class="material-icons-outlined" style="font-size:17px;">arrow_back</span>
+            Quay lại
+        </a>
+    </header>
+
+    <div class="page-body">
+        <div class="form-card">
+
+            <div class="form-card-header">
+                <div class="form-card-icon">
+                    <span class="material-icons-outlined">manage_accounts</span>
+                </div>
+                <div class="form-card-title">Cập nhật thông tin</div>
+                <div class="form-card-sub">Chỉnh sửa thông tin hồ sơ khách hàng</div>
+            </div>
+
+            <div class="form-card-body">
+                <form th:action="@{/admin/quan-ly-khach-hang/edit}" th:object="${khachHang}" method="post">
                     <input type="hidden" th:field="*{id}"/>
 
-                    <!-- Khung tài khoản ID (readonly) -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tài khoản ID</label>
-                        <input type="text" th:field="*{taikhoan_id}" class="w-full border p-3 rounded-xl bg-gray-100 text-gray-600" readonly>
+                    <div class="form-grid-2">
+
+                        <!-- Tài khoản ID (readonly) -->
+                        <div class="form-group full">
+                            <div class="form-label">
+                                Tài khoản ID
+                                <span class="readonly-badge">Chỉ đọc</span>
+                            </div>
+                            <div class="input-wrap">
+                                <input type="text" th:field="*{taikhoan_id}"
+                                       class="input-readonly" readonly/>
+                                <span class="material-icons-outlined input-icon">tag</span>
+                            </div>
+                        </div>
+
+                        <!-- Họ tên -->
+                        <div class="form-group full">
+                            <div class="form-label">Họ và tên <span class="required">*</span></div>
+                            <div class="input-wrap">
+                                <input type="text" th:field="*{hoten}" placeholder="Nhập họ và tên đầy đủ"/>
+                                <span class="material-icons-outlined input-icon">person</span>
+                            </div>
+                        </div>
+
+                        <!-- Giới tính -->
+                        <div class="form-group">
+                            <div class="form-label">Giới tính <span class="required">*</span></div>
+                            <div class="input-wrap select-wrap">
+                                <select th:field="*{gioiTinh}">
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                </select>
+                                <span class="material-icons-outlined input-icon">wc</span>
+                            </div>
+                        </div>
+
+                        <!-- Ngày sinh -->
+                        <div class="form-group">
+                            <div class="form-label">Ngày sinh <span class="required">*</span></div>
+                            <div class="input-wrap">
+                                <input type="date" th:field="*{ngaySinh}"/>
+                                <span class="material-icons-outlined input-icon">cake</span>
+                            </div>
+                        </div>
+
+                        <!-- CCCD -->
+                        <div class="form-group">
+                            <div class="form-label">CCCD / CMND <span class="required">*</span></div>
+                            <div class="input-wrap">
+                                <input type="text" th:field="*{cccd}" maxlength="12"
+                                       oninput="this.value=this.value.replace(/\D/g,'')"/>
+                                <span class="material-icons-outlined input-icon">badge</span>
+                            </div>
+                        </div>
+
+                        <!-- SĐT -->
+                        <div class="form-group">
+                            <div class="form-label">Số điện thoại <span class="required">*</span></div>
+                            <div class="input-wrap">
+                                <input type="text" th:field="*{sdt}" placeholder="VD: 0901 234 567"/>
+                                <span class="material-icons-outlined input-icon">phone</span>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <div class="form-label">Email</div>
+                            <div class="input-wrap">
+                                <input type="email" th:field="*{email}" placeholder="example@email.com"/>
+                                <span class="material-icons-outlined input-icon">mail</span>
+                            </div>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="form-group full">
+                            <div class="form-label">Địa chỉ</div>
+                            <div class="input-wrap">
+                                <input type="text" th:field="*{diaChi}"
+                                       placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"/>
+                                <span class="material-icons-outlined input-icon">home</span>
+                            </div>
+                        </div>
+
+                    </div><!-- /form-grid-2 -->
+
+                    <div class="divider"></div>
+
+                    <div class="form-actions">
+                        <a href="/admin/quan-ly-khach-hang" class="btn-ghost" style="text-decoration:none;">
+                            <span class="material-icons-outlined" style="font-size:17px;">close</span>
+                            Hủy
+                        </a>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons-outlined">save</span>
+                            Cập nhật
+                        </button>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Họ và tên</label>
-                        <input type="text" th:field="*{hoten}" class="w-full border p-3 rounded-xl">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Giới tính</label>
-                        <select th:field="*{gioiTinh}" class="w-full border p-3 rounded-xl">
-                            <option value="Nam">Nam</option>
-                            <option value="Nữ">Nữ</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Số điện thoại</label>
-                        <input type="text" th:field="*{sdt}" class="w-full border p-3 rounded-xl">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">CMND/CCCD</label>
-                        <input type="text" th:field="*{cccd}" class="w-full border p-3 rounded-xl">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Địa chỉ</label>
-                        <input type="text" th:field="*{diaChi}" class="w-full border p-3 rounded-xl">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                        <input type="email" th:field="*{email}" class="w-full border p-3 rounded-xl">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ngày sinh</label>
-                        <input type="date" th:field="*{ngaySinh}" class="w-full border p-3 rounded-xl">
-                    </div>
-
-                    <div class="pt-6 border-t flex justify-end gap-3">
-                        <a href="/admin/quan-ly-khach-hang" class="px-6 py-2.5 border rounded-xl hover:bg-gray-50">Hủy</a>
-                        <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700">Cập nhật</button>
-                    </div>
                 </form>
-
             </div>
         </div>
-    </main>
-</div>
+    </div>
+
+    <footer>© 2026 Hệ thống quản lý sổ tiết kiệm · Version 1.0.0</footer>
+</main>
+
 </body>
 </html>

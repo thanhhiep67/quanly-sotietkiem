@@ -1,95 +1,127 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Tra cứu yêu cầu mở sổ - MyBank</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tra cứu yêu cầu mở sổ - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
+    <style>
+        .td-id     { font-family:'DM Serif Display',serif; font-size:13px; color:var(--teal); font-weight:700; }
+        .td-thoihan{ font-weight:600; color:var(--text); }
+        .td-sotien { font-family:'DM Serif Display',serif; font-size:14px; color:var(--text); font-weight:700; }
+        .td-laisuat{ font-weight:600; color:var(--gold); }
+        .td-date   { font-size:12.5px; color:var(--gray-2); }
+
+        .badge-cho    { background:rgba(212,168,67,.12); color:#8a6a10; }
+        .badge-duyet  { background:rgba(26,138,90,.1);   color:var(--green); }
+        .badge-tuchoi { background:rgba(192,64,64,.09);  color:var(--red); }
+    </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900">
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl">
-        <div class="p-8 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
-                </div>
-                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
-            </div>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="tra-cuu-so" class="nav-item active"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat" class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
         </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">grid_view</span> Tổng quan
-            </a>
-            <a href="tra-cuu-so" class="bg-blue-600 text-white flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg"><span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
 
-            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">history</span> Giao dịch
-            </a>
-            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">percent</span> Lãi suất
-            </a>
-        </nav>
-        <div class="p-4 border-t border-slate-800 space-y-2">
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition font-semibold">
-                <span class="material-symbols-outlined">logout</span> Đăng xuất
-            </a>
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Yêu cầu mở sổ</div>
+            <div class="header-sub">Theo dõi trạng thái các yêu cầu của bạn</div>
         </div>
-    </aside>
+        <a href="tra-cuu-so" class="btn-ghost" style="text-decoration:none;">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Quay lại sổ
+        </a>
+    </header>
 
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="max-w-6xl mx-auto space-y-8">
-            <div class="flex justify-between items-end">
-                <div>
-                    <h2 class="text-3xl font-black text-slate-800">Yêu cầu mở sổ</h2>
-                    <p class="text-slate-500">Danh sách các yêu cầu mở sổ của bạn</p>
-                </div>
+    <div class="page-body">
+
+        <!-- Flash message -->
+        <div th:if="${successMessage}" class="alert alert-success" id="alertSuccess">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-panel">
+            <div class="table-header">
+                <div class="table-title">Danh sách yêu cầu</div>
             </div>
-
-            <!-- Flash message -->
-            <div th:if="${successMessage}" class="p-4 bg-green-100 text-green-700 rounded-xl font-semibold">
-                <p th:text="${successMessage}"></p>
-            </div>
-
-            <!-- Bảng danh sách yêu cầu -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <table class="min-w-full bg-white rounded-xl shadow">
-                    <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-bold">
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
                     <tr>
-                        <th class="px-6 py-3 text-left">Mã yêu cầu</th>
-                        <th class="px-6 py-3 text-left">Thời hạn</th>
-                        <th class="px-6 py-3 text-left">Số tiền gửi</th>
-                        <th class="px-6 py-3 text-left">Lãi suất áp dụng</th>
-                        <th class="px-6 py-3 text-left">Ngày tạo</th>
-                        <th class="px-6 py-3 text-left">Trạng thái</th>
+                        <th>Mã yêu cầu</th>
+                        <th>Thời hạn</th>
+                        <th>Số tiền gửi</th>
+                        <th>Lãi suất áp dụng</th>
+                        <th>Ngày tạo</th>
+                        <th style="text-align:center;">Trạng thái</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody>
                     <tr th:each="yc : ${yeuCauList}">
-                        <td class="px-6 py-4" th:text="${yc.id}"></td>
-                        <td class="px-6 py-4" th:text="${yc.thoiHan} + ' tháng'"></td>
-                        <td class="px-6 py-4" th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
-                        <td class="px-6 py-4" th:text="${yc.laiSuatApDung} + '%/năm'"></td>
-                        <td class="px-6 py-4" th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
-                        <td class="px-6 py-4">
-                        <span th:switch="${yc.trangThai}">
-                          <span th:case="'CHO'" class="text-yellow-600 font-bold">Chờ duyệt</span>
-                          <span th:case="'DUYET'" class="text-green-600 font-bold">Đã duyệt</span>
-                          <span th:case="'TU CHOI'" class="text-red-600 font-bold">Từ chối</span>
-                        </span>
+                        <td class="td-id"    th:text="${yc.id}"></td>
+                        <td class="td-thoihan" th:text="${yc.thoiHan} + ' tháng'"></td>
+                        <td class="td-sotien"
+                            th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
+                        <td class="td-laisuat" th:text="${yc.laiSuatApDung} + ' %/năm'"></td>
+                        <td class="td-date"
+                            th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+                        <td style="text-align:center;">
+                            <span th:switch="${yc.trangThai}">
+                                <span th:case="'CHO'"      class="badge badge-cho">⏳ Chờ duyệt</span>
+                                <span th:case="'DUYET'"    class="badge badge-duyet">✓ Đã duyệt</span>
+                                <span th:case="'TU CHOI'"  class="badge badge-tuchoi">✕ Từ chối</span>
+                                <span th:case="*"          class="badge badge-cho" th:text="${yc.trangThai}"></span>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr th:if="${yeuCauList == null or #lists.isEmpty(yeuCauList)}">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <span class="material-symbols-outlined">inbox</span>
+                                Bạn chưa có yêu cầu mở sổ nào.
+                            </div>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-
             </div>
         </div>
-    </main>
-</div>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
+<script>
+    setTimeout(function() {
+        const el = document.getElementById('alertSuccess');
+        if (el) { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }
+    }, 5000);
+</script>
 </body>
 </html>

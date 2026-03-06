@@ -1,180 +1,290 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mở sổ tiết kiệm mới - MyBank</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mở sổ tiết kiệm - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
+    <style>
+        .form-card {
+            width: 100%; max-width: 620px; margin: 0 auto;
+            background: var(--white); border-radius: 22px; overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 8px 32px rgba(13,115,119,.1);
+            border: 1px solid rgba(221,232,232,.8);
+        }
+        .form-card-header {
+            background: linear-gradient(135deg, #0A2828 0%, var(--teal) 100%);
+            padding: 30px 36px; position: relative; overflow: hidden;
+        }
+        .form-card-header::after {
+            content:''; position:absolute; right:-30px; top:-30px;
+            width:160px; height:160px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.1);
+        }
+        .form-card-header::before {
+            content:''; position:absolute; right:14px; top:14px;
+            width:86px; height:86px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.07);
+        }
+        .form-card-icon {
+            width:46px; height:46px; border-radius:13px;
+            background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.2);
+            display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+        }
+        .form-card-icon .material-symbols-outlined { font-size:23px; color:var(--teal-lt); }
+        .form-card-title { font-family:'DM Serif Display',serif; font-size:22px; color:var(--white); }
+        .form-card-sub   { font-size:12.5px; color:rgba(255,255,255,.45); margin-top:5px; font-weight:300; }
+        .form-card-body  { padding:30px 36px 36px; }
+
+        .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0 20px; }
+        .form-grid-2 .form-group.full { grid-column:1/-1; }
+
+        /* readonly date */
+        .input-readonly {
+            background:var(--gray-1) !important; color:var(--gray-2) !important;
+            cursor:not-allowed;
+        }
+        .input-readonly:focus { border-color:var(--gray-1) !important; box-shadow:none !important; }
+
+        /* ── Result panel ── */
+        .result-panel {
+            background:var(--mint); border:1.5px solid var(--gray-1);
+            border-radius:14px; padding:20px 22px;
+            display:flex; flex-direction:column; gap:12px;
+            margin-bottom:22px;
+        }
+        .result-row {
+            display:flex; align-items:center; justify-content:space-between; gap:12px;
+        }
+        .result-label {
+            font-size:13px; color:var(--gray-2); font-weight:500;
+            display:flex; align-items:center; gap:8px;
+        }
+        .result-label .material-symbols-outlined { font-size:17px; color:var(--teal-3); }
+        .result-value {
+            font-family:'DM Serif Display',serif; font-size:18px; font-weight:700;
+            color:var(--teal); text-align:right;
+        }
+        .result-value.gold  { color:var(--gold); }
+        .result-value.green { color:var(--green); }
+        .result-value.muted { font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:400; color:var(--gray-2); }
+
+        .result-divider { height:1px; background:var(--gray-1); }
+
+        /* error inline */
+        .error-inline {
+            display:none; align-items:center; gap:8px;
+            padding:11px 14px; border-radius:10px;
+            background:rgba(192,64,64,.07); border:1px solid rgba(192,64,64,.2);
+            color:#7a2020; font-size:13px; margin-top:8px;
+        }
+        .error-inline.show { display:flex; }
+        .error-inline .material-symbols-outlined { font-size:17px; flex-shrink:0; }
+
+        /* submit btn */
+        .btn-submit {
+            width:100%; padding:15px;
+            background:linear-gradient(135deg, var(--teal), var(--teal-2));
+            color:var(--white); border:none; border-radius:13px;
+            font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700;
+            cursor:pointer; transition:all .22s;
+            display:flex; align-items:center; justify-content:center; gap:9px;
+            box-shadow:0 4px 16px rgba(13,115,119,.28); letter-spacing:.4px;
+        }
+        .btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(13,115,119,.38); }
+        .btn-submit:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-submit .material-symbols-outlined { font-size:19px; }
+    </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900">
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shadow-2xl">
-        <div class="p-8 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl text-white">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="tra-cuu-so" class="nav-item active"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat" class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Mở sổ tiết kiệm</div>
+            <div class="header-sub">Chỉ mất 2 phút để bắt đầu kế hoạch tích lũy</div>
+        </div>
+        <a href="tra-cuu-so" class="btn-ghost" style="text-decoration:none;">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Quay lại
+        </a>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Flash message -->
+        <div th:if="${message}" class="alert alert-success" id="alertMsg"
+             style="max-width:620px;margin:0 auto;">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span th:text="${message}"></span>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <div class="form-card-icon">
+                    <span class="material-symbols-outlined">savings</span>
                 </div>
-                <h1 class="text-white text-xl font-bold tracking-tight">MyBank</h1>
-            </div>
-        </div>
-        <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">grid_view</span> Tổng quan
-            </a>
-            <a href="tra-cuu-so" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">receipt_long</span> Sổ tiết kiệm
-            </a>
-            <a href="giao-dich" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">history</span> Giao dịch
-            </a>
-            <a href="lai-suat" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition">
-                <span class="material-symbols-outlined">percent</span> Lãi suất
-            </a>
-        </nav>
-        <div class="p-4 border-t border-slate-800">
-            <a href="logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 font-semibold transition">
-                <span class="material-symbols-outlined">logout</span> Đăng xuất
-            </a>
-        </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="max-w-3xl mx-auto space-y-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-black text-slate-800">Mở Sổ Tiết Kiệm</h2>
-                <p class="text-slate-500">Chỉ mất 2 phút để bắt đầu kế hoạch tích lũy của bạn</p>
+                <div class="form-card-title">Đăng ký mở sổ mới</div>
+                <div class="form-card-sub">Chọn loại tiết kiệm và nhập số tiền để xem lãi dự tính</div>
             </div>
 
-            <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl">
-                <form th:action="@{/mo-so-tiet-kiem}" method="post" class="space-y-6">
-                    <!-- Loại sổ -->
-                    <div>
-                        <label class="block text-xs font-black uppercase text-slate-400 tracking-widest mb-2">
-                            Loại tiết kiệm
-                        </label>
-                        <select id="loaiSo" name="loaiSoId"
-                                class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-600 outline-none font-bold text-slate-700">
-                            <option th:each="loai : ${loaiSoList}"
-                                    th:value="${loai.id}"
-                                    th:data-lai="${loai.laiSuatNam}"
-                                    th:data-kyhan="${loai.kyHanThang}"
-                                    th:text="${loai.tenLoai + ' - Lãi suất ' + loai.laiSuatNam + '%/năm'}">
-                            </option>
-                        </select>
+            <div class="form-card-body">
+                <form th:action="@{/mo-so-tiet-kiem}" method="post">
+
+                    <div class="form-grid-2">
+
+                        <!-- Loại sổ -->
+                        <div class="form-group full">
+                            <div class="form-label">Loại tiết kiệm <span class="required">*</span></div>
+                            <div class="input-wrap select-wrap">
+                                <select id="loaiSo" name="loaiSoId" onchange="tinhLai()">
+                                    <option th:each="loai : ${loaiSoList}"
+                                            th:value="${loai.id}"
+                                            th:attr="data-lai=${loai.laiSuatNam}, data-kyhan=${loai.kyHanThang}"
+                                            th:text="${loai.tenLoai + ' — ' + loai.laiSuatNam + '%/năm'}">
+                                    </option>
+                                </select>
+                                <span class="material-symbols-outlined input-icon">style</span>
+                            </div>
+                        </div>
+
+                        <!-- Số tiền -->
+                        <div class="form-group">
+                            <div class="form-label">Số tiền gửi <span class="required">*</span>
+                                <span class="form-hint">VND</span>
+                            </div>
+                            <div class="input-wrap">
+                                <input type="number" id="soTienGui" name="soTienGui"
+                                       placeholder="Tối thiểu 100.000" min="100000" step="1000"
+                                       oninput="tinhLai()"/>
+                                <span class="material-symbols-outlined input-icon">payments</span>
+                            </div>
+                            <div class="error-inline" id="errorMsg">
+                                <span class="material-symbols-outlined">error_outline</span>
+                                Số tiền tối thiểu là 100.000 VND
+                            </div>
+                        </div>
+
+                        <!-- Ngày gửi (readonly) -->
+                        <div class="form-group">
+                            <div class="form-label">Ngày gửi</div>
+                            <div class="input-wrap">
+                                <input type="text" class="input-readonly"
+                                       th:value="${#dates.format(new java.util.Date(), 'dd/MM/yyyy')}"
+                                       readonly/>
+                                <span class="material-symbols-outlined input-icon">calendar_today</span>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <!-- Số tiền + Ngày gửi -->
-                    <div class="grid grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-xs font-black uppercase text-slate-400 tracking-widest mb-2">Số tiền gửi (VND)</label>
-                            <input type="number" id="soTienGui" name="soTienGui" placeholder="Tối thiểu 100.000"
-                                   class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-600 outline-none font-bold">
+                    <!-- Result panel -->
+                    <div class="result-panel">
+                        <div class="result-row">
+                            <div class="result-label">
+                                <span class="material-symbols-outlined">percent</span>
+                                Tiền lãi ước tính
+                            </div>
+                            <div class="result-value gold" id="laiUocTinh">~ 0 đ</div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-black uppercase text-slate-400 tracking-widest mb-2">Ngày gửi</label>
-                            <input type="text"
-                                   th:value="${#dates.format(new java.util.Date(), 'dd/MM/yyyy')}"
-                                   disabled
-                                   class="w-full bg-slate-100 border-none rounded-2xl p-4 text-slate-400 font-bold cursor-not-allowed">
-
-                        </div>
-                    </div>
-
-                    <!-- Kết quả -->
-                    <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
-                        <!-- Tiền lãi -->
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-600 font-semibold">Tiền lãi ước tính:</span>
-                            <span id="laiUocTinh" class="text-xl font-bold text-blue-600">~ 0 đ</span>
-                        </div>
-
-                        <!-- Tổng tiền nhận -->
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-600 font-semibold">Tổng tiền nhận (gốc + lãi):</span>
-                            <span id="tongTien" class="text-xl font-bold text-green-600">~ 0 đ</span>
-                        </div>
-
-                        <!-- Thông báo lỗi -->
-                        <div id="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 font-semibold hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 9v2m0 4h.01M12 5a7 7 0 100 14a7 7 0 000-14z"/>
-                            </svg>
-                            <span>Số tiền tối thiểu là 100.000 VND</span>
+                        <div class="result-divider"></div>
+                        <div class="result-row">
+                            <div class="result-label">
+                                <span class="material-symbols-outlined">account_balance_wallet</span>
+                                Tổng tiền nhận (gốc + lãi)
+                            </div>
+                            <div class="result-value green" id="tongTien">~ 0 đ</div>
                         </div>
                     </div>
 
-
-                    <!-- Thông báo -->
-                    <div th:if="${message}" class="p-4 bg-green-100 text-green-700 rounded-xl">
-                        <p th:text="${message}"></p>
-                    </div>
-
-                    <!-- Submit -->
-                    <button id="submitBtn" type="submit"
-                            class="w-full bg-blue-600 text-white py-5 rounded-3xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition transform hover:scale-[1.02]">
-                        XÁC NHẬN MỞ SỔ
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span class="material-symbols-outlined">savings</span>
+                        Xác nhận mở sổ
                     </button>
+
                 </form>
             </div>
         </div>
-    </main>
-</div>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
 
 <script>
+    function format(num) {
+        return Math.round(num).toLocaleString('vi-VN') + ' đ';
+    }
+
     function tinhLai() {
-        const select = document.getElementById("loaiSo");
-        const kyHanThang = parseInt(select.options[select.selectedIndex].dataset.kyhan);
-        const laiSuatNam = parseFloat(select.options[select.selectedIndex].dataset.lai);
+        const select   = document.getElementById('loaiSo');
+        const opt      = select.options[select.selectedIndex];
+        const kyHan    = parseInt(opt.dataset.kyhan) || 0;
+        const laiSuat  = parseFloat(opt.dataset.lai)  || 0;
+        const soTien   = parseFloat(document.getElementById('soTienGui').value) || 0;
 
-        const soTien = parseFloat(document.getElementById("soTienGui").value) || 0;
+        const errorEl  = document.getElementById('errorMsg');
+        const submitEl = document.getElementById('submitBtn');
+        const laiEl    = document.getElementById('laiUocTinh');
+        const tongEl   = document.getElementById('tongTien');
 
-        const errorMsg = document.getElementById("errorMsg");
-        const submitBtn = document.getElementById("submitBtn");
-
-        // Validation số tiền tối thiểu
+        // Validate tối thiểu
         if (soTien > 0 && soTien < 100000) {
-            errorMsg.classList.remove("hidden");
-            submitBtn.disabled = true;
-            submitBtn.classList.add("opacity-50", "cursor-not-allowed");
+            errorEl.classList.add('show');
+            submitEl.disabled = true;
         } else {
-            errorMsg.classList.add("hidden");
-            submitBtn.disabled = false;
-            submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+            errorEl.classList.remove('show');
+            submitEl.disabled = false;
         }
 
-        let laiUocTinh = 0;
-        let tongTien = soTien;
-
-        if (kyHanThang > 0) {
-            // Có kỳ hạn → tính lãi theo tháng/12
-            laiUocTinh = soTien * (laiSuatNam / 100) * (kyHanThang / 12);
-            tongTien = soTien + laiUocTinh;
-
-            document.getElementById("laiUocTinh").textContent = "~ " + format(laiUocTinh);
-            document.getElementById("tongTien").textContent = "~ " + format(tongTien);
+        if (kyHan > 0) {
+            const lai  = soTien * (laiSuat / 100) * (kyHan / 12);
+            const tong = soTien + lai;
+            laiEl.className = 'result-value gold';
+            laiEl.textContent = '~ ' + format(lai);
+            tongEl.textContent = '~ ' + format(tong);
         } else {
-            // Không kỳ hạn → chỉ hiển thị lãi suất năm, không tính lãi ngay
-            document.getElementById("laiUocTinh").textContent = "Lãi suất: " + laiSuatNam + "%/năm";
-            document.getElementById("tongTien").textContent = "Tiền lãi sẽ được tính theo số ngày thực gửi khi rút";
-        }
-
-        // Format số tiền
-        function format(num) {
-            return num.toLocaleString("vi-VN") + " đ";
+            laiEl.className = 'result-value muted';
+            laiEl.textContent = 'Lãi suất: ' + laiSuat + '%/năm (tính khi rút)';
+            tongEl.className = 'result-value muted';
+            tongEl.textContent = 'Tính theo số ngày thực gửi';
         }
     }
 
-    // Gắn sự kiện
-    document.getElementById("loaiSo").addEventListener("change", tinhLai);
-    document.getElementById("soTienGui").addEventListener("input", tinhLai);
+    document.getElementById('loaiSo').addEventListener('change', tinhLai);
+    document.getElementById('soTienGui').addEventListener('input', tinhLai);
+    window.addEventListener('DOMContentLoaded', tinhLai);
 
-    // Tính ngay khi load trang
-    window.addEventListener("DOMContentLoaded", tinhLai);
+    // Auto-hide alert
+    setTimeout(function() {
+        const el = document.getElementById('alertMsg');
+        if (el) { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }
+    }, 5000);
 </script>
-
+</body>
+</html>

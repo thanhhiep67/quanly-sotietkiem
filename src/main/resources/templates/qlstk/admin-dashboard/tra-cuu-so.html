@@ -1,100 +1,122 @@
 <!DOCTYPE html>
-<html lang="vi" class="light" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>TRA CỨU SỔ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/css/shared.css"/>
+    <style>
+        .td-maso  { font-family:'DM Serif Display',serif; font-size:14px; font-weight:700; color:var(--navy-3); }
+        .td-name  { font-weight:600; color:var(--navy); }
+        .td-loai  { font-size:13px; color:var(--gray-2); }
+        .td-sodu  { font-weight:600; color:var(--navy); font-size:14px; }
+
+        .badge-active  { background:rgba(45,125,90,.1);  color:var(--green); }
+        .badge-closed  { background:rgba(185,64,64,.09); color:var(--red);   }
+        .badge-pending { background:rgba(217,158,38,.12); color:#a07010;     }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
-<div class="flex h-screen overflow-hidden">
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <span class="material-icons-outlined text-white text-3xl">savings</span>
-                </div>
-                <h1 class="text-white text-xl font-bold uppercase tracking-tight">Tiết kiệm</h1>
-            </div>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-icons-outlined">savings</span></div>
+        <div class="logo-text">VietSave Bank<span>Hệ thống nội bộ</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Chính</p>
+            <a href="/admin" class="nav-item"><span class="material-icons-outlined">dashboard</span>Tổng quan</a>
+            <a href="/admin/mo-so" class="nav-item"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a>
+            <a href="/admin/quan-ly-khach-hang" class="nav-item"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a>
+            <a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item"><span class="material-icons-outlined">settings_suggest</span>Loại tiết kiệm</a>
         </div>
-        <nav class="flex-1 px-3 py-6 overflow-y-auto space-y-8">
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Chính</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">dashboard</span>Tổng quan</a></li>
-                    <li><a href="/admin/mo-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">add_circle_outline</span>Mở sổ tiết kiệm</a></li>
-                    <li><a href="/admin/quan-ly-khach-hang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">group</span>Quản lý khách hàng</a></li>
-                    <li><a href="/admin/quan-ly-loai-tiet-kiem" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">settings_suggest</span>Quản lý loại tiết kiệm</a></li>
-                </ul>
-            </div>
-            <div>
-                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Nghiệp vụ</p>
-                <ul class="space-y-1">
-                    <li><a href="/admin/giao-dich" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a></li>
-                    <li><a href="/admin/tra-cuu-so" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a></li>
-                    <li><a href="/admin/bao-cao-thong-ke" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
-    <main class="flex-1 overflow-y-auto flex flex-col">
-        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-10">
-            <h2 class="text-xl font-bold text-slate-800">Tra cứu danh sách sổ</h2>
-        </header>
+        <div class="nav-group">
+            <p class="nav-section-label">Nghiệp vụ</p>
+            <a href="/admin/giao-dich" class="nav-item"><span class="material-icons-outlined">swap_horiz</span>Giao dịch (Gửi/Rút)</a>
+            <a href="/admin/tra-cuu-so" class="nav-item active"><span class="material-icons-outlined">manage_search</span>Tra cứu sổ</a>
+            <a href="/admin/bao-cao-thong-ke" class="nav-item"><span class="material-icons-outlined">bar_chart</span>Báo cáo doanh số</a>
+        </div>
+    </nav>
 
-        <div class="p-8">
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <!-- Form tìm kiếm -->
-                <div class="p-6 border-b bg-gray-50 flex flex-wrap gap-4">
-                    <form th:action="@{/admin/tra-cuu-so/tim-kiem}" method="get" class="flex gap-4 w-full">
-                        <div class="flex-1 min-w-[300px] relative">
-                            <span class="material-icons-outlined absolute left-3 top-2.5 text-gray-400">search</span>
-                            <input type="text" name="cccd" th:value="${keyword}"
-                                   placeholder="Nhập CCCD khách hàng..."
-                                   class="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20">
+</aside>
 
-                        </div>
-                        <button type="submit"
-                                class="bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">
-                            Tìm kiếm
-                        </button>
-                    </form>
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <h2 class="header-title">Tra cứu sổ tiết kiệm</h2>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Search bar -->
+        <div class="search-bar">
+            <form th:action="@{/admin/tra-cuu-so/tim-kiem}" method="get"
+                  style="display:flex;gap:12px;align-items:center;flex:1;">
+                <div class="search-wrap">
+                    <span class="material-icons-outlined search-icon">badge</span>
+                    <input type="text" name="cccd" class="search-input"
+                           th:value="${keyword}"
+                           placeholder="Nhập CCCD khách hàng để tra cứu sổ..."/>
                 </div>
+                <button type="submit" class="btn-search">
+                    <span class="material-icons-outlined">search</span>
+                    Tìm kiếm
+                </button>
+            </form>
+        </div>
 
-                <!-- Bảng danh sách sổ -->
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider">
+        <!-- Table -->
+        <div class="table-panel">
+            <div class="table-header">
+                <div class="table-title">Danh sách sổ tiết kiệm</div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
                     <tr>
-                        <th class="px-6 py-4">Mã Sổ</th>
-                        <th class="px-6 py-4">Khách hàng</th>
-                        <th class="px-6 py-4">Loại hình</th>
-                        <th class="px-6 py-4">Số dư</th>
-                        <th class="px-6 py-4 text-center">Trạng thái</th>
+                        <th>Mã sổ</th>
+                        <th>Khách hàng</th>
+                        <th>Loại hình</th>
+                        <th>Số dư</th>
+                        <th style="text-align:center;">Trạng thái</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
-                    <tr th:each="so : ${soList}" class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 font-bold text-blue-600" th:text="${so.maSo}"></td>
-                        <td class="px-6 py-4 font-medium" th:text="${so.tenKhachHang}"></td>
-                        <td class="px-6 py-4" th:text="${so.loaiSoId}"></td>
-                        <td class="px-6 py-4 font-bold text-slate-800"
-                            th:text="${#numbers.formatDecimal(so.soDuHienTai,0,'COMMA',0,'POINT')} + 'đ'"></td>
-                        <td class="px-6 py-4 text-center">
-        <span th:classappend="${so.trangThai == 'DANGHOATDONG' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}"
-              class="px-3 py-1 rounded-full text-[10px] font-bold"
-              th:text="${so.trangThai}"></span>
+                    <tbody>
+                    <tr th:each="so : ${soList}">
+                        <td class="td-maso" th:text="${so.maSo}"></td>
+                        <td class="td-name" th:text="${so.tenKhachHang}"></td>
+                        <td class="td-loai" th:text="${so.loaiSoId}"></td>
+                        <td class="td-sodu"
+                            th:text="${#numbers.formatDecimal(so.soDuHienTai,0,'COMMA',0,'POINT')} + ' đ'"></td>
+                        <td style="text-align:center;">
+                            <span th:if="${so.trangThai == 'DANGHOATDONG'}"   class="badge badge-active">● Hoạt động</span>
+                            <span th:if="${so.trangThai == 'DADONGSO'}"       class="badge badge-closed">● Đã đóng</span>
+                            <span th:if="${so.trangThai != 'DANGHOATDONG' and so.trangThai != 'DADONGSO'}"
+                                  class="badge badge-pending" th:text="${so.trangThai}"></span>
+                        </td>
+                    </tr>
+                    <!-- Empty state -->
+                    <tr th:if="${soList == null or #lists.isEmpty(soList)}">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <span class="material-icons-outlined">manage_search</span>
+                                Nhập CCCD để tra cứu sổ tiết kiệm.
+                            </div>
                         </td>
                     </tr>
                     </tbody>
-
                 </table>
             </div>
         </div>
-    </main>
-</div>
-<script src="../../../static/css/js/script.js"></script>
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 Hệ thống quản lý sổ tiết kiệm · Version 1.0.0</footer>
+</main>
+
 </body>
 </html>
