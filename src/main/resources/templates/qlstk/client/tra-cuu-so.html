@@ -28,15 +28,51 @@
             box-shadow: 0 8px 32px rgba(13,115,119,.14);
         }
 
-        /* status ribbon */
+        /* ── Status ribbon (expanded) ── */
         .so-status {
-            position: absolute; top: 0; right: 0;
-            padding: 5px 16px; border-radius: 0 20px 0 14px;
-            font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px;
-            text-transform: uppercase; color: var(--white);
+            position: absolute;
+            top: 0; right: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px 7px 12px;
+            border-radius: 0 20px 0 16px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--white);
+            z-index: 10;
+            /* subtle shadow so ribbon pops over header bg */
+            box-shadow: -2px 2px 8px rgba(0,0,0,.18);
         }
-        .so-status.active { background: var(--green); }
-        .so-status.closed { background: var(--gray-2); }
+        .so-status .material-symbols-outlined {
+            font-size: 14px;
+            font-variation-settings: 'FILL' 1, 'wght' 600;
+        }
+
+        /* MO = teal/green */
+        .so-status.active {
+            background: linear-gradient(135deg, #0e9474, #0A7A5A);
+        }
+        /* DONG = grey */
+        .so-status.closed {
+            background: linear-gradient(135deg, #7a8a8a, #556060);
+        }
+
+        /* dot pulse for active only */
+        .so-status.active .status-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #fff;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        .so-status.closed .status-dot { display: none; }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1;  transform: scale(1); }
+            50%       { opacity: .45; transform: scale(.7); }
+        }
 
         /* card header */
         .so-card-head {
@@ -86,6 +122,25 @@
         .so-row-value.highlight { color: var(--teal); }
         .so-row-value.gold { color: var(--gold); font-family: 'DM Serif Display', serif; font-size: 15px; }
 
+        /* inline badge for trang thai row */
+        .trang-thai-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; letter-spacing: .5px;
+        }
+        .trang-thai-badge .material-symbols-outlined {
+            font-size: 13px;
+            font-variation-settings: 'FILL' 1;
+        }
+        .trang-thai-badge.active {
+            background: rgba(13,148,116,.12);
+            color: #0e9474;
+        }
+        .trang-thai-badge.closed {
+            background: rgba(120,136,136,.13);
+            color: #556060;
+        }
+
         /* card footer */
         .so-card-footer { padding: 0 24px 20px; margin-top: auto; }
         .btn-detail {
@@ -126,6 +181,19 @@
         </div>
     </nav>
     <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
         <a href="logout" class="logout-btn">
             <span class="material-symbols-outlined">logout</span>Đăng xuất
         </a>
@@ -157,10 +225,15 @@
         <div class="so-grid">
             <div th:each="item : ${danhSachSo}" class="so-card">
 
-                <!-- Ribbon trạng thái -->
+                <!-- ── Ribbon trạng thái (mở rộng) ── -->
                 <div class="so-status"
-                     th:classappend="${item.so.trangThai == 'MO'} ? 'active' : 'closed'"
-                     th:text="${item.so.trangThai == 'MO'} ? 'Đang hoạt động' : 'Đã tất toán'">
+                     th:classappend="${item.so.trangThai == 'MO'} ? 'active' : 'closed'">
+                    <!-- dot nhấp nháy chỉ hiện khi MO -->
+                    <span class="status-dot"></span>
+                    <span class="material-symbols-outlined"
+                          th:text="${item.so.trangThai == 'MO'} ? 'lock_open' : 'lock'">
+                    </span>
+                    <span th:text="${item.so.trangThai == 'MO'} ? 'Đang mở' : 'Đã đóng'"></span>
                 </div>
 
                 <!-- Header card -->
@@ -174,6 +247,21 @@
 
                 <!-- Body -->
                 <div class="so-card-body">
+
+                    <!-- ── Row trạng thái (badge inline) ── -->
+                    <div class="so-row">
+                        <div class="so-row-label">
+                            <span class="material-symbols-outlined">toggle_on</span>
+                            Trạng thái
+                        </div>
+                        <span class="trang-thai-badge"
+                              th:classappend="${item.so.trangThai == 'MO'} ? 'active' : 'closed'">
+                            <span class="material-symbols-outlined"
+                                  th:text="${item.so.trangThai == 'MO'} ? 'check_circle' : 'cancel'">
+                            </span>
+                            <span th:text="${item.so.trangThai == 'MO'} ? 'Đang mở' : 'Đã đóng'"></span>
+                        </span>
+                    </div>
 
                     <div class="so-row">
                         <div class="so-row-label">

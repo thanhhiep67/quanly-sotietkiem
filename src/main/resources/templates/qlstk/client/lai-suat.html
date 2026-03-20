@@ -138,6 +138,19 @@
         </div>
     </nav>
     <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
         <a href="logout" class="logout-btn">
             <span class="material-symbols-outlined">logout</span>Đăng xuất
         </a>

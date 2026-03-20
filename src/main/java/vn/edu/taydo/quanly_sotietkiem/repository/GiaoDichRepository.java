@@ -28,4 +28,8 @@ public interface GiaoDichRepository extends MongoRepository<GiaoDich, String> {
     List<GiaoDich> findByKhachHangIdOrderByNgayGiaoDichDesc(String id);
 
     List<GiaoDich> findByKhachHangIdOrderByCreatedAtDesc(String khachHangId);
+
+    List<GiaoDich> findBySoTkIdOrderByCreatedAtDesc(String soTkId);
+
+    List<GiaoDich> findAllBySoTkIdOrderByCreatedAtDesc(String maSo);
 }

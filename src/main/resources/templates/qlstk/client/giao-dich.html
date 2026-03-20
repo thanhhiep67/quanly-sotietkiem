@@ -32,12 +32,9 @@
         .txn-card-sub   { font-size: 12px; color: var(--gray-2); margin-top: 2px; }
         .txn-card-body  { padding: 22px 26px 26px; }
 
-        /* select & input overrides (no icon padding for these) */
         .txn-card-body select,
-        .txn-card-body input[type="number"] {
-            padding: 13px 16px;
-        }
-        .txn-card-body .select-wrap::after { right: 14px; }
+        .txn-card-body input[type="number"] { padding: 13px 16px; }
+        .txn-card-body .select-wrap::after  { right: 14px; }
 
         .form-group-label {
             font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
@@ -52,8 +49,7 @@
             font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
             cursor: pointer; transition: all .2s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 14px rgba(192,64,64,.25);
-            letter-spacing: .5px;
+            box-shadow: 0 4px 14px rgba(192,64,64,.25); letter-spacing: .5px;
         }
         .btn-rut:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,64,64,.35); }
         .btn-rut .material-symbols-outlined { font-size: 18px; }
@@ -65,23 +61,11 @@
             font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
             cursor: pointer; transition: all .2s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 14px rgba(26,138,90,.25);
-            letter-spacing: .5px;
+            box-shadow: 0 4px 14px rgba(26,138,90,.25); letter-spacing: .5px;
         }
         .btn-nap:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,138,90,.35); }
         .btn-nap .material-symbols-outlined { font-size: 18px; }
 
-        /* inline alert (bên trong form) */
-        .alert-inline {
-            display: flex; align-items: center; gap: 8px;
-            padding: 11px 14px; border-radius: 10px;
-            font-size: 13px; margin-top: 14px;
-        }
-        .alert-inline .material-symbols-outlined { font-size: 17px; flex-shrink: 0; }
-        .alert-inline-success { background: rgba(26,138,90,.08); border: 1px solid rgba(26,138,90,.22); color: #145c38; }
-        .alert-inline-error   { background: rgba(192,64,64,.07); border: 1px solid rgba(192,64,64,.2);  color: #7a2020; }
-
-        /* amount preview */
         .amount-preview {
             font-size: 12.5px; color: var(--teal); font-weight: 600;
             min-height: 18px; margin-top: 6px;
@@ -93,7 +77,7 @@
         .td-amount { font-family: 'DM Serif Display', serif; font-size: 14px; font-weight: 700; text-align: right; }
         .td-amount.nap { color: var(--green); }
         .td-amount.rut { color: var(--red); }
-        thead th.right { text-align: right; }
+        thead th.right  { text-align: right; }
         thead th.center { text-align: center; }
         tbody td.center { text-align: center; }
 
@@ -103,6 +87,102 @@
             display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
         }
         .section-title .material-symbols-outlined { font-size: 21px; color: var(--teal); }
+
+        /* ══════════════════════════════════════
+           MODAL XÁC NHẬN
+        ══════════════════════════════════════ */
+        .modal-backdrop {
+            display: none;
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(10,40,40,.55);
+            backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal-backdrop.show { display: flex; }
+
+        .modal {
+            background: var(--white); border-radius: 22px;
+            width: 100%; max-width: 420px; margin: 16px;
+            box-shadow: 0 24px 64px rgba(0,0,0,.18);
+            overflow: hidden;
+            animation: modal-in .22s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes modal-in {
+            from { opacity:0; transform:scale(.92) translateY(12px); }
+            to   { opacity:1; transform:scale(1)   translateY(0); }
+        }
+
+        .modal-header {
+            padding: 26px 28px 20px;
+            display: flex; align-items: center; gap: 14px;
+            border-bottom: 1px solid var(--gray-1);
+        }
+        .modal-header-icon {
+            width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-header-icon .material-symbols-outlined { font-size: 24px; }
+        .modal-header-icon.rut { background: rgba(192,64,64,.1); color: var(--red); }
+        .modal-header-icon.nap { background: rgba(26,138,90,.1); color: var(--green); }
+        .modal-title { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); }
+        .modal-sub   { font-size: 12.5px; color: var(--gray-2); margin-top: 3px; }
+
+        .modal-body { padding: 22px 28px; display: flex; flex-direction: column; gap: 12px; }
+
+        .modal-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid var(--gray-1);
+        }
+        .modal-row:last-child { border-bottom: none; }
+        .modal-row-label {
+            font-size: 12px; font-weight: 600; color: var(--gray-2);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .modal-row-label .material-symbols-outlined { font-size: 15px; }
+        .modal-row-value { font-size: 13.5px; font-weight: 700; color: var(--text); }
+        .modal-row-value.gold  { font-family:'DM Serif Display',serif; font-size:16px; color:var(--gold); }
+        .modal-row-value.green { font-family:'DM Serif Display',serif; font-size:16px; color:var(--green); }
+        .modal-row-value.red   { font-family:'DM Serif Display',serif; font-size:16px; color:var(--red); }
+
+        .modal-warning {
+            display: flex; align-items: flex-start; gap: 8px;
+            background: rgba(212,168,67,.08); border: 1px solid rgba(212,168,67,.25);
+            border-radius: 10px; padding: 10px 12px;
+            font-size: 12px; color: #7a6010; font-weight: 500;
+        }
+        .modal-warning .material-symbols-outlined { font-size: 15px; color: var(--gold); flex-shrink:0; margin-top:1px; }
+
+        .modal-footer {
+            padding: 0 28px 24px;
+            display: flex; gap: 10px;
+        }
+        .btn-modal-cancel {
+            flex: 1; padding: 13px;
+            background: var(--mint); border: 1.5px solid var(--gray-1);
+            border-radius: 12px; font-family:'DM Sans',sans-serif;
+            font-size: 14px; font-weight: 600; color: var(--gray-2);
+            cursor: pointer; transition: all .2s;
+        }
+        .btn-modal-cancel:hover { background: var(--gray-1); color: var(--text); }
+
+        .btn-modal-confirm {
+            flex: 2; padding: 13px;
+            border: none; border-radius: 12px;
+            font-family:'DM Sans',sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            color: var(--white);
+        }
+        .btn-modal-confirm .material-symbols-outlined { font-size: 17px; }
+        .btn-modal-confirm.rut {
+            background: linear-gradient(135deg,#9e2020,var(--red));
+            box-shadow: 0 4px 14px rgba(192,64,64,.3);
+        }
+        .btn-modal-confirm.nap {
+            background: linear-gradient(135deg,#145c38,var(--green));
+            box-shadow: 0 4px 14px rgba(26,138,90,.3);
+        }
+        .btn-modal-confirm:hover { transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -116,13 +196,26 @@
     <nav>
         <div class="nav-group">
             <p class="nav-section-label">Menu</p>
-            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="/"          class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
             <a href="tra-cuu-so" class="nav-item"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
-            <a href="giao-dich" class="nav-item active"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
-            <a href="lai-suat" class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+            <a href="giao-dich"  class="nav-item active"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat"   class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
         </div>
     </nav>
     <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
         <a href="logout" class="logout-btn">
             <span class="material-symbols-outlined">logout</span>Đăng xuất
         </a>
@@ -140,7 +233,7 @@
 
     <div class="page-body">
 
-        <!-- Flash alerts (RedirectAttributes — hiện sau redirect) -->
+        <!-- Flash alerts -->
         <div th:if="${error}" class="alert alert-error" id="alertError">
             <span class="material-symbols-outlined">error_outline</span>
             <span th:text="${error}"></span>
@@ -173,21 +266,20 @@
                     </div>
                 </div>
                 <div class="txn-card-body">
-                    <form th:action="@{/rut-tien}" method="post">
-
+                    <!-- form thật — submit bởi modal -->
+                    <form id="formRut" th:action="@{/rut-tien}" method="post">
                         <div class="form-group">
                             <label class="form-group-label">Chọn sổ</label>
                             <div class="input-wrap select-wrap">
                                 <select name="soTkId" id="selectRut" onchange="previewRut()">
                                     <option th:each="soView : ${soList}"
                                             th:value="${soView.so.maSo}"
-                                            th:attr="data-du=${soView.so.soDuHienTai}"
+                                            th:attr="data-du=${soView.so.soDuHienTai}, data-trangthai=${soView.so.trangThai}"
                                             th:text="${soView.so.maSo + ' — ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ'}">
                                     </option>
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label class="form-group-label">Số tiền rút</label>
                             <div class="input-wrap">
@@ -195,14 +287,13 @@
                                        placeholder="Nhập số tiền..." min="1000" step="1000"
                                        oninput="previewRut()"/>
                             </div>
-                            <div class="amount-preview" id="previewRut"></div>
+                            <div class="amount-preview" id="previewRutEl"></div>
                         </div>
-
-                        <button type="submit" class="btn-rut">
+                        <!-- nút mở modal thay vì submit trực tiếp -->
+                        <button type="button" class="btn-rut" onclick="openModal('rut')">
                             <span class="material-symbols-outlined">arrow_upward</span>
                             Xác nhận rút
                         </button>
-
                     </form>
                 </div>
             </div>
@@ -219,20 +310,19 @@
                     </div>
                 </div>
                 <div class="txn-card-body">
-                    <form th:action="@{/nap-tien}" method="post">
-
+                    <form id="formNap" th:action="@{/nap-tien}" method="post">
                         <div class="form-group">
                             <label class="form-group-label">Chọn sổ</label>
                             <div class="input-wrap select-wrap">
-                                <select name="soTkId">
+                                <select name="soTkId" id="selectNap" onchange="previewNapSelect()">
                                     <option th:each="soView : ${soList}"
                                             th:value="${soView.so.maSo}"
+                                            th:attr="data-du=${soView.so.soDuHienTai}"
                                             th:text="${soView.so.maSo + ' — ' + #numbers.formatDecimal(soView.so.soDuHienTai,0,'POINT',0,'COMMA') + ' đ'}">
                                     </option>
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label class="form-group-label">Số tiền nạp</label>
                             <div class="input-wrap">
@@ -240,14 +330,12 @@
                                        placeholder="Nhập số tiền..." min="1000" step="1000"
                                        oninput="previewNap(this.value)"/>
                             </div>
-                            <div class="amount-preview" id="previewNap"></div>
+                            <div class="amount-preview" id="previewNapEl"></div>
                         </div>
-
-                        <button type="submit" class="btn-nap">
+                        <button type="button" class="btn-nap" onclick="openModal('nap')">
                             <span class="material-symbols-outlined">arrow_downward</span>
                             Xác nhận nạp
                         </button>
-
                     </form>
                 </div>
             </div>
@@ -309,44 +397,184 @@
         </div>
 
     </div><!-- /page-body -->
-
     <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
 </main>
 
+<!-- ════ MODAL XÁC NHẬN ════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOutside(event)">
+    <div class="modal" id="modalBox">
+        <div class="modal-header">
+            <div class="modal-header-icon" id="modalIcon">
+                <span class="material-symbols-outlined" id="modalIconSymbol">payments</span>
+            </div>
+            <div>
+                <div class="modal-title" id="modalTitle">Xác nhận giao dịch</div>
+                <div class="modal-sub"  id="modalSub">Vui lòng kiểm tra trước khi thực hiện</div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="modal-row">
+                <div class="modal-row-label">
+                    <span class="material-symbols-outlined">receipt_long</span> Mã sổ
+                </div>
+                <div class="modal-row-value" id="modalMaSo">—</div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-row-label">
+                    <span class="material-symbols-outlined">account_balance</span> Số dư hiện tại
+                </div>
+                <div class="modal-row-value" id="modalSoDu">—</div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-row-label">
+                    <span class="material-symbols-outlined">payments</span>
+                    <span id="modalAmountLabel">Số tiền</span>
+                </div>
+                <div class="modal-row-value" id="modalAmount">—</div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-row-label">
+                    <span class="material-symbols-outlined">account_balance_wallet</span> Số dư sau
+                </div>
+                <div class="modal-row-value" id="modalSoDuSau">—</div>
+            </div>
+            <div class="modal-warning" id="modalWarning" style="display:none;">
+                <span class="material-symbols-outlined">warning</span>
+                <span id="modalWarningText"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="closeModal()">Huỷ</button>
+            <button class="btn-modal-confirm" id="modalConfirmBtn" onclick="submitModal()">
+                <span class="material-symbols-outlined" id="modalConfirmIcon">check</span>
+                <span id="modalConfirmText">Xác nhận</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Auto-hide alerts sau 5s
-    setTimeout(function() {
-        ['alertError','alertSuccess','alertErrorNap','alertSuccessNap'].forEach(function(id) {
-            const el = document.getElementById(id);
-            if (el) { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }
-        });
-    }, 5000);
-    function formatVND(n) {
-        if (!n || isNaN(n) || n < 1) return '';
+    let currentType = null; // 'rut' | 'nap'
+
+    function fmt(n) {
         return parseInt(n).toLocaleString('vi-VN') + ' đ';
     }
 
+    // ── Preview inline ──────────────────────────────────────
     function previewRut() {
         const val = document.getElementById('inputRut').value;
-        const el  = document.getElementById('previewRut');
+        const el  = document.getElementById('previewRutEl');
         const sel = document.getElementById('selectRut');
         const du  = parseFloat(sel.selectedOptions[0]?.dataset?.du || 0);
         if (!val || isNaN(val) || val < 1) { el.textContent = ''; return; }
         const n = parseInt(val);
         if (n > du) {
             el.style.color = 'var(--red)';
-            el.textContent = '⚠ Vượt quá số dư: ' + formatVND(du);
+            el.textContent = '⚠ Vượt quá số dư: ' + fmt(du);
         } else {
             el.style.color = 'var(--teal)';
-            el.textContent = '≈ ' + formatVND(n);
+            el.textContent = '≈ ' + fmt(n);
         }
     }
 
     function previewNap(val) {
-        const el = document.getElementById('previewNap');
+        const el = document.getElementById('previewNapEl');
         if (!val || isNaN(val) || val < 1) { el.textContent = ''; return; }
-        el.textContent = '≈ ' + formatVND(val);
+        el.style.color = 'var(--teal)';
+        el.textContent = '≈ ' + fmt(val);
     }
+
+    function previewNapSelect() {} // placeholder
+
+    // ── Mở modal ────────────────────────────────────────────
+    function openModal(type) {
+        currentType = type;
+        const isRut = type === 'rut';
+
+        const sel    = document.getElementById(isRut ? 'selectRut' : 'selectNap');
+        const input  = document.getElementById(isRut ? 'inputRut'  : 'inputNap');
+        const opt    = sel.selectedOptions[0];
+        const maSo   = opt?.value || '—';
+        const du     = parseFloat(opt?.dataset?.du || 0);
+        const soTien = parseFloat(input.value) || 0;
+
+        // Validate trước khi mở modal
+        if (!soTien || soTien < 1000) {
+            alert('Vui lòng nhập số tiền hợp lệ (tối thiểu 1.000 đ)');
+            return;
+        }
+        if (isRut && soTien > du) {
+            alert('Số tiền rút vượt quá số dư hiện tại!');
+            return;
+        }
+
+        // Điền thông tin vào modal
+        document.getElementById('modalMaSo').textContent   = maSo;
+        document.getElementById('modalSoDu').textContent   = fmt(du);
+        document.getElementById('modalAmount').textContent = fmt(soTien);
+        document.getElementById('modalAmount').className   = 'modal-row-value ' + (isRut ? 'red' : 'green');
+        document.getElementById('modalAmountLabel').textContent = isRut ? 'Số tiền rút' : 'Số tiền nạp';
+
+        const soDuSau = isRut ? du - soTien : du + soTien;
+        document.getElementById('modalSoDuSau').textContent = fmt(soDuSau);
+        document.getElementById('modalSoDuSau').className   = 'modal-row-value ' + (isRut ? 'red' : 'green');
+
+        // Header
+        document.getElementById('modalIcon').className      = 'modal-header-icon ' + type;
+        document.getElementById('modalIconSymbol').textContent = isRut ? 'arrow_upward' : 'arrow_downward';
+        document.getElementById('modalTitle').textContent   = isRut ? 'Xác nhận rút tiền' : 'Xác nhận nạp tiền';
+        document.getElementById('modalSub').textContent     = isRut
+            ? 'Tiền sẽ được chuyển về tài khoản liên kết'
+            : 'Tiền sẽ được cộng vào sổ tiết kiệm';
+
+        // Confirm button
+        const btn = document.getElementById('modalConfirmBtn');
+        btn.className = 'btn-modal-confirm ' + type;
+        document.getElementById('modalConfirmIcon').textContent = isRut ? 'arrow_upward' : 'arrow_downward';
+        document.getElementById('modalConfirmText').textContent = isRut ? 'Rút ngay' : 'Nạp ngay';
+
+        // Cảnh báo nếu rút gần hết
+        const warn    = document.getElementById('modalWarning');
+        const warnTxt = document.getElementById('modalWarningText');
+        if (isRut && soDuSau < du * 0.1 && soDuSau > 0) {
+            warnTxt.textContent = 'Sau giao dịch này, số dư sổ còn lại rất ít (' + fmt(soDuSau) + ').';
+            warn.style.display = 'flex';
+        } else if (isRut && soDuSau === 0) {
+            warnTxt.textContent = 'Rút toàn bộ sẽ đóng sổ tiết kiệm này.';
+            warn.style.display = 'flex';
+        } else {
+            warn.style.display = 'none';
+        }
+
+        document.getElementById('modalBackdrop').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('modalBackdrop').classList.remove('show');
+        currentType = null;
+    }
+
+    function closeModalOutside(e) {
+        if (e.target === document.getElementById('modalBackdrop')) closeModal();
+    }
+
+    function submitModal() {
+        if (currentType === 'rut') document.getElementById('formRut').submit();
+        else                       document.getElementById('formNap').submit();
+        closeModal();
+    }
+
+    // ── Auto-hide alerts ─────────────────────────────────────
+    setTimeout(function() {
+        ['alertError','alertSuccess','alertErrorNap','alertSuccessNap'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.transition = 'opacity .4s';
+                el.style.opacity    = '0';
+                setTimeout(() => el.remove(), 400);
+            }
+        });
+    }, 5000);
 </script>
 </body>
 </html>

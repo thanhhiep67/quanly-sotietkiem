@@ -25,15 +25,14 @@ public class BaoCaoService {
     @Autowired
     private BaoCaoNgayRepository baoCaoNgayRepository;
 
+    // Tạo báo cáo cho một ngày
     public BaoCaoNgay taoBaoCaoNgay(LocalDate ngay) {
-
         ZoneId zoneId = ZoneId.systemDefault();
 
-        // Tạo khoảng thời gian trong ngày
         Date startOfDay = Date.from(ngay.atStartOfDay(zoneId).toInstant());
         Date endOfDay = Date.from(ngay.plusDays(1).atStartOfDay(zoneId).toInstant());
 
-        // ===== TỔNG THU - CHI =====
+        // ===== TỔNG THU =====
         List<GiaoDich> thuList = giaoDichRepository
                 .findByLoaiGiaoDichAndNgayGiaoDichBetween("NAP", startOfDay, endOfDay);
 
@@ -41,21 +40,19 @@ public class BaoCaoService {
                 .mapToDouble(GiaoDich::getSoTien)
                 .sum();
 
+        // ===== TỔNG CHI =====
         List<GiaoDich> chiList = giaoDichRepository
                 .findByLoaiGiaoDichAndNgayGiaoDichBetween("RUT", startOfDay, endOfDay);
 
         double tongChi = chiList.stream()
-                .mapToDouble(GiaoDich::getTongTienNhan) // QUAN TRỌNG
+                .mapToDouble(GiaoDich::getTongTienNhan)
                 .sum();
+
         double chenhLech = tongThu - tongChi;
 
         // ===== SỔ MỞ - ĐÓNG =====
-        long soMo = soTietKiemRepository
-                .countByNgayMoSoBetween(startOfDay, endOfDay);
-
-        long soDong = soTietKiemRepository
-                .countByNgayDongSoBetween(startOfDay, endOfDay);
-
+        long soMo = soTietKiemRepository.countByNgayMoSoBetween(startOfDay, endOfDay);
+        long soDong = soTietKiemRepository.countByNgayDongSoBetween(startOfDay, endOfDay);
         long chenhLechSo = soMo - soDong;
 
         // ===== LƯU BÁO CÁO =====
@@ -73,7 +70,30 @@ public class BaoCaoService {
         return baoCaoNgayRepository.save(baoCao);
     }
 
+    // Lấy báo cáo trong khoảng ngày
     public List<BaoCaoNgay> layBaoCao(LocalDate start, LocalDate end) {
         return baoCaoNgayRepository.findByNgayBetween(start, end);
+    }
+
+    // Lấy ngày cuối cùng đã có báo cáo
+    public LocalDate layNgayCuoiBaoCao() {
+        BaoCaoNgay baoCao = baoCaoNgayRepository.findTopByOrderByNgayDesc();
+        if (baoCao != null) {
+            return baoCao.getNgay();
+        }
+        return LocalDate.now().minusDays(1);
+    }
+
+
+    // Tạo báo cáo bù cho các ngày bị thiếu
+    public void taoBaoCaoBu() {
+        LocalDate homNay = LocalDate.now();
+        LocalDate ngayCuoi = layNgayCuoiBaoCao();
+
+        while (ngayCuoi.isBefore(homNay)) {
+            ngayCuoi = ngayCuoi.plusDays(1);
+            taoBaoCaoNgay(ngayCuoi);
+            System.out.println("Đã tạo báo cáo bù cho ngày: " + ngayCuoi);
+        }
     }
 }

@@ -17,6 +17,10 @@ public class BaoCaoScheduler {
     // Chạy mỗi ngày lúc 23:59
     @Scheduled(cron = "0 59 23 * * *")
     public void chotBaoCaoCuoiNgay() {
+        // tạo báo cáo bù trước
+        baoCaoService.taoBaoCaoBu();
+
+        // tạo báo cáo cho ngày hiện tại
         LocalDate ngay = LocalDate.now();
         baoCaoService.taoBaoCaoNgay(ngay);
         System.out.println("Đã tạo báo cáo cho ngày: " + ngay);

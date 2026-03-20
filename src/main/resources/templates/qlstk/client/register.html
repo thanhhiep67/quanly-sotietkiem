@@ -1,102 +1,401 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mở tài khoản - MyBank</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mở tài khoản - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --teal:   #0D7377;
+            --teal-2: #0F8A8F;
+            --teal-3: #14A5AA;
+            --teal-lt:#7DD4D8;
+            --mint:   #E8FAF8;
+            --cream:  #F5F9F9;
+            --gray-1: #DDE8E8;
+            --gray-2: #9BB5B5;
+            --text:   #132B2B;
+            --white:  #FFFFFF;
+            --green:  #1A8A5A;
+            --red:    #C04040;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+
+        /* ── Card ── */
+        .register-card {
+            width: 100%; max-width: 980px;
+            background: var(--white); border-radius: 28px;
+            box-shadow: 0 8px 16px rgba(0,0,0,.04), 0 24px 80px rgba(13,115,119,.12);
+            overflow: hidden; display: flex;
+        }
+
+        /* ── Left deco panel ── */
+        .deco-panel {
+            width: 300px; flex-shrink: 0;
+            background: linear-gradient(160deg, #0A2828 0%, #0D3535 60%, #0D5A5E 100%);
+            padding: 48px 40px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden;
+        }
+        .deco-panel::before {
+            content:''; position:absolute; top:-60px; right:-60px;
+            width:240px; height:240px; border-radius:50%;
+            background:radial-gradient(circle,rgba(13,115,119,.5) 0%,transparent 70%);
+        }
+        .deco-panel::after {
+            content:''; position:absolute; bottom:-40px; left:-40px;
+            width:180px; height:180px; border-radius:50%;
+            background:radial-gradient(circle,rgba(20,165,170,.3) 0%,transparent 70%);
+        }
+
+        .deco-brand { position:relative; z-index:1; }
+        .deco-logo {
+            width:44px; height:44px; border-radius:12px;
+            background:linear-gradient(135deg,var(--teal-3),var(--teal-lt));
+            display:flex; align-items:center; justify-content:center;
+            margin-bottom:16px;
+            box-shadow:0 4px 14px rgba(13,115,119,.35);
+        }
+        .deco-logo .material-symbols-outlined { font-size:22px; color:var(--text); }
+        .deco-brand-name {
+            font-family:'DM Serif Display',serif;
+            font-size:18px; color:var(--white); line-height:1.2;
+        }
+        .deco-brand-name span {
+            display:block; font-family:'DM Sans',sans-serif;
+            font-size:10px; color:var(--gray-2);
+            letter-spacing:2px; text-transform:uppercase; font-weight:500; margin-top:2px;
+        }
+
+        .deco-steps {
+            position:relative; z-index:1; flex:1;
+            display:flex; flex-direction:column; justify-content:center;
+            gap:0; margin:32px 0;
+        }
+        .deco-step {
+            display:flex; align-items:flex-start; gap:14px; padding:14px 0;
+            border-bottom:1px solid rgba(255,255,255,.06);
+        }
+        .deco-step:last-child { border-bottom:none; }
+        .step-num {
+            width:28px; height:28px; flex-shrink:0; border-radius:8px;
+            background:rgba(125,212,216,.15); border:1px solid rgba(125,212,216,.2);
+            display:flex; align-items:center; justify-content:center;
+            font-family:'DM Serif Display',serif; font-size:13px; color:var(--teal-lt);
+            margin-top:1px;
+        }
+        .step-title { font-size:13px; font-weight:600; color:rgba(255,255,255,.8); }
+        .step-sub   { font-size:11.5px; color:rgba(255,255,255,.35); margin-top:2px; font-weight:300; }
+
+        .deco-bottom { position:relative; z-index:1; }
+        .deco-bottom-text {
+            font-family:'DM Serif Display',serif;
+            font-size:18px; color:var(--white); line-height:1.4; margin-bottom:10px;
+        }
+        .deco-bottom-sub { font-size:12px; color:rgba(255,255,255,.35); line-height:1.6; font-weight:300; }
+
+        /* ── Right form panel ── */
+        .form-panel {
+            flex:1; padding:44px 48px; overflow-y:auto;
+            display:flex; flex-direction:column;
+        }
+
+        .form-heading { margin-bottom:28px; }
+        .form-title { font-family:'DM Serif Display',serif; font-size:24px; color:var(--text); margin-bottom:5px; }
+        .form-sub   { font-size:13px; color:var(--gray-2); font-weight:300; }
+
+        /* alerts */
+        .alert {
+            display:flex; align-items:center; gap:10px;
+            padding:13px 16px; border-radius:12px; margin-bottom:20px;
+            font-size:13.5px;
+        }
+        .alert-error   { background:rgba(192,64,64,.07); border:1px solid rgba(192,64,64,.2);  color:#7a2020; }
+        .alert-success { background:rgba(26,138,90,.08);  border:1px solid rgba(26,138,90,.22); color:#145c38; }
+        .alert .material-symbols-outlined { font-size:18px; flex-shrink:0; }
+
+        /* form grid */
+        .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }
+        .form-grid-2 .form-group.full { grid-column:1/-1; }
+
+        .form-group { margin-bottom:18px; }
+        .form-label {
+            font-size:10.5px; font-weight:700; letter-spacing:1.5px;
+            text-transform:uppercase; color:var(--gray-2);
+            margin-bottom:8px; display:block;
+        }
+        .form-label .required { color:var(--red); margin-left:2px; }
+
+        .input-wrap { position:relative; }
+        .input-icon {
+            position:absolute; left:14px; top:50%; transform:translateY(-50%);
+            font-size:18px; color:var(--gray-2); pointer-events:none;
+            font-family:'Material Symbols Outlined'; transition:color .2s;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"],
+        input[type="date"], select {
+            width:100%; padding:12px 14px 12px 44px;
+            border:1.5px solid var(--gray-1); border-radius:11px;
+            font-family:'DM Sans',sans-serif; font-size:13.5px;
+            color:var(--text); background:var(--cream); outline:none;
+            transition:border-color .2s,background .2s,box-shadow .2s;
+            -webkit-appearance:none;
+        }
+        input::placeholder { color:var(--gray-2); font-weight:300; }
+        input:focus, select:focus {
+            border-color:var(--teal-3); background:var(--white);
+            box-shadow:0 0 0 3px rgba(13,115,119,.1);
+        }
+        .select-wrap::after {
+            content:'expand_more'; font-family:'Material Symbols Outlined';
+            position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            font-size:19px; color:var(--gray-2); pointer-events:none;
+        }
+
+        /* section divider */
+        .section-label {
+            font-size:10px; font-weight:700; letter-spacing:2px;
+            text-transform:uppercase; color:var(--teal);
+            padding:6px 0 10px; margin-top:4px; margin-bottom:6px;
+            border-bottom:1px solid var(--gray-1);
+            display:flex; align-items:center; gap:8px;
+            grid-column:1/-1;
+        }
+        .section-label .material-symbols-outlined { font-size:14px; }
+
+        /* checkbox */
+        .checkbox-wrap {
+            display:flex; align-items:flex-start; gap:10px;
+            padding:14px; background:var(--mint); border:1.5px solid var(--gray-1);
+            border-radius:11px; margin-bottom:20px; cursor:pointer;
+        }
+        .checkbox-wrap input[type="checkbox"] {
+            width:16px; height:16px; flex-shrink:0; margin-top:2px;
+            padding:0; background:var(--white); cursor:pointer;
+            accent-color:var(--teal);
+        }
+        .checkbox-text { font-size:12px; color:var(--gray-2); line-height:1.55; }
+        .checkbox-text a { color:var(--teal); text-decoration:none; font-weight:600; }
+
+        /* submit */
+        .btn-register {
+            width:100%; padding:14px;
+            background:linear-gradient(135deg,var(--teal),var(--teal-2));
+            color:var(--white); border:none; border-radius:12px;
+            font-family:'DM Sans',sans-serif; font-size:14.5px; font-weight:700;
+            cursor:pointer; transition:all .22s;
+            box-shadow:0 4px 16px rgba(13,115,119,.28); letter-spacing:.4px;
+        }
+        .btn-register:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(13,115,119,.38); }
+
+        .form-footer {
+            text-align:center; margin-top:18px;
+            font-size:13px; color:var(--gray-2);
+        }
+        .form-footer a { color:var(--teal); font-weight:600; text-decoration:none; }
+        .form-footer a:hover { text-decoration:underline; }
+
+        @media (max-width:700px) {
+            .deco-panel { display:none; }
+            .form-panel { padding:32px 24px; }
+            .form-grid-2 { grid-template-columns:1fr; }
+        }
+    </style>
 </head>
-<body class="bg-[#f8fafc] min-h-screen flex items-center justify-center p-4">
-<div class="max-w-2xl w-full bg-white rounded-[2.5rem] shadow-2xl p-10 md:p-16 border border-slate-100">
-    <div class="text-center mb-10">
-        <h2 class="text-3xl font-black text-slate-800 tracking-tight">Mở tài khoản MyBank</h2>
-        <p class="text-slate-500 mt-2 font-medium">Bắt đầu hành trình tích lũy tài sản của bạn hôm nay</p>
+<body>
+
+<div class="register-card">
+
+    <!-- ── Left deco ── -->
+    <div class="deco-panel">
+        <div class="deco-brand">
+            <div class="deco-logo">
+                <span class="material-symbols-outlined">account_balance</span>
+            </div>
+            <div class="deco-brand-name">
+                VietSave Bank
+                <span>Hệ thống tiết kiệm</span>
+            </div>
+        </div>
+
+        <div class="deco-steps">
+            <div class="deco-step">
+                <div class="step-num">1</div>
+                <div>
+                    <div class="step-title">Điền thông tin</div>
+                    <div class="step-sub">Họ tên, CCCD, liên hệ</div>
+                </div>
+            </div>
+            <div class="deco-step">
+                <div class="step-num">2</div>
+                <div>
+                    <div class="step-title">Tạo mật khẩu</div>
+                    <div class="step-sub">Bảo vệ tài khoản của bạn</div>
+                </div>
+            </div>
+            <div class="deco-step">
+                <div class="step-num">3</div>
+                <div>
+                    <div class="step-title">Đăng nhập & mở sổ</div>
+                    <div class="step-sub">Bắt đầu tích lũy ngay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="deco-bottom">
+            <div class="deco-bottom-text">Tích lũy mỗi ngày,<br>thịnh vượng mỗi năm.</div>
+            <div class="deco-bottom-sub">Đăng ký miễn phí, không mất phí duy trì tài khoản.</div>
+        </div>
     </div>
-    <div th:if="${errorMessage}" class="bg-red-100 text-red-700 p-3 rounded-xl mb-6 text-center font-bold">
-        <p th:text="${errorMessage}"></p>
+
+    <!-- ── Right form ── -->
+    <div class="form-panel">
+        <div class="form-heading">
+            <div class="form-title">Mở tài khoản mới</div>
+            <div class="form-sub">Bắt đầu hành trình tích lũy tài sản của bạn hôm nay</div>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <span class="material-symbols-outlined">error_outline</span>
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <form action="/register" method="post">
+            <div class="form-grid-2">
+
+                <!-- ── Thông tin cá nhân ── -->
+                <div class="section-label full">
+                    <span class="material-symbols-outlined">person</span>
+                    Thông tin cá nhân
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Họ và tên <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <input type="text" name="hoten" placeholder="Nguyễn Văn A" required/>
+                        <span class="material-symbols-outlined input-icon">person</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Số CCCD <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <input type="text" name="cccd" placeholder="07909000xxxx"
+                               maxlength="12" oninput="this.value=this.value.replace(/\D/g,'')" required/>
+                        <span class="material-symbols-outlined input-icon">badge</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Giới tính <span class="required">*</span></label>
+                    <div class="input-wrap select-wrap">
+                        <select name="gioiTinh" required>
+                            <option value="">-- Chọn --</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                        <span class="material-symbols-outlined input-icon">wc</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ngày sinh</label>
+                    <div class="input-wrap">
+                        <input type="date" name="ngaySinh"/>
+                        <span class="material-symbols-outlined input-icon">cake</span>
+                    </div>
+                </div>
+
+                <!-- ── Liên hệ ── -->
+                <div class="section-label full">
+                    <span class="material-symbols-outlined">contact_phone</span>
+                    Thông tin liên hệ
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Số điện thoại <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <input type="text" name="sdt" placeholder="0912 345 678" required/>
+                        <span class="material-symbols-outlined input-icon">phone</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <div class="input-wrap">
+                        <input type="email" name="email" placeholder="example@gmail.com"/>
+                        <span class="material-symbols-outlined input-icon">mail</span>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label class="form-label">Địa chỉ</label>
+                    <div class="input-wrap">
+                        <input type="text" name="diaChi" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành"/>
+                        <span class="material-symbols-outlined input-icon">home</span>
+                    </div>
+                </div>
+
+                <!-- ── Bảo mật ── -->
+                <div class="section-label full">
+                    <span class="material-symbols-outlined">lock</span>
+                    Bảo mật tài khoản
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mật khẩu <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <input type="password" name="password" placeholder="••••••••" required/>
+                        <span class="material-symbols-outlined input-icon">lock</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Xác nhận mật khẩu <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <input type="password" name="confirmPassword" placeholder="••••••••" required/>
+                        <span class="material-symbols-outlined input-icon">lock_reset</span>
+                    </div>
+                </div>
+
+            </div><!-- /form-grid-2 -->
+
+            <!-- Checkbox -->
+            <div class="checkbox-wrap">
+                <input type="checkbox" required/>
+                <div class="checkbox-text">
+                    Tôi đồng ý với <a href="#">điều khoản sử dụng</a> và
+                    <a href="#">chính sách bảo mật</a> của VietSave Bank.
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register">Hoàn tất đăng ký</button>
+        </form>
+
+        <div class="form-footer">
+            Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+        </div>
     </div>
-    <div th:if="${successMessage}" class="bg-green-100 text-green-700 p-3 rounded-xl mb-6 text-center font-bold">
-        <p th:text="${successMessage}"></p>
-    </div>
 
-    <!-- Form đăng ký khớp với KhachHang -->
-    <form action="/register" method="post" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Họ và Tên</label>
-                <input type="text" name="hoten" placeholder="Nguyễn Văn A"
-                       class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all" required>
-            </div>
-            <div>
-                <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Số CCCD</label>
-                <input type="text" name="cccd" placeholder="07909000xxxx"
-                       class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all" required>
-            </div>
-        </div>
-
-        <div>
-            <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Email</label>
-            <input type="text" name="email" placeholder="xxxxgmail.com"
-                   class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all">
-        </div>
-
-        <div>
-            <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Số điện thoại</label>
-            <input type="text" name="sdt" placeholder="0912345678"
-                   class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all" required>
-        </div>
-        <div>
-            <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Giới tính</label>
-            <select name="gioiTinh" class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all" required>
-                <option value="">-- Chọn giới tính --</option>
-                <option value="Nam">Nam</option>
-                <option value="Nữ">Nữ</option>
-                <option value="Khác">Khác</option>
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Địa chỉ</label>
-            <input type="text" name="diaChi" placeholder="Hà Nội"
-                   class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all">
-        </div>
-
-        <div>
-            <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Ngày sinh</label>
-            <input type="date" name="ngaySinh"
-                   class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all">
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Mật khẩu</label>
-                <input type="password" name="password" placeholder="••••••••"
-                       class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all" required>
-            </div>
-            <div>
-                <label class="block text-[10px] font-black uppercase text-slate-400 mb-2">Xác nhận mật khẩu</label>
-                <input type="password" name="confirmPassword" placeholder="••••••••"
-                       class="w-full bg-slate-50 border-2 focus:border-blue-600 rounded-2xl p-4 font-bold transition-all" required>
-            </div>
-        </div>
-
-        <div class="flex items-start gap-3 p-2">
-            <input type="checkbox" class="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" required>
-            <p class="text-[11px] text-slate-500 font-medium">Tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật của MyBank.</p>
-        </div>
-
-        <button type="submit" class="w-full bg-[#0f172a] text-white py-5 rounded-[2rem] font-black text-lg shadow-xl hover:bg-blue-600 transition-all transform hover:scale-[1.01]">
-            HOÀN TẤT ĐĂNG KÝ
-        </button>
-
-    </form>
-
-    <p class="mt-8 text-center text-sm font-medium text-slate-500">
-        Đã có tài khoản? <a href="/login" class="text-blue-600 font-bold hover:underline">Đăng nhập ngay</a>
-    </p>
 </div>
+
 </body>
 </html>

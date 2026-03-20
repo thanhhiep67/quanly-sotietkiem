@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chi tiết sổ - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
+    <style>
+        /* ── Layout ── */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* ── Hero card (trái) ── */
+        .so-hero {
+            background: linear-gradient(155deg, #0A2828 0%, var(--teal) 100%);
+            border-radius: 20px; padding: 28px 26px 24px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 28px rgba(13,115,119,.25);
+            color: var(--white);
+        }
+        .so-hero::before {
+            content:''; position:absolute; right:-40px; top:-40px;
+            width:200px; height:200px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.07); pointer-events:none;
+        }
+        .so-hero::after {
+            content:''; position:absolute; right:20px; bottom:20px;
+            width:90px; height:90px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.05); pointer-events:none;
+        }
+
+        /* status ribbon */
+        .so-hero-ribbon {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .so-hero-ribbon .material-symbols-outlined { font-size: 13px; font-variation-settings:'FILL' 1; }
+        .so-hero-ribbon.active { background: linear-gradient(135deg,#0e9474,#0A7A5A); color:#fff; }
+        .so-hero-ribbon.closed { background: linear-gradient(135deg,#7a8a8a,#556060); color:#fff; }
+        .so-hero-ribbon .pulse {
+            width:7px; height:7px; border-radius:50%; background:#fff;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+        .so-hero-ribbon.closed .pulse { display:none; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+        .so-hero-maso {
+            font-size: 10px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 6px;
+        }
+        .so-hero-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px; color: var(--white); margin-bottom: 20px; line-height: 1.2;
+        }
+
+        .so-hero-divider { height:1px; background:rgba(255,255,255,.1); margin:16px 0; }
+
+        .so-hero-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0;
+        }
+        .so-hero-row-label {
+            font-size: 11px; color: rgba(255,255,255,.45); font-weight: 500;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .so-hero-row-label .material-symbols-outlined { font-size: 13px; }
+        .so-hero-row-value { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); }
+        .so-hero-row-value.gold { font-family:'DM Serif Display',serif; font-size:15px; color:var(--gold); }
+        .so-hero-row-value.teal-lt { color: var(--teal-lt); }
+
+        /* balance big */
+        .so-hero-balance-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 4px;
+        }
+        .so-hero-balance-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 30px; color: var(--white); line-height: 1;
+        }
+
+        /* ── Right column ── */
+        .detail-right { display: flex; flex-direction: column; gap: 20px; }
+
+        /* ── Lãi dự tính card ── */
+        .lai-card {
+            background: var(--white);
+            border-radius: 18px;
+            border: 1px solid rgba(221,232,232,.8);
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 16px rgba(13,115,119,.06);
+            overflow: hidden;
+        }
+        .lai-card-header {
+            padding: 16px 22px 12px;
+            border-bottom: 1px solid var(--gray-1);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .lai-card-header-icon {
+            width: 32px; height: 32px; border-radius: 9px;
+            background: rgba(13,115,119,.08);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .lai-card-header-icon .material-symbols-outlined { font-size: 16px; color: var(--teal); }
+        .lai-card-title { font-family:'DM Serif Display',serif; font-size:15px; color:var(--text); }
+
+        /* big stat row */
+        .lai-stats {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            border-bottom: 1px solid var(--gray-1);
+        }
+        .lai-stat {
+            padding: 18px 20px;
+            border-right: 1px solid var(--gray-1);
+            text-align: center;
+        }
+        .lai-stat:last-child { border-right: none; }
+        .lai-stat-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; color: var(--gray-2); margin-bottom: 7px;
+        }
+        .lai-stat-value {
+            font-family: 'DM Serif Display', serif; font-size: 18px;
+        }
+        .lai-stat-value.gold  { color: var(--gold); }
+        .lai-stat-value.green { color: var(--green); }
+        .lai-stat-value.teal  { color: var(--teal); }
+
+        /* progress bar thời gian */
+        .time-progress { padding: 16px 22px; }
+        .time-progress-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+        .time-progress-label { font-size: 11.5px; font-weight: 600; color: var(--gray-2); }
+        .time-progress-pct   { font-size: 12px; font-weight: 700; color: var(--teal); }
+        .progress-track {
+            height: 8px; background: var(--gray-1); border-radius: 99px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, var(--teal), var(--teal-lt));
+            transition: width .6s ease;
+        }
+        .time-progress-dates {
+            display: flex; justify-content: space-between;
+            margin-top: 6px; font-size: 10.5px; color: var(--gray-2); font-weight: 500;
+        }
+
+        /* ── Chart ── */
+        .chart-wrap { height: 180px; position: relative; }
+
+        /* ── Giao dịch ── */
+        .txn-list { display: flex; flex-direction: column; }
+        .txn-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 13px 0; border-bottom: 1px solid var(--gray-1);
+        }
+        .txn-item:last-child { border-bottom: none; }
+        .txn-icon {
+            width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .txn-icon .material-symbols-outlined { font-size: 17px; }
+        .txn-icon.nap { background: rgba(26,138,90,.1);  color: var(--green); }
+        .txn-icon.rut { background: rgba(192,64,64,.09); color: var(--red); }
+        .txn-info { flex: 1; min-width: 0; }
+        .txn-name  { font-size: 13px; font-weight: 600; color: var(--text); }
+        .txn-date  { font-size: 11px; color: var(--gray-2); margin-top: 2px; }
+        .txn-amount { font-family:'DM Serif Display',serif; font-size:13.5px; font-weight:700; white-space:nowrap; }
+        .txn-amount.nap { color: var(--green); }
+        .txn-amount.rut { color: var(--red); }
+    </style>
+</head>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/"          class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="/tra-cuu-so" class="nav-item active"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="/giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="/lai-suat"  class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Chi tiết sổ tiết kiệm</div>
+            <div class="header-sub" th:text="'Mã sổ: ' + ${so.maSo}">Mã sổ: —</div>
+        </div>
+        <div class="header-right">
+            <a href="/tra-cuu-so" class="btn-ghost">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Quay lại
+            </a>
+        </div>
+    </header>
+
+    <div class="page-body">
+        <div class="detail-layout">
+
+            <!-- ══ CỘT TRÁI: Hero card ══ -->
+            <div>
+                <div class="so-hero">
+                    <!-- Ribbon trạng thái -->
+                    <div class="so-hero-ribbon"
+                         th:classappend="${so.trangThai == 'MO'} ? 'active' : 'closed'">
+                        <span class="pulse"></span>
+                        <span class="material-symbols-outlined"
+                              th:text="${so.trangThai == 'MO'} ? 'lock_open' : 'lock'"></span>
+                        <span th:text="${so.trangThai == 'MO'} ? 'Đang mở' : 'Đã đóng'"></span>
+                    </div>
+
+                    <div class="so-hero-maso" th:text="'Mã sổ: ' + ${so.maSo}"></div>
+                    <div class="so-hero-name" th:text="${loai.tenLoai}">Kỳ hạn 12 tháng</div>
+
+                    <!-- Số dư hiện tại -->
+                    <div class="so-hero-balance-label">Số dư hiện tại</div>
+                    <div class="so-hero-balance-value"
+                         th:text="${#numbers.formatDecimal(so.soDuHienTai,0,'COMMA',0,'POINT')} + ' đ'">0 đ</div>
+
+                    <div class="so-hero-divider"></div>
+
+                    <div class="so-hero-row">
+                        <div class="so-hero-row-label">
+                            <span class="material-symbols-outlined">payments</span> Số tiền gốc
+                        </div>
+                        <div class="so-hero-row-value gold"
+                             th:text="${#numbers.formatDecimal(so.soTienBanDau,0,'COMMA',0,'POINT')} + ' đ'">—</div>
+                    </div>
+                    <div class="so-hero-row">
+                        <div class="so-hero-row-label">
+                            <span class="material-symbols-outlined">percent</span> Lãi suất
+                        </div>
+                        <div class="so-hero-row-value teal-lt"
+                             th:text="${so.laiSuatApDung} + ' %/năm'">—</div>
+                    </div>
+                    <div class="so-hero-row">
+                        <div class="so-hero-row-label">
+                            <span class="material-symbols-outlined">calendar_today</span> Ngày mở
+                        </div>
+                        <div class="so-hero-row-value"
+                             th:text="${#dates.format(so.ngayMoSo,'dd/MM/yyyy')}">—</div>
+                    </div>
+                    <div class="so-hero-row">
+                        <div class="so-hero-row-label">
+                            <span class="material-symbols-outlined">event</span> Ngày đáo hạn
+                        </div>
+                        <div class="so-hero-row-value"
+                             th:text="${so.ngayDaoHan != null ? #dates.format(so.ngayDaoHan,'dd/MM/yyyy') : 'Không kỳ hạn'}">—</div>
+                    </div>
+                    <div class="so-hero-row">
+                        <div class="so-hero-row-label">
+                            <span class="material-symbols-outlined">timelapse</span> Kỳ hạn
+                        </div>
+                        <div class="so-hero-row-value"
+                             th:text="${loai.kyHanThang != null and loai.kyHanThang > 0 ? loai.kyHanThang + ' tháng' : 'Không kỳ hạn'}">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ CỘT PHẢI ══ -->
+            <div class="detail-right">
+
+                <!-- Lãi dự tính card -->
+                <div class="lai-card">
+                    <div class="lai-card-header">
+                        <div class="lai-card-header-icon">
+                            <span class="material-symbols-outlined">calculate</span>
+                        </div>
+                        <div class="lai-card-title">Lãi dự tính</div>
+                    </div>
+
+                    <!-- 3 stat: lãi tích lũy / lãi đến đáo hạn / tổng nhận -->
+                    <div class="lai-stats">
+                        <div class="lai-stat">
+                            <div class="lai-stat-label">Lãi tích lũy</div>
+                            <div class="lai-stat-value gold"
+                                 th:text="'~ ' + ${#numbers.formatDecimal(laiTichLuy,0,'COMMA',0,'POINT')} + ' đ'">—</div>
+                        </div>
+                        <div class="lai-stat">
+                            <div class="lai-stat-label">Lãi đến đáo hạn</div>
+                            <div class="lai-stat-value teal"
+                                 th:text="'~ ' + ${#numbers.formatDecimal(laiDenDaoHan,0,'COMMA',0,'POINT')} + ' đ'">—</div>
+                        </div>
+                        <div class="lai-stat">
+                            <div class="lai-stat-label">Tổng nhận</div>
+                            <div class="lai-stat-value green"
+                                 th:text="'~ ' + ${#numbers.formatDecimal(tongNhanDaoHan,0,'COMMA',0,'POINT')} + ' đ'">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar thời gian (chỉ hiện với sổ có kỳ hạn) -->
+                    <div class="time-progress" th:if="${so.ngayDaoHan != null}">
+                        <div class="time-progress-header">
+                            <span class="time-progress-label">Tiến độ kỳ hạn</span>
+                            <span class="time-progress-pct" th:text="${phanTramThoiGian} + '%'">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill"
+                                 th:style="'width:' + ${phanTramThoiGian} + '%'"></div>
+                        </div>
+                        <div class="time-progress-dates">
+                            <span th:text="${#dates.format(so.ngayMoSo,'dd/MM/yyyy')}">—</span>
+                            <span th:text="${#dates.format(so.ngayDaoHan,'dd/MM/yyyy')}">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ số dư theo tháng -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Biến động số dư</div>
+                        <span style="font-size:10.5px;font-weight:700;color:var(--teal);
+                                     background:rgba(13,115,119,.08);padding:4px 10px;
+                                     border-radius:99px;letter-spacing:.8px;text-transform:uppercase;">
+                            6 tháng
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-wrap">
+                            <canvas id="chartSoDu"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lịch sử giao dịch của sổ này -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Lịch sử giao dịch</div>
+                        <span style="font-size:11px;font-weight:600;color:var(--gray-2);"
+                              th:text="${#lists.size(lichSu)} + ' giao dịch'">0 giao dịch</span>
+                    </div>
+                    <div class="panel-body" style="padding-top:8px;padding-bottom:8px;">
+                        <div class="txn-list">
+                            <div class="txn-item" th:each="gd : ${lichSu}">
+                                <div class="txn-icon"
+                                     th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'">
+                                    <span class="material-symbols-outlined"
+                                          th:text="${gd.loaiGiaoDich == 'NAP'} ? 'arrow_downward' : 'arrow_upward'"></span>
+                                </div>
+                                <div class="txn-info">
+                                    <div class="txn-name"
+                                         th:text="${gd.loaiGiaoDich == 'NAP'} ? 'Gửi tiền' : 'Rút tiền'"></div>
+                                    <div class="txn-date"
+                                         th:text="${#dates.format(gd.ngayGiaoDich,'dd/MM/yyyy HH:mm')}"></div>
+                                </div>
+                                <div class="txn-amount"
+                                     th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'"
+                                     th:text="${(gd.loaiGiaoDich == 'NAP' ? '+' : '-') + #numbers.formatDecimal(gd.soTien,0,'COMMA',0,'POINT')} + ' đ'">
+                                </div>
+                            </div>
+                            <div th:if="${lichSu == null or #lists.isEmpty(lichSu)}"
+                                 class="empty-state" style="padding:28px 0;">
+                                <span class="material-symbols-outlined">history</span>
+                                Chưa có giao dịch nào.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /detail-right -->
+        </div><!-- /detail-layout -->
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
+<!-- Inject chart data từ Thymeleaf -->
+<script th:inline="javascript">
+    const CHART_LABELS = /*[[${chartLabels}]]*/ ["T10/25","T11/25","T12/25","T1/26","T2/26","T3/26"];
+    const CHART_VALUES = /*[[${chartValues}]]*/ [1000000, 1000000, 1000000, 1000000, 1000000, 1000000];
+</script>
+
+<script>
+    (function () {
+        const fmt = v => new Intl.NumberFormat('vi-VN').format(v) + ' đ';
+        const ctx = document.getElementById('chartSoDu').getContext('2d');
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+        gradient.addColorStop(0, 'rgba(13,115,119,0.18)');
+        gradient.addColorStop(1, 'rgba(13,115,119,0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: CHART_LABELS,
+                datasets: [{
+                    data: CHART_VALUES,
+                    borderColor: '#0D7377',
+                    borderWidth: 2.5,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: gradient,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#0D7377',
+                    pointBorderWidth: 2.5
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0A2828',
+                        titleColor: 'rgba(255,255,255,.5)',
+                        bodyColor: '#fff',
+                        padding: 12, cornerRadius: 10,
+                        callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) }
+                    }
+                },
+                scales: {
+                    y: {
+                        display: true,
+                        grid: { color: 'rgba(0,0,0,.04)' },
+                        border: { display: false },
+                        ticks: {
+                            font: { family:'DM Sans', size:10, weight:'600' },
+                            color: '#9BB5B5',
+                            callback: v => v >= 1_000_000
+                                ? (v/1_000_000).toFixed(1) + ' tr'
+                                : v >= 1_000 ? (v/1_000).toFixed(0) + 'k' : v
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font:{ family:'DM Sans', size:11, weight:'600' }, color:'#9BB5B5' }
+                    }
+                }
+            }
+        });
+    })();
+</script>
+</body>
+</html>

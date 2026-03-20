@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chỉnh sửa hồ sơ - VietSave Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/customer-shared.css"/>
+    <style>
+        /* ── Edit form card ── */
+        .edit-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* ── Side panel ── */
+        .edit-side {
+            background: linear-gradient(135deg, #0A2828 0%, var(--teal) 100%);
+            border-radius: 20px; padding: 32px 24px;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; gap: 16px;
+            box-shadow: 0 8px 28px rgba(13,115,119,.22);
+        }
+        .edit-side::before {
+            content:''; position:absolute; right:-40px; top:-40px;
+            width:180px; height:180px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.08); pointer-events:none;
+        }
+        .edit-avatar {
+            width: 80px; height: 80px; border-radius: 22px;
+            background: rgba(255,255,255,.15);
+            border: 2px solid rgba(255,255,255,.25);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 32px; color: var(--white);
+        }
+        .edit-side-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px; color: var(--white); line-height: 1.2;
+        }
+        .edit-side-note {
+            font-size: 11.5px; color: rgba(255,255,255,.5);
+            line-height: 1.6; padding: 0 4px;
+        }
+        .edit-side-divider {
+            width: 100%; height: 1px;
+            background: rgba(255,255,255,.1); margin: 4px 0;
+        }
+        .edit-locked-item {
+            width: 100%; display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,.07); border-radius: 10px;
+            padding: 10px 12px; text-align: left;
+        }
+        .edit-locked-item .material-symbols-outlined { font-size:16px; color:rgba(255,255,255,.4); }
+        .edit-locked-label { font-size: 10px; color: rgba(255,255,255,.4); letter-spacing: .8px; text-transform: uppercase; }
+        .edit-locked-value { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.75); margin-top: 2px; }
+
+        /* ── Main form panel ── */
+        .edit-main { display: flex; flex-direction: column; gap: 20px; }
+
+        .form-section {
+            background: var(--white);
+            border-radius: 18px;
+            border: 1px solid rgba(221,232,232,.8);
+            box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 4px 16px rgba(13,115,119,.06);
+            overflow: hidden;
+        }
+        .form-section-header {
+            padding: 18px 24px 14px;
+            border-bottom: 1px solid var(--gray-1);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .form-section-icon {
+            width: 34px; height: 34px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(13,115,119,.08);
+        }
+        .form-section-icon .material-symbols-outlined { font-size: 17px; color: var(--teal); }
+        .form-section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 15px; color: var(--text);
+        }
+        .form-section-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+        /* ── Form row (2 cols) ── */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-row.single { grid-template-columns: 1fr; }
+
+        /* ── Input group ── */
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-label {
+            font-size: 11.5px; font-weight: 700; color: var(--gray-2);
+            letter-spacing: .5px; display: flex; align-items: center; gap: 5px;
+        }
+        .input-label .material-symbols-outlined { font-size: 13px; }
+        .input-label .required { color: var(--red); margin-left: 2px; }
+
+        .form-input {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid var(--gray-1);
+            border-radius: 12px; font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px; font-weight: 500; color: var(--text);
+            background: var(--white);
+            transition: border-color .2s, box-shadow .2s;
+            outline: none; box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: var(--teal-3);
+            box-shadow: 0 0 0 3px rgba(13,115,119,.08);
+        }
+        .form-input::placeholder { color: var(--gray-2); font-weight: 400; }
+
+        select.form-input { cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239BB5B5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        .input-hint {
+            font-size: 11px; color: var(--gray-2); margin-top: 2px;
+        }
+
+        /* password toggle */
+        .input-wrap { position: relative; }
+        .input-wrap .form-input { padding-right: 44px; }
+        .pw-toggle {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; padding: 4px;
+            color: var(--gray-2); display: flex; align-items: center;
+        }
+        .pw-toggle .material-symbols-outlined { font-size: 18px; }
+        .pw-toggle:hover { color: var(--teal); }
+
+        /* strength bar */
+        .pw-strength { display: flex; gap: 4px; margin-top: 6px; }
+        .pw-strength-bar {
+            flex: 1; height: 3px; border-radius: 99px;
+            background: var(--gray-1); transition: background .3s;
+        }
+        .pw-strength-bar.weak   { background: var(--red); }
+        .pw-strength-bar.medium { background: var(--gold); }
+        .pw-strength-bar.strong { background: var(--green); }
+        .pw-strength-label { font-size: 10.5px; font-weight: 700; margin-top: 4px; }
+
+        /* ── Footer actions ── */
+        .form-actions {
+            display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+            padding: 18px 24px;
+            border-top: 1px solid var(--gray-1);
+            background: var(--mint);
+        }
+
+        /* error */
+        .field-error {
+            font-size: 11px; color: var(--red); font-weight: 600;
+            display: flex; align-items: center; gap: 4px; margin-top: 2px;
+        }
+        .field-error .material-symbols-outlined { font-size: 13px; }
+
+        /* alert */
+        .alert {
+            padding: 14px 20px; border-radius: 12px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+        }
+        .alert.error   { background: rgba(192,64,64,.09); color: var(--red); }
+        .alert .material-symbols-outlined { font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside>
+    <div class="sidebar-logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">account_balance</span></div>
+        <div class="logo-text">VietSave Bank<span>Cổng khách hàng</span></div>
+    </div>
+    <nav>
+        <div class="nav-group">
+            <p class="nav-section-label">Menu</p>
+            <a href="/"          class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="tra-cuu-so" class="nav-item"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
+            <a href="giao-dich"  class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat"   class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
+        <a href="logout" class="logout-btn">
+            <span class="material-symbols-outlined">logout</span>Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main>
+    <header>
+        <div class="header-left">
+            <div class="header-title">Chỉnh sửa hồ sơ</div>
+            <div class="header-sub">Cập nhật thông tin cá nhân của bạn</div>
+        </div>
+        <div class="header-right">
+            <a href="/profile" class="btn-ghost">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Quay lại
+            </a>
+        </div>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Alert lỗi chung -->
+        <div th:if="${errorMsg}" class="alert error">
+            <span class="material-symbols-outlined">error</span>
+            <span th:text="${errorMsg}"></span>
+        </div>
+
+        <div class="edit-layout">
+
+            <!-- ── Side panel: avatar + trường cố định ── -->
+            <div class="edit-side">
+                <div class="edit-avatar"
+                     th:text="${khachHang.hoten != null ? khachHang.hoten.substring(0,1).toUpperCase() : 'K'}">K</div>
+                <div class="edit-side-name" th:text="${khachHang.hoten}">Nguyễn Văn A</div>
+                <div class="edit-side-note">
+                    Một số thông tin định danh được khóa và không thể tự thay đổi.
+                    Liên hệ hotline <strong style="color:rgba(255,255,255,.8)">1800 1234</strong> nếu cần hỗ trợ.
+                </div>
+                <div class="edit-side-divider"></div>
+                <!-- CCCD -->
+                <div class="edit-locked-item">
+                    <span class="material-symbols-outlined">credit_card</span>
+                    <div>
+                        <div class="edit-locked-label">CCCD</div>
+                        <div class="edit-locked-value"
+                             th:text="${khachHang.cccd != null ? khachHang.cccd.substring(0,3) + ' *** *** ' + khachHang.cccd.substring(khachHang.cccd.length()-3) : '—'}">—</div>
+                    </div>
+                </div>
+                <!-- Ngày sinh -->
+                <div class="edit-locked-item">
+                    <span class="material-symbols-outlined">cake</span>
+                    <div>
+                        <div class="edit-locked-label">Ngày sinh</div>
+                        <div class="edit-locked-value"
+                             th:text="${khachHang.ngaySinh != null ? #temporals.format(khachHang.ngaySinh,'dd/MM/yyyy') : '—'}">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Main form ── -->
+            <div class="edit-main">
+                <form method="post" th:action="@{/profile/edit}" id="editForm">
+
+                    <!-- Section 1: Thông tin cá nhân -->
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <div class="form-section-icon">
+                                <span class="material-symbols-outlined">person</span>
+                            </div>
+                            <div class="form-section-title">Thông tin cá nhân</div>
+                        </div>
+                        <div class="form-section-body">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label class="input-label" for="hoten">
+                                        <span class="material-symbols-outlined">badge</span>
+                                        Họ và tên <span class="required">*</span>
+                                    </label>
+                                    <input id="hoten" name="hoten" type="text"
+                                           class="form-input"
+                                           placeholder="Nguyễn Văn A"
+                                           th:value="${khachHang.hoten}"
+                                           required/>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label" for="gioiTinh">
+                                        <span class="material-symbols-outlined">wc</span>
+                                        Giới tính
+                                    </label>
+                                    <select id="gioiTinh" name="gioiTinh" class="form-input">
+                                        <option value="">-- Chọn --</option>
+                                        <option value="NAM" th:selected="${khachHang.gioiTinh == 'NAM'}">Nam</option>
+                                        <option value="NU"  th:selected="${khachHang.gioiTinh == 'NU'}">Nữ</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Liên hệ -->
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <div class="form-section-icon">
+                                <span class="material-symbols-outlined">contact_phone</span>
+                            </div>
+                            <div class="form-section-title">Thông tin liên hệ</div>
+                        </div>
+                        <div class="form-section-body">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label class="input-label" for="sdt">
+                                        <span class="material-symbols-outlined">phone</span>
+                                        Số điện thoại <span class="required">*</span>
+                                    </label>
+                                    <input id="sdt" name="sdt" type="tel"
+                                           class="form-input"
+                                           placeholder="0901 234 567"
+                                           th:value="${khachHang.sdt}"
+                                           required/>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label" for="email">
+                                        <span class="material-symbols-outlined">mail</span>
+                                        Email <span class="required">*</span>
+                                    </label>
+                                    <input id="email" name="email" type="email"
+                                           class="form-input"
+                                           placeholder="example@email.com"
+                                           th:value="${khachHang.email}"
+                                           required/>
+                                </div>
+                            </div>
+                            <div class="form-row single">
+                                <div class="input-group">
+                                    <label class="input-label" for="diaChi">
+                                        <span class="material-symbols-outlined">home</span>
+                                        Địa chỉ
+                                    </label>
+                                    <input id="diaChi" name="diaChi" type="text"
+                                           class="form-input"
+                                           placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"
+                                           th:value="${khachHang.diaChi}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Đổi mật khẩu (tuỳ chọn) -->
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <div class="form-section-icon">
+                                <span class="material-symbols-outlined">lock</span>
+                            </div>
+                            <div class="form-section-title">Đổi mật khẩu</div>
+                        </div>
+                        <div class="form-section-body">
+                            <div class="input-hint" style="margin-bottom:4px;">
+                                Để trống nếu không muốn thay đổi mật khẩu.
+                            </div>
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label class="input-label" for="matKhauCu">
+                                        <span class="material-symbols-outlined">key</span>
+                                        Mật khẩu hiện tại
+                                    </label>
+                                    <div class="input-wrap">
+                                        <input id="matKhauCu" name="matKhauCu" type="password"
+                                               class="form-input" placeholder="••••••••" autocomplete="current-password"/>
+                                        <button type="button" class="pw-toggle" onclick="togglePw('matKhauCu', this)">
+                                            <span class="material-symbols-outlined">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label" for="matKhauMoi">
+                                        <span class="material-symbols-outlined">lock_reset</span>
+                                        Mật khẩu mới
+                                    </label>
+                                    <div class="input-wrap">
+                                        <input id="matKhauMoi" name="matKhauMoi" type="password"
+                                               class="form-input" placeholder="••••••••"
+                                               autocomplete="new-password"
+                                               oninput="checkStrength(this.value)"/>
+                                        <button type="button" class="pw-toggle" onclick="togglePw('matKhauMoi', this)">
+                                            <span class="material-symbols-outlined">visibility</span>
+                                        </button>
+                                    </div>
+                                    <div class="pw-strength" id="pwStrength">
+                                        <div class="pw-strength-bar" id="bar1"></div>
+                                        <div class="pw-strength-bar" id="bar2"></div>
+                                        <div class="pw-strength-bar" id="bar3"></div>
+                                    </div>
+                                    <div class="pw-strength-label" id="pwLabel" style="color:var(--gray-2);"></div>
+                                </div>
+                            </div>
+                            <div class="form-row single">
+                                <div class="input-group">
+                                    <label class="input-label" for="xacNhanMatKhau">
+                                        <span class="material-symbols-outlined">lock_reset</span>
+                                        Xác nhận mật khẩu mới
+                                    </label>
+                                    <div class="input-wrap">
+                                        <input id="xacNhanMatKhau" name="xacNhanMatKhau" type="password"
+                                               class="form-input" placeholder="••••••••" autocomplete="new-password"/>
+                                        <button type="button" class="pw-toggle" onclick="togglePw('xacNhanMatKhau', this)">
+                                            <span class="material-symbols-outlined">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer actions bên trong form -->
+                        <div class="form-actions">
+                            <a href="/profile" class="btn-ghost">Huỷ</a>
+                            <button type="submit" class="btn-primary">
+                                <span class="material-symbols-outlined">save</span>
+                                Lưu thay đổi
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div><!-- /edit-main -->
+        </div><!-- /edit-layout -->
+
+    </div><!-- /page-body -->
+
+    <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
+</main>
+
+<script>
+    // Toggle hiện/ẩn mật khẩu
+    function togglePw(id, btn) {
+        const input = document.getElementById(id);
+        const icon  = btn.querySelector('.material-symbols-outlined');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = 'visibility_off';
+        } else {
+            input.type = 'password';
+            icon.textContent = 'visibility';
+        }
+    }
+
+    // Thanh độ mạnh mật khẩu
+    function checkStrength(val) {
+        const bars  = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+        const label = document.getElementById('pwLabel');
+        bars.forEach(b => b.className = 'pw-strength-bar');
+
+        if (!val) { label.textContent = ''; return; }
+
+        let score = 0;
+        if (val.length >= 8)            score++;
+        if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+        if (/[0-9]/.test(val) || /[^A-Za-z0-9]/.test(val)) score++;
+
+        const map = ['weak', 'medium', 'strong'];
+        const txt = ['Yếu', 'Trung bình', 'Mạnh'];
+        const col = ['var(--red)', 'var(--gold)', 'var(--green)'];
+        for (let i = 0; i < score; i++) bars[i].classList.add(map[score - 1]);
+        label.textContent = txt[score - 1] || '';
+        label.style.color = col[score - 1] || '';
+    }
+
+    // Validate mật khẩu khớp trước khi submit
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        const moi      = document.getElementById('matKhauMoi').value;
+        const xacNhan  = document.getElementById('xacNhanMatKhau').value;
+        if (moi && moi !== xacNhan) {
+            e.preventDefault();
+            alert('Mật khẩu xác nhận không khớp!');
+        }
+    });
+</script>
+</body>
+</html>

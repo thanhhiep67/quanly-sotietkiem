@@ -93,7 +93,34 @@
         .two-col { display:grid; grid-template-columns:1fr 320px; gap:20px; }
 
         /* ── Chart ── */
-        .chart-wrap { height:220px; position:relative; }
+        .chart-wrap { height:200px; position:relative; }
+
+        /* ── Chart mini stats ── */
+        .chart-mini-stats {
+            display:flex; gap:0; margin-bottom:18px;
+            background: var(--mint); border-radius:12px;
+            border: 1px solid var(--gray-1); overflow:hidden;
+        }
+        .chart-mini-stat {
+            flex:1; padding:10px 16px; text-align:center;
+            border-right:1px solid var(--gray-1);
+        }
+        .chart-mini-stat:last-child { border-right:none; }
+        .chart-mini-stat-label {
+            font-size:9.5px; font-weight:700; letter-spacing:1.2px;
+            text-transform:uppercase; color:var(--gray-2); margin-bottom:5px;
+        }
+        .chart-mini-stat-value {
+            font-family:'DM Serif Display',serif; font-size:14px;
+        }
+
+        /* growth badge */
+        #growthBadge {
+            font-size:11px; font-weight:700;
+            padding:4px 10px; border-radius:99px; letter-spacing:.5px;
+        }
+        #growthBadge.up   { background:rgba(26,138,90,.1);  color:var(--green); }
+        #growthBadge.down { background:rgba(192,64,64,.09); color:var(--red); }
 
         /* ── Recent transactions ── */
         .txn-list { display:flex; flex-direction:column; }
@@ -138,14 +165,13 @@
                 <span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm
             </a>
             <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
-
             <a href="lai-suat" class="nav-item">
                 <span class="material-symbols-outlined">percent</span>Lãi suất
             </a>
         </div>
     </nav>
     <div class="sidebar-footer">
-        <div class="user-card">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
             <div class="user-avatar"
                  th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
             <div class="user-info">
@@ -155,7 +181,9 @@
                     Khách hàng
                 </div>
             </div>
-        </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
         <a href="logout" class="logout-btn">
             <span class="material-symbols-outlined">logout</span>Đăng xuất
         </a>
@@ -206,8 +234,6 @@
 
         <!-- Hero + Quick actions -->
         <div class="two-col">
-
-            <!-- Hero asset card -->
             <div class="asset-hero">
                 <div class="asset-hero-label">Tài sản tiết kiệm của bạn</div>
                 <div class="asset-hero-value"
@@ -224,13 +250,9 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Quick actions -->
             <div class="quick-grid">
                 <a href="mo-so-tiet-kiem" class="quick-card">
-                    <div class="quick-card-icon teal">
-                        <span class="material-symbols-outlined">add_circle</span>
-                    </div>
+                    <div class="quick-card-icon teal"><span class="material-symbols-outlined">add_circle</span></div>
                     <div>
                         <div class="quick-card-title">Mở sổ mới</div>
                         <div class="quick-card-sub">Bắt đầu tích lũy</div>
@@ -238,9 +260,7 @@
                     <span class="quick-card-arrow">arrow_forward</span>
                 </a>
                 <a href="giao-dich" class="quick-card">
-                    <div class="quick-card-icon red">
-                        <span class="material-symbols-outlined">payments</span>
-                    </div>
+                    <div class="quick-card-icon red"><span class="material-symbols-outlined">payments</span></div>
                     <div>
                         <div class="quick-card-title">Rút tiền</div>
                         <div class="quick-card-sub">Về tài khoản liên kết</div>
@@ -248,9 +268,7 @@
                     <span class="quick-card-arrow">arrow_forward</span>
                 </a>
                 <a href="tra-cuu-so" class="quick-card">
-                    <div class="quick-card-icon green">
-                        <span class="material-symbols-outlined">manage_search</span>
-                    </div>
+                    <div class="quick-card-icon green"><span class="material-symbols-outlined">manage_search</span></div>
                     <div>
                         <div class="quick-card-title">Tra cứu sổ</div>
                         <div class="quick-card-sub">Xem chi tiết</div>
@@ -258,9 +276,7 @@
                     <span class="quick-card-arrow">arrow_forward</span>
                 </a>
                 <a href="lai-suat" class="quick-card">
-                    <div class="quick-card-icon gold">
-                        <span class="material-symbols-outlined">percent</span>
-                    </div>
+                    <div class="quick-card-icon gold"><span class="material-symbols-outlined">percent</span></div>
                     <div>
                         <div class="quick-card-title">Lãi suất</div>
                         <div class="quick-card-sub">Biểu lãi hiện hành</div>
@@ -273,13 +289,37 @@
         <!-- Chart + Recent transactions -->
         <div class="two-col">
 
-            <!-- Chart -->
+            <!-- ── Chart tăng trưởng tài sản ── -->
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-title">Xu hướng tài sản</div>
-                    <span style="font-size:10.5px;font-weight:700;color:var(--teal);background:rgba(13,115,119,.08);padding:4px 10px;border-radius:99px;letter-spacing:.8px;text-transform:uppercase;">Live</span>
+                    <div>
+                        <div class="panel-title">Tăng trưởng tài sản</div>
+                        <div style="font-size:11.5px;color:var(--gray-2);margin-top:2px;">Tổng tài sản theo từng tháng</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <!-- Badge % thay đổi — tính bằng JS sau -->
+                        <span id="growthBadge"></span>
+                        <span style="font-size:10.5px;font-weight:700;color:var(--teal);background:rgba(13,115,119,.08);padding:4px 10px;border-radius:99px;letter-spacing:.8px;text-transform:uppercase;">6 tháng</span>
+                    </div>
                 </div>
                 <div class="panel-body">
+
+                    <!-- Mini stats row -->
+                    <div class="chart-mini-stats">
+                        <div class="chart-mini-stat">
+                            <div class="chart-mini-stat-label">Cao nhất</div>
+                            <div class="chart-mini-stat-value" id="statMax" style="color:var(--teal);">—</div>
+                        </div>
+                        <div class="chart-mini-stat">
+                            <div class="chart-mini-stat-label">Thấp nhất</div>
+                            <div class="chart-mini-stat-value" id="statMin" style="color:var(--gold);">—</div>
+                        </div>
+                        <div class="chart-mini-stat">
+                            <div class="chart-mini-stat-label">Trung bình</div>
+                            <div class="chart-mini-stat-value" id="statAvg" style="color:var(--text);">—</div>
+                        </div>
+                    </div>
+
                     <div class="chart-wrap">
                         <canvas id="chartClientLine"></canvas>
                     </div>
@@ -290,24 +330,18 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">Giao dịch gần đây</div>
-                    <a href="giao-dich" class="btn-teal-outline" style="font-size:12px;padding:6px 12px;">
-                        Xem tất cả
-                    </a>
+                    <a href="giao-dich" class="btn-teal-outline" style="font-size:12px;padding:6px 12px;">Xem tất cả</a>
                 </div>
                 <div class="panel-body" style="padding-top:8px;padding-bottom:8px;">
                     <div class="txn-list">
-                        <!-- Thymeleaf loop — dùng gdGanNhat từ controller -->
                         <div class="txn-item" th:each="gd : ${lichSuGiaoDich}">
-                            <div class="txn-icon"
-                                 th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'">
-        <span class="material-symbols-outlined"
-              th:text="${gd.loaiGiaoDich == 'NAP'} ? 'arrow_downward' : 'arrow_upward'"></span>
+                            <div class="txn-icon" th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'">
+                                <span class="material-symbols-outlined"
+                                      th:text="${gd.loaiGiaoDich == 'NAP'} ? 'arrow_downward' : 'arrow_upward'"></span>
                             </div>
                             <div class="txn-info">
-                                <div class="txn-name"
-                                     th:text="${gd.loaiGiaoDich == 'NAP' ? 'Gửi tiền' : 'Rút tiền'}"></div>
-                                <div class="txn-date"
-                                     th:text="${#dates.format(gd.ngayGiaoDich, 'dd/MM/yyyy')}"></div>
+                                <div class="txn-name" th:text="${gd.loaiGiaoDich == 'NAP' ? 'Gửi tiền' : 'Rút tiền'}"></div>
+                                <div class="txn-date" th:text="${#dates.format(gd.ngayGiaoDich, 'dd/MM/yyyy')}"></div>
                             </div>
                             <div class="txn-amount"
                                  th:classappend="${gd.loaiGiaoDich == 'NAP'} ? 'nap' : 'rut'"
@@ -316,11 +350,6 @@
                         </div>
                         <div th:if="${lichSuGiaoDich == null or #lists.isEmpty(lichSuGiaoDich)}"
                              class="empty-state" style="padding:32px 0;">
-                            <span class="material-symbols-outlined">history</span>
-                            Chưa có giao dịch nào.
-                        </div>
-                        <!-- Empty state -->
-                        <div th:if="${lichSuGiaoDich == null or #lists.isEmpty(lichSuGiaoDich)}" class="empty-state" style="padding:32px 0;">
                             <span class="material-symbols-outlined">history</span>
                             Chưa có giao dịch nào.
                         </div>
@@ -335,42 +364,119 @@
     <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
 </main>
 
+<!--
+    ══════════════════════════════════════════════════════
+    HƯỚNG DẪN BACKEND (Spring MVC / Thymeleaf):
+
+    Controller cần truyền 2 model attributes:
+      - chartLabels : List<String>  → tên tháng, VD: ["T11/25","T12/25","T1/26",...]
+      - chartValues : List<Long>    → tổng tài sản cuối mỗi tháng (đơn vị: đồng)
+
+    Ví dụ:
+      model.addAttribute("chartLabels", List.of("T11/25","T12/25","T1/26","T2/26","T3/26","T4/26"));
+      model.addAttribute("chartValues", List.of(12000000L, 13500000L, 15000000L, 14800000L, 16200000L, 17500000L));
+    ══════════════════════════════════════════════════════
+-->
+
+<!-- Thymeleaf inject data vào JS -->
+<script th:inline="javascript">
+    const CHART_LABELS = /*[[${chartLabels}]]*/ ["T11/25","T12/25","T1/26","T2/26","T3/26","T4/26"];
+    const CHART_VALUES = /*[[${chartValues}]]*/ [12000000, 13500000, 15000000, 14800000, 16200000, 17500000];
+</script>
+
 <!-- Chart.js -->
 <script>
-    const ctx = document.getElementById('chartClientLine').getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(13,115,119,0.22)');
-    gradient.addColorStop(1, 'rgba(13,115,119,0)');
+    (function () {
+        const fmt = v => new Intl.NumberFormat('vi-VN').format(v) + ' đ';
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['T9', 'T10', 'T11', 'T12', 'T1'],
-            datasets: [{
-                data: [850, 1100, 1050, 1250, 1280],
-                borderColor: '#0D7377',
-                borderWidth: 3,
-                tension: 0.45,
-                fill: true,
-                backgroundColor: gradient,
-                pointRadius: 5,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#0D7377',
-                pointBorderWidth: 2.5
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { display: false },
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { family: 'DM Sans', size: 11, weight: '600' }, color: '#9BB5B5' }
+        // ── Mini stats ──
+        const max = Math.max(...CHART_VALUES);
+        const min = Math.min(...CHART_VALUES);
+        const avg = Math.round(CHART_VALUES.reduce((a, b) => a + b, 0) / CHART_VALUES.length);
+        document.getElementById('statMax').textContent = fmt(max);
+        document.getElementById('statMin').textContent = fmt(min);
+        document.getElementById('statAvg').textContent = fmt(avg);
+
+        // ── Growth badge ──
+        const first = CHART_VALUES[0];
+        const last  = CHART_VALUES[CHART_VALUES.length - 1];
+        const pct   = first > 0 ? (((last - first) / first) * 100).toFixed(1) : 0;
+        const badge = document.getElementById('growthBadge');
+        const up    = last >= first;
+        badge.textContent = (up ? '▲ +' : '▼ ') + pct + '%';
+        badge.classList.add(up ? 'up' : 'down');
+
+        // ── Chart ──
+        const ctx = document.getElementById('chartClientLine').getContext('2d');
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, 'rgba(13,115,119,0.20)');
+        gradient.addColorStop(1, 'rgba(13,115,119,0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: CHART_LABELS,
+                datasets: [{
+                    data: CHART_VALUES,
+                    borderColor: '#0D7377',
+                    borderWidth: 2.5,
+                    tension: 0.42,
+                    fill: true,
+                    backgroundColor: gradient,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#0D7377',
+                    pointBorderWidth: 2.5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0A2828',
+                        titleColor: 'rgba(255,255,255,.5)',
+                        bodyColor: '#fff',
+                        padding: 12,
+                        cornerRadius: 10,
+                        titleFont: { family: 'DM Sans', size: 11, weight: '600' },
+                        bodyFont:  { family: 'DM Serif Display', size: 14 },
+                        callbacks: {
+                            label: ctx => ' ' + fmt(ctx.parsed.y)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        display: true,
+                        grid: { color: 'rgba(0,0,0,.04)' },
+                        border: { display: false },
+                        ticks: {
+                            font: { family: 'DM Sans', size: 10, weight: '600' },
+                            color: '#9BB5B5',
+                            callback: v => {
+                                if (v >= 1_000_000) return (v / 1_000_000).toFixed(0) + ' tr';
+                                if (v >= 1_000)     return (v / 1_000).toFixed(0) + ' k';
+                                return v;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: {
+                            font: { family: 'DM Sans', size: 11, weight: '600' },
+                            color: '#9BB5B5'
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
+    })();
 </script>
 </body>
 </html>

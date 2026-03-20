@@ -22,24 +22,25 @@ import java.util.Optional;
 @RequestMapping("/admin/giao-dich")
 public class AdminGdController {
 
-    @Autowired
-    private KhachHangRepository khachHangRepository;
+    @Autowired private KhachHangRepository  khachHangRepository;
+    @Autowired private SoTietKiemRepository soTietKiemRepository;
+    @Autowired private GiaoDichRepository   giaoDichRepository;
 
-    @Autowired
-    private SoTietKiemRepository soTietKiemRepository;
-
-    @Autowired
-    private GiaoDichRepository giaoDichRepository;
-
-    // Trang giao dịch ban đầu
+    // ─────────────────────────────────────────────────────────
+    //  GET /admin/giao-dich  →  trang mặc định
+    // ─────────────────────────────────────────────────────────
     @GetMapping
     public String getGdPage() {
         return "qlstk/admin-dashboard/giao-dich";
     }
 
-    // Tìm kiếm khách hàng theo CCCD và hiển thị danh sách sổ + lịch sử giao dịch
+    // ─────────────────────────────────────────────────────────
+    //  GET /admin/giao-dich/tim-kiem?cccd=...
+    // ─────────────────────────────────────────────────────────
     @GetMapping("/tim-kiem")
-    public String timKiemTheoCccd(@RequestParam String cccd, Model model, RedirectAttributes redirectAttributes) {
+    public String timKiemTheoCccd(@RequestParam String cccd,
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
         Optional<KhachHang> khOpt = khachHangRepository.findByCccd(cccd);
         if (khOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy khách hàng với CCCD này!");
@@ -48,21 +49,26 @@ public class AdminGdController {
 
         KhachHang kh = khOpt.get();
         List<SoTietKiem> soList = soTietKiemRepository.findByKhachHangId(kh.getId());
-        List<GiaoDich> gdList = giaoDichRepository.findByKhachHangIdOrderByNgayGiaoDichDesc(kh.getId());
+        List<GiaoDich>   gdList = giaoDichRepository
+                .findByKhachHangIdOrderByNgayGiaoDichDesc(kh.getId());
 
         model.addAttribute("khachHang", kh);
-        model.addAttribute("soList", soList);
-        model.addAttribute("gdList", gdList);
+        model.addAttribute("soList",    soList);
+        model.addAttribute("gdList",    gdList);
         return "qlstk/admin-dashboard/giao-dich";
     }
 
-    // Thực hiện giao dịch trên một sổ
+    // ─────────────────────────────────────────────────────────
+    //  POST /admin/giao-dich/thuc-hien
+    // ─────────────────────────────────────────────────────────
     @PostMapping("/thuc-hien")
-    public String thucHienGiaoDich(@RequestParam String maSo,
-                                   @RequestParam double soTien,
-                                   @RequestParam String loai,
-                                   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayThucHien,
-                                   RedirectAttributes redirectAttributes) {
+    public String thucHienGiaoDich(
+            @RequestParam String maSo,
+            @RequestParam double soTien,
+            @RequestParam String loai,
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayThucHien,
+            RedirectAttributes redirectAttributes) {
 
         Optional<SoTietKiem> stkOpt = soTietKiemRepository.findById(maSo);
         if (stkOpt.isEmpty()) {
@@ -71,25 +77,36 @@ public class AdminGdController {
         }
 
         SoTietKiem stk = stkOpt.get();
+        String redirectCccd = "redirect:/admin/giao-dich/tim-kiem?cccd="
+                + getCccdByKhachHangId(stk.getKhachHangId());
+
+        // ── Kiểm tra trạng thái sổ ───────────────────────────
+        if (!"MO".equals(stk.getTrangThai())) {
+            redirectAttributes.addFlashAttribute("error", "Sổ đã đóng, không thể thực hiện giao dịch!");
+            return redirectCccd;
+        }
+
         Date today = new Date();
 
         if ("RUT".equals(loai)) {
             if (stk.getNgayDaoHan() != null && today.before(stk.getNgayDaoHan())) {
                 redirectAttributes.addFlashAttribute("error", "Chưa tới ngày đáo hạn, không thể rút!");
-                return "redirect:/admin/giao-dich/tim-kiem?cccd=" + getCccdByKhachHangId(stk.getKhachHangId());
+                return redirectCccd;
             }
             if (stk.getSoDuHienTai() < soTien) {
                 redirectAttributes.addFlashAttribute("error", "Số dư không đủ để rút!");
-                return "redirect:/admin/giao-dich/tim-kiem?cccd=" + getCccdByKhachHangId(stk.getKhachHangId());
+                return redirectCccd;
             }
             stk.setSoDuHienTai(stk.getSoDuHienTai() - soTien);
-            stk.setTrangThai("DONG");
-            stk.setNgayDongSo(LocalDate.now());
+            if (stk.getSoDuHienTai() == 0) {
+                stk.setTrangThai("DONG");
+                stk.setNgayDongSo(LocalDate.now());
+            }
         } else if ("GUI".equals(loai) || "NAP".equals(loai)) {
             stk.setSoDuHienTai(stk.getSoDuHienTai() + soTien);
         }
 
-        // lưu giao dịch
+        // ── Lưu giao dịch ────────────────────────────────────
         GiaoDich gd = new GiaoDich();
         gd.setSoTkId(maSo);
         gd.setKhachHangId(stk.getKhachHangId());
@@ -101,19 +118,18 @@ public class AdminGdController {
         gd.setNgayGiaoDich(ngayThucHien != null ? ngayThucHien : today);
         giaoDichRepository.save(gd);
 
-        // lưu lại sổ tiết kiệm
         soTietKiemRepository.save(stk);
 
         redirectAttributes.addFlashAttribute("message", "Thực hiện giao dịch thành công!");
-        return "redirect:/admin/giao-dich/tim-kiem?cccd=" + getCccdByKhachHangId(stk.getKhachHangId());
+        return redirectCccd;
     }
 
-    // Hàm tiện ích để lấy CCCD từ khachHangId
+    // ─────────────────────────────────────────────────────────
+    //  Helper: lấy CCCD từ khachHangId
+    // ─────────────────────────────────────────────────────────
     private String getCccdByKhachHangId(String khachHangId) {
         return khachHangRepository.findById(khachHangId)
                 .map(KhachHang::getCccd)
                 .orElse("");
     }
-
-
 }

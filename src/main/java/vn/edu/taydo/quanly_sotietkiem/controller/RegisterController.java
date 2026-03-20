@@ -64,7 +64,7 @@ public class RegisterController {
         kh.setTaikhoan_id(tk.getId());
         kh.setHoten(hoten);
         kh.setCccd(cccd);
-        kh.setCccd(email);
+        kh.setEmail(email);
         kh.setSdt(sdt);
         kh.setGioiTinh(gioiTinh);
         kh.setDiaChi(diaChi);

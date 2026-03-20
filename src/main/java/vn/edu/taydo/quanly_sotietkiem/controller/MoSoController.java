@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.taydo.quanly_sotietkiem.DTO.LoaiSoView;
 import vn.edu.taydo.quanly_sotietkiem.config.JwtUtil;
+import vn.edu.taydo.quanly_sotietkiem.model.KhachHang;
 import vn.edu.taydo.quanly_sotietkiem.model.YeuCauMoSo;
 import vn.edu.taydo.quanly_sotietkiem.model.LoaiSoTK;
 import vn.edu.taydo.quanly_sotietkiem.model.LaiSuat;
@@ -14,48 +15,62 @@ import vn.edu.taydo.quanly_sotietkiem.repository.LoaiSoTKRepository;
 import vn.edu.taydo.quanly_sotietkiem.repository.LaiSuatRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
+import vn.edu.taydo.quanly_sotietkiem.service.ProfileService;
+
 import java.util.*;
 
 @Controller
 public class MoSoController {
 
-    @Autowired
-    private LoaiSoTKRepository loaiSoTKRepository;
+    @Autowired private LoaiSoTKRepository    loaiSoTKRepository;
+    @Autowired private LaiSuatRepository     laiSuatRepository;
+    @Autowired private YeuCauMoSoRepository  yeuCauMoSoRepository;
+    @Autowired private ProfileService        profileService;
 
-    @Autowired
-    private LaiSuatRepository laiSuatRepository;
-
-    @Autowired
-    private YeuCauMoSoRepository yeuCauMoSoRepository;
-
-    // Hiển thị form mở sổ
+    // ─────────────────────────────────────────────────────────
+    //  GET /mo-so-tiet-kiem
+    // ─────────────────────────────────────────────────────────
     @GetMapping("/mo-so-tiet-kiem")
-    public String moSoTietKiem(Model model) {
-        List<LoaiSoTK> loaiSoList = loaiSoTKRepository.findAll();
+    public String moSoTietKiem(Model model, HttpServletRequest request) {
 
-        // Lấy lãi suất mới nhất cho từng loại sổ
+        KhachHang kh = profileService.getKhachHangFromRequest(request);
+        if (kh == null) return "redirect:/login";
+
+        Map<String, Object> claims = JwtUtil.getClaimsFromCookie(request);
+        String role = claims != null ? (String) claims.get("role") : "";
+
+        model.addAttribute("khachHang",    kh);
+        model.addAttribute("tenKhachHang", kh.getHoten());
+        model.addAttribute("role",         role);
+
+        // Lãi suất mới nhất cho từng loại sổ
+        List<LoaiSoTK> loaiSoList = loaiSoTKRepository.findAll();
         List<LoaiSoView> viewList = new ArrayList<>();
         for (LoaiSoTK loai : loaiSoList) {
-            LaiSuat laiSuat = laiSuatRepository.findTopByLoaiStkIdOrderByNgayApDungDesc(loai.getId());
+            LaiSuat laiSuat = laiSuatRepository
+                    .findTopByLoaiStkIdOrderByNgayApDungDesc(loai.getId());
             viewList.add(new LoaiSoView(loai, laiSuat));
         }
 
         model.addAttribute("loaiSoList", viewList);
-        model.addAttribute("ngayMoSo", new Date());
+        model.addAttribute("ngayMoSo",   new Date());
 
         return "qlstk/client/mo-so-tiet-kiem";
     }
 
-    // Xử lý submit form mở sổ
+    // ─────────────────────────────────────────────────────────
+    //  POST /mo-so-tiet-kiem
+    // ─────────────────────────────────────────────────────────
     @PostMapping("/mo-so-tiet-kiem")
     public String xuLyMoSo(@RequestParam String loaiSoId,
                            @RequestParam double soTienGui,
-                           HttpServletRequest request,
-                           Model model) {
-        // Lấy userId từ JWT cookie (giả sử có util hỗ trợ)
-        String khachHangId = JwtUtil.getUserIdFromCookie(request);
+                           HttpServletRequest request) {
 
-        LaiSuat laiSuat = laiSuatRepository.findTopByLoaiStkIdOrderByNgayApDungDesc(loaiSoId);
+        String khachHangId = JwtUtil.getUserIdFromCookie(request);
+        if (khachHangId == null) return "redirect:/login";
+
+        LaiSuat laiSuat = laiSuatRepository
+                .findTopByLoaiStkIdOrderByNgayApDungDesc(loaiSoId);
 
         YeuCauMoSo yc = new YeuCauMoSo();
         yc.setKhachHangId(khachHangId);
@@ -66,8 +81,6 @@ public class MoSoController {
         yc.setLaiSuatApDung(laiSuat != null ? laiSuat.getLaiSuatNam() : null);
 
         yeuCauMoSoRepository.save(yc);
-
-        model.addAttribute("message", "Yêu cầu mở sổ đã được gửi thành công!");
 
         return "redirect:/tra-cuu-yeu-cau";
     }

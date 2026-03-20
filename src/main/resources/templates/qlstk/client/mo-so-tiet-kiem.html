@@ -50,28 +50,72 @@
 
         /* ── Result panel ── */
         .result-panel {
-            background:var(--mint); border:1.5px solid var(--gray-1);
-            border-radius:14px; padding:20px 22px;
-            display:flex; flex-direction:column; gap:12px;
-            margin-bottom:22px;
+            background: linear-gradient(135deg, #0A2828 0%, var(--teal) 100%);
+            border-radius: 18px; overflow: hidden;
+            position: relative; margin-bottom: 22px;
+            box-shadow: 0 6px 24px rgba(13,115,119,.22);
         }
-        .result-row {
-            display:flex; align-items:center; justify-content:space-between; gap:12px;
+        .result-panel::before {
+            content:''; position:absolute; right:-30px; top:-30px;
+            width:150px; height:150px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.07); pointer-events:none;
         }
-        .result-label {
-            font-size:13px; color:var(--gray-2); font-weight:500;
-            display:flex; align-items:center; gap:8px;
+        .result-panel::after {
+            content:''; position:absolute; left:-20px; bottom:-20px;
+            width:100px; height:100px; border-radius:50%;
+            border:1px solid rgba(255,255,255,.05); pointer-events:none;
         }
-        .result-label .material-symbols-outlined { font-size:17px; color:var(--teal-3); }
-        .result-value {
-            font-family:'DM Serif Display',serif; font-size:18px; font-weight:700;
-            color:var(--teal); text-align:right;
-        }
-        .result-value.gold  { color:var(--gold); }
-        .result-value.green { color:var(--green); }
-        .result-value.muted { font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:400; color:var(--gray-2); }
 
-        .result-divider { height:1px; background:var(--gray-1); }
+        /* header strip */
+        .result-header {
+            padding: 12px 22px 10px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            display: flex; align-items: center; gap: 7px;
+        }
+        .result-header .material-symbols-outlined {
+            font-size: 14px; color: rgba(255,255,255,.4);
+            font-variation-settings: 'FILL' 1;
+        }
+        .result-header-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,.4);
+        }
+
+        /* two stat blocks side by side */
+        .result-stats {
+            display: grid; grid-template-columns: 1fr 1fr;
+        }
+        .result-stat {
+            padding: 20px 22px 22px; position: relative;
+        }
+        .result-stat:first-child {
+            border-right: 1px solid rgba(255,255,255,.08);
+        }
+        .result-stat-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; letter-spacing: .6px;
+            color: rgba(255,255,255,.45); margin-bottom: 10px;
+        }
+        .result-stat-label .material-symbols-outlined {
+            font-size: 14px;
+            font-variation-settings: 'FILL' 1;
+        }
+        .result-stat-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px; line-height: 1.1;
+            transition: all .3s ease;
+        }
+        .result-stat-value.gold  { color: var(--gold); }
+        .result-stat-value.green { color: #3ecf8e; }
+        .result-stat-value.muted {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,.4); line-height: 1.5;
+        }
+        .result-stat-sub {
+            font-size: 10.5px; color: rgba(255,255,255,.3);
+            margin-top: 5px; font-weight: 500;
+        }
 
         /* error inline */
         .error-inline {
@@ -116,6 +160,19 @@
         </div>
     </nav>
     <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;color:inherit;">
+            <div class="user-avatar"
+                 th:text="${tenKhachHang != null ? tenKhachHang.substring(0,1).toUpperCase() : 'K'}">K</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${tenKhachHang}">Khách hàng</div>
+                <div class="user-role"
+                     th:text="${role == 'K_H' ? 'Khách hàng' : (role == 'ADMIN' ? 'Quản trị viên' : 'Nhân viên')}">
+                    Khách hàng
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size:16px;color:var(--gray-2);margin-left:auto;">chevron_right</span>
+        </a>
         <a href="logout" class="logout-btn">
             <span class="material-symbols-outlined">logout</span>Đăng xuất
         </a>
@@ -203,22 +260,31 @@
 
                     </div>
 
-                    <!-- Result panel -->
+                    <!-- ── Result panel (redesigned) ── -->
                     <div class="result-panel">
-                        <div class="result-row">
-                            <div class="result-label">
-                                <span class="material-symbols-outlined">percent</span>
-                                Tiền lãi ước tính
-                            </div>
-                            <div class="result-value gold" id="laiUocTinh">~ 0 đ</div>
+                        <div class="result-header">
+                            <span class="material-symbols-outlined">calculate</span>
+                            <span class="result-header-label">Dự tính lãi suất</span>
                         </div>
-                        <div class="result-divider"></div>
-                        <div class="result-row">
-                            <div class="result-label">
-                                <span class="material-symbols-outlined">account_balance_wallet</span>
-                                Tổng tiền nhận (gốc + lãi)
+                        <div class="result-stats">
+                            <!-- Tiền lãi -->
+                            <div class="result-stat">
+                                <div class="result-stat-label">
+                                    <span class="material-symbols-outlined">percent</span>
+                                    Tiền lãi ước tính
+                                </div>
+                                <div class="result-stat-value gold" id="laiUocTinh">~ 0 đ</div>
+                                <div class="result-stat-sub" id="laiSub">Sau kỳ hạn</div>
                             </div>
-                            <div class="result-value green" id="tongTien">~ 0 đ</div>
+                            <!-- Tổng nhận -->
+                            <div class="result-stat">
+                                <div class="result-stat-label">
+                                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                                    Tổng nhận (gốc + lãi)
+                                </div>
+                                <div class="result-stat-value green" id="tongTien">~ 0 đ</div>
+                                <div class="result-stat-sub" id="tongSub">Khi đáo hạn</div>
+                            </div>
                         </div>
                     </div>
 
@@ -252,6 +318,8 @@
         const submitEl = document.getElementById('submitBtn');
         const laiEl    = document.getElementById('laiUocTinh');
         const tongEl   = document.getElementById('tongTien');
+        const laiSub   = document.getElementById('laiSub');
+        const tongSub  = document.getElementById('tongSub');
 
         // Validate tối thiểu
         if (soTien > 0 && soTien < 100000) {
@@ -265,19 +333,25 @@
         if (kyHan > 0) {
             const lai  = soTien * (laiSuat / 100) * (kyHan / 12);
             const tong = soTien + lai;
-            laiEl.className = 'result-value gold';
+
+            laiEl.className = 'result-stat-value gold';
             laiEl.textContent = '~ ' + format(lai);
+            laiSub.textContent = 'Sau ' + kyHan + ' tháng (' + laiSuat + '%/năm)';
+
+            tongEl.className = 'result-stat-value green';
             tongEl.textContent = '~ ' + format(tong);
+            tongSub.textContent = 'Khi đáo hạn';
         } else {
-            laiEl.className = 'result-value muted';
-            laiEl.textContent = 'Lãi suất: ' + laiSuat + '%/năm (tính khi rút)';
-            tongEl.className = 'result-value muted';
-            tongEl.textContent = 'Tính theo số ngày thực gửi';
+            laiEl.className = 'result-stat-value muted';
+            laiEl.textContent = laiSuat + '%/năm';
+            laiSub.textContent = 'Tính theo số ngày thực gửi';
+
+            tongEl.className = 'result-stat-value muted';
+            tongEl.textContent = 'Tính khi rút';
+            tongSub.textContent = 'Không kỳ hạn';
         }
     }
 
-    document.getElementById('loaiSo').addEventListener('change', tinhLai);
-    document.getElementById('soTienGui').addEventListener('input', tinhLai);
     window.addEventListener('DOMContentLoaded', tinhLai);
 
     // Auto-hide alert

@@ -1,6 +1,7 @@
 package vn.edu.taydo.quanly_sotietkiem.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import vn.edu.taydo.quanly_sotietkiem.model.BaoCaoNgay;
 
 import java.time.LocalDate;
@@ -10,5 +11,7 @@ import java.util.Optional;
 public interface BaoCaoNgayRepository extends MongoRepository<BaoCaoNgay, String> {
     List<BaoCaoNgay> findByNgayBetween(LocalDate start, LocalDate end);
     Optional<BaoCaoNgay> findByNgay(LocalDate ngay);
+
+    BaoCaoNgay findTopByOrderByNgayDesc();
 }
 
