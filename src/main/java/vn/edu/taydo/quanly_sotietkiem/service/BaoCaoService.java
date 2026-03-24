@@ -9,6 +9,7 @@ import vn.edu.taydo.quanly_sotietkiem.repository.GiaoDichRepository;
 import vn.edu.taydo.quanly_sotietkiem.repository.SoTietKiemRepository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -16,46 +17,50 @@ import java.util.List;
 @Service
 public class BaoCaoService {
 
-    @Autowired
-    private GiaoDichRepository giaoDichRepository;
+    @Autowired private GiaoDichRepository    giaoDichRepository;
+    @Autowired private SoTietKiemRepository  soTietKiemRepository;
+    @Autowired private BaoCaoNgayRepository  baoCaoNgayRepository;
 
-    @Autowired
-    private SoTietKiemRepository soTietKiemRepository;
+    // ─────────────────────────────────────────────────────────
+    //  Helper: chuyển LocalDate → Date với giờ cụ thể
+    //  Dùng START_OF_DAY (00:00:00.000) và END_OF_DAY (23:59:59.999)
+    //  thay vì plusDays(1) để tránh lấy lẫn giao dịch ngày hôm sau
+    // ─────────────────────────────────────────────────────────
+    private Date toDate(LocalDate date, LocalTime time) {
+        return Date.from(date.atTime(time)
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
 
-    @Autowired
-    private BaoCaoNgayRepository baoCaoNgayRepository;
-
-    // Tạo báo cáo cho một ngày
+    // ─────────────────────────────────────────────────────────
+    //  Tạo báo cáo cho một ngày
+    // ─────────────────────────────────────────────────────────
     public BaoCaoNgay taoBaoCaoNgay(LocalDate ngay) {
-        ZoneId zoneId = ZoneId.systemDefault();
 
-        Date startOfDay = Date.from(ngay.atStartOfDay(zoneId).toInstant());
-        Date endOfDay = Date.from(ngay.plusDays(1).atStartOfDay(zoneId).toInstant());
+        Date startOfDay = toDate(ngay, LocalTime.MIN);           // 00:00:00.000
+        Date endOfDay   = toDate(ngay, LocalTime.MAX);           // 23:59:59.999999999
 
-        // ===== TỔNG THU =====
+        // ── Tổng thu (NAP) ───────────────────────────────────
         List<GiaoDich> thuList = giaoDichRepository
                 .findByLoaiGiaoDichAndNgayGiaoDichBetween("NAP", startOfDay, endOfDay);
-
         double tongThu = thuList.stream()
                 .mapToDouble(GiaoDich::getSoTien)
                 .sum();
 
-        // ===== TỔNG CHI =====
+        // ── Tổng chi (RUT) ───────────────────────────────────
         List<GiaoDich> chiList = giaoDichRepository
                 .findByLoaiGiaoDichAndNgayGiaoDichBetween("RUT", startOfDay, endOfDay);
-
         double tongChi = chiList.stream()
                 .mapToDouble(GiaoDich::getTongTienNhan)
                 .sum();
 
         double chenhLech = tongThu - tongChi;
 
-        // ===== SỔ MỞ - ĐÓNG =====
-        long soMo = soTietKiemRepository.countByNgayMoSoBetween(startOfDay, endOfDay);
+        // ── Sổ mở / đóng ─────────────────────────────────────
+        long soMo   = soTietKiemRepository.countByNgayMoSoBetween(startOfDay, endOfDay);
         long soDong = soTietKiemRepository.countByNgayDongSoBetween(startOfDay, endOfDay);
-        long chenhLechSo = soMo - soDong;
 
-        // ===== LƯU BÁO CÁO =====
+        // ── Lưu báo cáo ──────────────────────────────────────
         BaoCaoNgay baoCao = baoCaoNgayRepository.findByNgay(ngay)
                 .orElse(new BaoCaoNgay());
 
@@ -65,35 +70,50 @@ public class BaoCaoService {
         baoCao.setChenhLech(chenhLech);
         baoCao.setSoMo(soMo);
         baoCao.setSoDong(soDong);
-        baoCao.setChenhLechSo(chenhLechSo);
+        baoCao.setChenhLechSo(soMo - soDong);
 
         return baoCaoNgayRepository.save(baoCao);
     }
 
-    // Lấy báo cáo trong khoảng ngày
+    // ─────────────────────────────────────────────────────────
+    //  Lấy báo cáo trong khoảng ngày
+    // ─────────────────────────────────────────────────────────
     public List<BaoCaoNgay> layBaoCao(LocalDate start, LocalDate end) {
         return baoCaoNgayRepository.findByNgayBetween(start, end);
     }
 
-    // Lấy ngày cuối cùng đã có báo cáo
+    // ─────────────────────────────────────────────────────────
+    //  Lấy ngày cuối cùng đã có báo cáo
+    // ─────────────────────────────────────────────────────────
     public LocalDate layNgayCuoiBaoCao() {
         BaoCaoNgay baoCao = baoCaoNgayRepository.findTopByOrderByNgayDesc();
-        if (baoCao != null) {
-            return baoCao.getNgay();
-        }
-        return LocalDate.now().minusDays(1);
+        return baoCao != null ? baoCao.getNgay() : LocalDate.now().minusDays(1);
     }
 
-
-    // Tạo báo cáo bù cho các ngày bị thiếu
+    // ─────────────────────────────────────────────────────────
+    //  Tạo báo cáo bù cho các ngày bị thiếu
+    //
+    //  Lưu ý: vòng lặp dừng TRƯỚC hôm nay (isBefore)
+    //  vì báo cáo hôm nay chưa hoàn chỉnh (ngày chưa kết thúc)
+    //  Nếu muốn tạo luôn cho hôm nay thì đổi thành isBeforeOrEqual
+    // ─────────────────────────────────────────────────────────
     public void taoBaoCaoBu() {
-        LocalDate homNay = LocalDate.now();
+        LocalDate homNay   = LocalDate.now();
         LocalDate ngayCuoi = layNgayCuoiBaoCao();
 
-        while (ngayCuoi.isBefore(homNay)) {
-            ngayCuoi = ngayCuoi.plusDays(1);
-            taoBaoCaoNgay(ngayCuoi);
-            System.out.println("Đã tạo báo cáo bù cho ngày: " + ngayCuoi);
+        // Tạo báo cáo cho từng ngày còn thiếu, không bao gồm hôm nay
+        LocalDate ngayCanTao = ngayCuoi.plusDays(1);
+        while (ngayCanTao.isBefore(homNay)) {
+            taoBaoCaoNgay(ngayCanTao);
+            System.out.println("Đã tạo báo cáo bù cho ngày: " + ngayCanTao);
+            ngayCanTao = ngayCanTao.plusDays(1);
+        }
+
+        // Luôn tạo/cập nhật báo cáo hôm qua (ngày gần nhất hoàn chỉnh)
+        LocalDate homQua = homNay.minusDays(1);
+        if (!homQua.isBefore(ngayCuoi)) {
+            taoBaoCaoNgay(homQua);
+            System.out.println("Đã cập nhật báo cáo hôm qua: " + homQua);
         }
     }
 }

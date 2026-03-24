@@ -8,15 +8,104 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/customer-shared.css"/>
     <style>
-        .td-id     { font-family:'DM Serif Display',serif; font-size:13px; color:var(--teal); font-weight:700; }
-        .td-thoihan{ font-weight:600; color:var(--text); }
-        .td-sotien { font-family:'DM Serif Display',serif; font-size:14px; color:var(--text); font-weight:700; }
-        .td-laisuat{ font-weight:600; color:var(--gold); }
-        .td-date   { font-size:12.5px; color:var(--gray-2); }
+        .yc-list { display:flex; flex-direction:column; gap:14px; }
 
-        .badge-cho    { background:rgba(212,168,67,.12); color:#8a6a10; }
-        .badge-duyet  { background:rgba(26,138,90,.1);   color:var(--green); }
-        .badge-tuchoi { background:rgba(192,64,64,.09);  color:var(--red); }
+        .yc-card {
+            background:var(--white); border-radius:16px;
+            border:1px solid rgba(221,232,232,.8);
+            box-shadow:0 2px 4px rgba(0,0,0,.03),0 4px 16px rgba(13,115,119,.05);
+            overflow:hidden; transition:box-shadow .2s,transform .2s;
+        }
+        .yc-card:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(13,115,119,.1); }
+
+        .yc-card-inner {
+            display:grid; grid-template-columns:3px 1fr auto; min-height:88px;
+        }
+
+        /* accent bar */
+        .yc-accent { width:3px; border-radius:3px 0 0 3px; }
+        .yc-accent.cho    { background:var(--gold); }
+        .yc-accent.duyet  { background:var(--green); }
+        .yc-accent.tuchoi { background:var(--red); }
+
+        /* body */
+        .yc-body {
+            padding:18px 22px; display:flex; align-items:center;
+            gap:24px; flex:1; min-width:0;
+        }
+
+        /* mã yêu cầu */
+        .yc-id-wrap { flex-shrink:0; min-width:0; width:160px; }
+        .yc-id-label {
+            font-size:9.5px; font-weight:700; letter-spacing:1.5px;
+            text-transform:uppercase; color:var(--gray-2); margin-bottom:4px;
+        }
+        .yc-id {
+            font-family:monospace; font-size:11.5px; color:var(--teal);
+            font-weight:700; white-space:nowrap; overflow:hidden;
+            text-overflow:ellipsis; max-width:150px;
+        }
+
+        .yc-divider { width:1px; height:40px; background:var(--gray-1); flex-shrink:0; }
+
+        /* stats */
+        .yc-stats { display:flex; gap:32px; flex:1; }
+        .yc-stat  { display:flex; flex-direction:column; gap:3px; }
+        .yc-stat-label {
+            font-size:10px; font-weight:600; letter-spacing:1px;
+            text-transform:uppercase; color:var(--gray-2);
+        }
+        .yc-stat-value { font-size:14px; font-weight:600; color:var(--text); }
+        .yc-stat-value.gold { font-family:'DM Serif Display',serif; font-size:16px; color:var(--gold); }
+        .yc-stat-value.teal { color:var(--teal); font-weight:700; }
+
+        .yc-date-chip {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:11px; color:var(--gray-2); font-weight:500;
+        }
+        .yc-date-chip .material-symbols-outlined { font-size:13px; }
+
+        /* right */
+        .yc-right {
+            padding:18px 22px 18px 0;
+            display:flex; flex-direction:column;
+            align-items:flex-end; justify-content:center;
+            gap:8px; flex-shrink:0; min-width:160px;
+        }
+
+        /* badge */
+        .yc-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:6px 14px; border-radius:20px;
+            font-size:11.5px; font-weight:700; letter-spacing:.4px; white-space:nowrap;
+        }
+        .yc-badge .material-symbols-outlined { font-size:14px; font-variation-settings:'FILL' 1; }
+        .yc-badge.cho    { background:rgba(212,168,67,.12); color:#8a6a10; }
+        .yc-badge.duyet  { background:rgba(26,138,90,.1);   color:var(--green); }
+        .yc-badge.tuchoi { background:rgba(192,64,64,.09);  color:var(--red); }
+
+        /* rejection reason */
+        .yc-reason {
+            display:flex; align-items:flex-start; gap:6px;
+            background:rgba(192,64,64,.05); border:1px solid rgba(192,64,64,.15);
+            border-radius:10px; padding:7px 11px; max-width:220px; text-align:left;
+        }
+        .yc-reason .material-symbols-outlined {
+            font-size:13px; color:var(--red); flex-shrink:0;
+            margin-top:1px; font-variation-settings:'FILL' 1;
+        }
+        .yc-reason-text { font-size:11.5px; color:var(--red); font-weight:500; line-height:1.5; }
+
+        /* pulse */
+        .pulse-dot {
+            width:7px; height:7px; border-radius:50%;
+            background:var(--gold); flex-shrink:0;
+            animation:pulse-yc 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse-yc {
+            0%,100%{opacity:1;transform:scale(1)}
+            50%{opacity:.4;transform:scale(.7)}
+        }
     </style>
 </head>
 <body>
@@ -30,10 +119,10 @@
     <nav>
         <div class="nav-group">
             <p class="nav-section-label">Menu</p>
-            <a href="/" class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
+            <a href="/"          class="nav-item"><span class="material-symbols-outlined">grid_view</span>Tổng quan</a>
             <a href="tra-cuu-so" class="nav-item active"><span class="material-symbols-outlined">receipt_long</span>Sổ tiết kiệm</a>
-            <a href="giao-dich" class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
-            <a href="lai-suat" class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
+            <a href="giao-dich"  class="nav-item"><span class="material-symbols-outlined">payments</span>Giao dịch</a>
+            <a href="lai-suat"   class="nav-item"><span class="material-symbols-outlined">percent</span>Lãi suất</a>
         </div>
     </nav>
     <div class="sidebar-footer">
@@ -71,61 +160,95 @@
 
     <div class="page-body">
 
-        <!-- Flash message -->
         <div th:if="${successMessage}" class="alert alert-success" id="alertSuccess">
             <span class="material-symbols-outlined">check_circle</span>
             <span th:text="${successMessage}"></span>
         </div>
 
-        <!-- Table -->
-        <div class="table-panel">
-            <div class="table-header">
-                <div class="table-title">Danh sách yêu cầu</div>
-            </div>
-            <div style="overflow-x:auto;">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Mã yêu cầu</th>
-                        <th>Thời hạn</th>
-                        <th>Số tiền gửi</th>
-                        <th>Lãi suất áp dụng</th>
-                        <th>Ngày tạo</th>
-                        <th style="text-align:center;">Trạng thái</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="yc : ${yeuCauList}">
-                        <td class="td-id"    th:text="${yc.id}"></td>
-                        <td class="td-thoihan" th:text="${yc.thoiHan} + ' tháng'"></td>
-                        <td class="td-sotien"
-                            th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'POINT',0,'COMMA')} + ' đ'"></td>
-                        <td class="td-laisuat" th:text="${yc.laiSuatApDung} + ' %/năm'"></td>
-                        <td class="td-date"
-                            th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}"></td>
-                        <td style="text-align:center;">
-                            <span th:switch="${yc.trangThai}">
-                                <span th:case="'CHO'"      class="badge badge-cho">⏳ Chờ duyệt</span>
-                                <span th:case="'DUYET'"    class="badge badge-duyet">✓ Đã duyệt</span>
-                                <span th:case="'TU CHOI'"  class="badge badge-tuchoi">✕ Từ chối</span>
-                                <span th:case="*"          class="badge badge-cho" th:text="${yc.trangThai}"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr th:if="${yeuCauList == null or #lists.isEmpty(yeuCauList)}">
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <span class="material-symbols-outlined">inbox</span>
-                                Bạn chưa có yêu cầu mở sổ nào.
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div class="yc-list">
 
-    </div><!-- /page-body -->
+            <div class="yc-card" th:each="yc : ${yeuCauList}">
+                <div class="yc-card-inner">
+
+                    <!-- Accent bar -->
+                    <div class="yc-accent"
+                         th:classappend="${yc.trangThai == 'CHO'} ? 'cho' : (${yc.trangThai == 'DUYET'} ? 'duyet' : 'tuchoi')">
+                    </div>
+
+                    <!-- Body -->
+                    <div class="yc-body">
+                        <div class="yc-id-wrap">
+                            <div class="yc-id-label">Mã yêu cầu</div>
+                            <div class="yc-id" th:text="${yc.id}" th:title="${yc.id}"></div>
+                        </div>
+                        <div class="yc-divider"></div>
+                        <div class="yc-stats">
+                            <div class="yc-stat">
+                                <div class="yc-stat-label">Số tiền gửi</div>
+                                <div class="yc-stat-value gold"
+                                     th:text="${#numbers.formatDecimal(yc.soTienGuiBanDau,0,'COMMA',0,'POINT')} + ' đ'">—</div>
+                            </div>
+                            <div class="yc-stat">
+                                <div class="yc-stat-label">Thời hạn</div>
+                                <div class="yc-stat-value teal"
+                                     th:text="${yc.thoiHan != null ? yc.thoiHan + ' tháng' : 'Không KH'}">—</div>
+                            </div>
+                            <div class="yc-stat">
+                                <div class="yc-stat-label">Lãi suất</div>
+                                <div class="yc-stat-value"
+                                     th:text="${yc.laiSuatApDung} + ' %/năm'">—</div>
+                            </div>
+                            <div class="yc-stat">
+                                <div class="yc-stat-label">Ngày tạo</div>
+                                <div class="yc-date-chip">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    <span th:text="${#dates.format(yc.createdAt,'dd/MM/yyyy HH:mm')}">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right -->
+                    <div class="yc-right">
+                        <span th:switch="${yc.trangThai}">
+                            <span th:case="'CHO'" class="yc-badge cho">
+                                <span class="pulse-dot"></span>Chờ duyệt
+                            </span>
+                            <span th:case="'DUYET'" class="yc-badge duyet">
+                                <span class="material-symbols-outlined">check_circle</span>Đã duyệt
+                            </span>
+                            <span th:case="'TU CHOI'" class="yc-badge tuchoi">
+                                <span class="material-symbols-outlined">cancel</span>Từ chối
+                            </span>
+                        </span>
+                        <div th:if="${yc.trangThai == 'TU CHOI' and yc.lyDoTuChoi != null}"
+                             class="yc-reason">
+                            <span class="material-symbols-outlined">info</span>
+                            <div class="yc-reason-text" th:text="${yc.lyDoTuChoi}"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${yeuCauList == null or #lists.isEmpty(yeuCauList)}"
+                 class="panel" style="padding:60px 24px;text-align:center;">
+                <span class="material-symbols-outlined"
+                      style="font-size:48px;color:var(--gray-1);display:block;margin-bottom:12px;">inbox</span>
+                <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:6px;">
+                    Chưa có yêu cầu nào
+                </div>
+                <div style="font-size:13px;color:var(--gray-2);margin-bottom:22px;">
+                    Hãy mở sổ mới để bắt đầu tích lũy
+                </div>
+                <a href="mo-so-tiet-kiem" class="btn-primary" style="display:inline-flex;">
+                    <span class="material-symbols-outlined">add</span>Mở sổ ngay
+                </a>
+            </div>
+
+        </div>
+    </div>
 
     <footer>© 2026 VietSave Bank · Bảo mật SSL · Hotline: 1800 1234</footer>
 </main>

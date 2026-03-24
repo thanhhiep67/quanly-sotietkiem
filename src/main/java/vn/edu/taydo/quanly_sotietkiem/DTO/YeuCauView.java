@@ -12,23 +12,23 @@ public class YeuCauView {
     private Date createdAt;
     private Double laiSuatApDung;
     private Integer thoiHan;
+    private String lyDoTuChoi;   // ← thêm mới
 
     public YeuCauView(YeuCauMoSo yc, LoaiSoTK loai) {
-        this.id = yc.getId();
-        this.soTienGuiBanDau = yc.getSoTienGuiBanDau();
-        this.trangThai = yc.getTrangThai();
-        this.createdAt = yc.getCreatedAt();
-        this.laiSuatApDung = yc.getLaiSuatApDung();
-        this.thoiHan = loai.getKyHanThang();
+        this.id               = yc.getId();
+        this.soTienGuiBanDau  = yc.getSoTienGuiBanDau();
+        this.trangThai        = yc.getTrangThai();
+        this.createdAt        = yc.getCreatedAt();
+        this.laiSuatApDung    = yc.getLaiSuatApDung();
+        this.thoiHan          = loai.getKyHanThang();
+        this.lyDoTuChoi       = yc.getLyDoTuChoi();  // ← thêm mới
     }
 
-    // Getter chuẩn cho Thymeleaf
-    public String getId() { return id; }
-    public double getSoTienGuiBanDau() { return soTienGuiBanDau; }
-    public String getTrangThai() { return trangThai; }
-    public Date getCreatedAt() { return createdAt; }
-    public Double getLaiSuatApDung() { return laiSuatApDung; }
-    public Integer getThoiHan() { return thoiHan; }
+    public String getId()                { return id; }
+    public double getSoTienGuiBanDau()   { return soTienGuiBanDau; }
+    public String getTrangThai()         { return trangThai; }
+    public Date getCreatedAt()           { return createdAt; }
+    public Double getLaiSuatApDung()     { return laiSuatApDung; }
+    public Integer getThoiHan()          { return thoiHan; }
+    public String getLyDoTuChoi()        { return lyDoTuChoi; }  // ← thêm mới
 }
-
-
